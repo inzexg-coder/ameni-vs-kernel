@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2004">
+  <PropertyGroup>
+    <ConfigurationType>Driver</ConfigurationType>
+    <TargetExt>.sys</TargetExt>
+    <UseOfMfc>Use Standard Windows Libraries</UseOfMfc>
+    <CharacterSet>Use Unicode Character Set</CharacterSet>
+    <!-- Драйверы используют ntoskrnl.lib вместо kernel32.lib -->
+    <LibraryDirectories>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64;$(DDK_LibraryPath)</LibraryDirectories>
+  </PropertyGroup>
+</Project>

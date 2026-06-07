@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2004">
+  <PropertyGroup>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <TargetExt>.lib</TargetExt>
+    <!-- Статическая библиотека не линкуется с kernel32.lib, но включает объектные файлы -->
+    <LibraryDirectories>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryDirectories>
+  </PropertyGroup>
+</Project>

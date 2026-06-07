@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2004">
+  <!-- Эталонные Advanced и C++/CLI свойства -->
+  <PropertyGroup>
+    <TargetExt>.exe</TargetExt>
+    <DeleteOnClean>*.cdf;*.cache;*.obj;*.obj.enc;*.ilk;*.ipdb;*.iobj;*.resources;*.tlb;*.tli;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;*.meta;*.tlog;*.manifest;*.res;*.pch;*.exp;*.idb;*.rep;*.xdc;*.pdb;*_manifest.rc;*.bsc;*.sbr;*.xml;*.metagen;*.bi</DeleteOnClean>
+    <BuildLogFile>$(IntDir)$(MSBuildProjectName).log</BuildLogFile>
+    <PreferredToolArchitecture>Default</PreferredToolArchitecture>
+    <UseDebugLibraries>Yes</UseDebugLibraries>
+    <EnableUnitySupport>No</EnableUnitySupport>
+    <CopyContentToOutputDirectory>No</CopyContentToOutputDirectory>
+    <CopyProjectReferencesToOutputDirectory>No</CopyProjectReferencesToOutputDirectory>
+    <CopyProjectReferenceSymbolsToOutputDirectory>No</CopyProjectReferenceSymbolsToOutputDirectory>
+    <CopyCppRuntimeToOutputDirectory>No</CopyCppRuntimeToOutputDirectory>
+    <UseOfMfc>Use Standard Windows Libraries</UseOfMfc>
+    <CharacterSet>Use Unicode Character Set</CharacterSet>
+    <WholeProgramOptimization>NoWholeProgramOptimization</WholeProgramOptimization>
+    <MsBuildToolsetVersion>Default</MsBuildToolsetVersion>
+    <EnableMSVCStructuredOutput>Yes</EnableMSVCStructuredOutput>
+  </PropertyGroup>
+
+  <!-- C++/CLI Properties -->
+  <PropertyGroup>
+    <CLRSupport>No</CLRSupport>
+    <EnableManagedIncrementalBuild>No</EnableManagedIncrementalBuild>
+  </PropertyGroup>
+</Project>
