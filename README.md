@@ -8,273 +8,365 @@
 <h1 align="center">Visual Studio Configuration Archive</h1>
 
 <p align="center">
-  <b>EN</b> · Эталонные конфигурации Visual Studio для восстановления проектных настроек,<br>
-  устранения ошибок линковки и диагностики сборочного окружения.
-</p>
-
-<p align="center">
-  <b>RU</b> · Reference Visual Studio configurations for restoring project settings,<br>
-  fixing linker errors, and diagnosing the build environment.
+  <b>EN</b> · Step‑by‑step guide to fix linker errors (kernel32.lib, LNK2019, LNK1104) and restore VS project settings<br>
+  <b>RU</b> · Пошаговое руководство по исправлению ошибок линковки (kernel32.lib, LNK2019, LNK1104) и восстановлению настроек проектов VS
 </p>
 
 ---
 
-<p align="center">
-  <!-- EN Quick Start --> <b>EN:</b> Jump to <a href="#quick-start">Quick Start</a> ·
-  <a href="#reference-configuration">Reference Configuration</a> ·
-  <a href="#scripts">Scripts</a> ·
-  <a href="#version-specific-configs">Versions</a>
-</p>
-<p align="center">
-  <!-- RU Быстрый старт --> <b>RU:</b> Перейти к <a href="#Быстрый-старт">Быстрому старту</a> ·
-  <a href="#Эталонная-конфигурация">Эталонной конфигурации</a> ·
-  <a href="#Скрипты">Скриптам</a> ·
-  <a href="#Конфиги-по-версиям">Версиям</a>
-</p>
+## 📖 Table of Contents / Содержание
+- [Quick Start / Быстрый старт](#quick-start--быстрый-старт)
+- [Step‑by‑Step Troubleshooting / Пошаговое устранение неполадок](#step-by-step-troubleshooting--пошаговое-устранение-неполадок)
+- [Reference Configuration / Эталонная конфигурация](#reference-configuration--эталонная-конфигурация)
+- [Property Sheets (.props) / Property Sheets (.props)](#propertysheets-props--propertysheets-props)
+- [PowerShell Scripts / PowerShell‑скрипты](#powershell-scripts--powershell-скрипты)
+- [Version‑Specific Configs / Конфиги по версиям VS](#version-specific-configs--конфиги-по-версиям-vs)
+- [Linker Error Reference / Справочник ошибок линковки](#linker-error-reference--справочник-ошибок-линковки)
+- [.vsconfig — VS Component Manifest / .vsconfig — манифест компонентов VS](#vsconfig---vs-component-manifest-vsconfig---манифест-компонентов-vs)
 
 ---
 
-## English
+## 🚀 Quick Start / Быстрый старт
 
-### Overview
+If your build fails with errors like `LNK1120`, `LNK2019` or `LNK1104`, follow these steps **in order** — from simplest/safest to more advanced/risky.
 
-This repository stores **reference Visual Studio project configurations** — a recoverable
-baseline of include directories, library directories, and linker dependencies as they appear
-in a standard VS installation. Its purpose is to help you quickly restore default settings
-when build configurations get corrupted or misaligned, most commonly fixing `kernel32.lib`
-and related linker errors.
+Если сборка падает с ошибками `LNK1120`, `LNK2019` или `LNK1104`, выполняйте шаги **по порядку** — от самых простых и безопасных к более сложным/рискованным.
 
-### Quick Start
+| Step / Шаг | Action / Действие | EN Description | RU Description |
+|---|---|---|---|
+| 1 | 🔍 **Diagnose environment** | Verify VS, Windows SDK, MSVC toolchain and presence of `kernel32.lib` | Проверить установку VS, Windows SDK, MSVC toolchain и наличие `kernel32.lib` |
+| 2 | 📊 **Compare with reference** | Check current .vcxproj settings against the archived baseline | Сверить текущие настройки .vcxproj с эталонными из репозитория |
+| 3 | 🛠️ **Apply reference via .props** (recommended) | Import a property sheet to fix VC++ Directories without editing .vcxproj | Импортировать property sheet для исправления VC++ Directories без изменения .vcxproj |
+| 4 | ⚙️ **Apply reference via script** | Automatically patch all .vcxproj files in a folder | Автоматически исправить все .vcxproj в папке |
+| 5 | 🔧 **Manual edit** | Open project properties and correct paths manually | Открыть свойства проекта и исправить пути вручную |
+| 6 | 💾 **Reinstall SDK/VS** | Repair or reinstall Windows SDK or Visual Studio build tools | Переустановить или восстановить Windows SDK или инструменты сборки VS |
 
-#### Scenario: Build fails with LNK1120 / LNK2019
+---
 
-**Step 1 — diagnose the environment:**
+## 🛠️ Step‑by‑Step Troubleshooting / Пошаговое устранение неполадок
+
+### Step 1 — Diagnose environment / Шаг 1 — Диагностика окружения
+
+Run the verification script to ensure the build tools are installed and `kernel32.lib` exists.
+
+Запустите скрипт проверки, чтобы убедиться, что инструменты сборки установлены и `kernel32.lib` доступен.
+
+**PowerShell:**
 ```powershell
+# From repository root:
 .\scripts\verify-environment.ps1
 ```
-If it reports missing components — install them via `.vsconfig`.
 
-**Step 2 — compare with reference:**
-```powershell
-.\scripts\diff-project-settings.ps1 -ProjectPath "YourProject.vcxproj"
+**What it checks / Что проверяет:**
+- Presence of `vswhere.exe` → VS installations
+- Windows SDK folder (`Windows Kits\10`) and `kernel32.lib`
+- MSVC toolchain directories and `vcruntime.lib`
+- Key environment variables (`VC_IncludePath`, `VC_LibraryPath_x64`, etc.)
+
+**Sample output / Пример вывода:**
 ```
-See which paths differ from the reference.
-
-**Step 3 — apply reference paths:**
-```powershell
-# Automatic restore:
-.\scripts\apply-default-paths.ps1 -Path "C:\SolutionDir" -Architecture x64
-
-# Or via Property Manager (recommended):
-#   Add props/DefaultPaths.props to your project
-```
-
-**Step 4 — rebuild:**
-```powershell
-# Clean + Rebuild in Visual Studio, or via MSBuild:
-msbuild YourProject.vcxproj /t:Rebuild /p:Configuration=Release
+=== Visual Studio Environment Verification ===
+[OK] vswhere.exe найден
+     Установка: Visual Studio Community 2022 [17.x]
+[OK] Windows Kits найден
+     SDK 10.0.19041.0: kernel32.lib найден
+[OK] MSVC 14.35 (VS 2022 Community)
+     vcruntime.lib найден
 ```
 
-#### Scenario: Fresh VS installation
+If the script reports missing components → proceed to **Step 6** (reinstall) or use `.vsconfig` to install them.
 
-1. Import `.vsconfig` into Visual Studio Installer.
-2. Install the components.
-3. Attach `DefaultPaths.props` via Property Manager.
+Если скрипт сообщает об отсутствующих компонентах → переходите к **Шагу 6** (переустановка) или используйте `.vsconfig` для их установки.
 
 ---
 
-### Reference Configuration
+### Step 2 — Compare with reference / Шаг 2 — Сравнение с эталоном
 
-Baseline configuration files in the repository root describe the exact reference values
-for every important project property. These are the settings that a clean VS installation
-would use by default.
+Use the diff script to see which VC++ Directory properties deviate from the reference.
+
+Запустите скрипт сравнения, чтобы увидеть, какие свойства VC++ Directories отличаются от эталонных.
+
+**PowerShell:**
+```powershell
+# Specify full path to your .vcxproj
+.\scripts\diff-project-settings.ps1 -ProjectPath "C:\MyProject\MyProject.vcxproj"
+```
+
+**Output format / Формат вывода:**
+```
+=== Diff: проект vs эталон ===
+Файл: C:\MyProject\MyProject.vcxproj
+
+  [OK] ExecutableDirectories
+  [!] LibraryDirectories
+      Сейчас:   $(VC_LibraryPath_x64);C:\Custom\Lib
+      Эталон:  $(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64
+  [OK] IncludeDirectories
+```
+
+If all items show `[OK]` → your VC++ Directories already match the reference; the issue may be elsewhere (see linker errors below).
+
+Если все пункты показывают `[OK]` → ваши VC++ Directories уже совпадают с эталоном; проблема может быть в другом (см. справочник ошибок ниже).
+
+---
+
+### Step 3 — Apply reference via .props (recommended) / Шаг 3 — Применение эталонного через .props (рекомендуется)
+
+Property Sheets let you apply reference settings without touching the .vcxproj file. This is the safest and most reversible method.
+
+Property Sheets позволяют применять эталонные настройки без изменения .vcxproj файла. Это самый безопасный и обратимый способ.
+
+**How to do it / Как сделать:**
+1. In Visual Studio, open **View → Other Windows → Property Manager**
+2. Right‑click the configuration (e.g. `Debug|x64`) → **Add Existing Property Sheet…**
+3. Browse to the repository and select:
+   - `props/DefaultPaths.props` for x64 projects
+   - `props/DefaultPaths-x86.props` for x86 projects
+   - `props/DefaultPaths-ARM64.props` for ARM64 projects
+4. Click **OK**, then **Rebuild** the solution.
+
+**To undo / Отмена:**
+Simply remove the property sheet from Property Manager — no changes remain in the .vcxproj.
+
+Просто удалите property sheet из Property Manager — изменений в .vcxproj не останется.
+
+---
+
+### Step 4 — Apply reference via script / Шаг 4 — Применение эталонного через скрипт
+
+Use this when you need to fix many projects at once or prefer a fully automated approach. The script creates `.bak` files before changing anything.
+
+Используйте этот метод, когда нужно поправить множество проектов сразу или предпочитаете полностью автоматизированный подход. Скрипт создаёт `.bak` копии перед изменением.
+
+**PowerShell:**
+```powershell
+# Fix all .vcxproj under a folder (default: current directory)
+.\scripts\apply-default-paths.ps1
+
+# Specify folder and architecture explicitly
+.\scripts\apply-default-paths.ps1 -Path "C:\SolutionRoot" -Architecture x64
+
+# Skip backups (not recommended)
+.\scripts\apply-default-paths.ps1 -Backup $false
+```
+
+**What it does / Что делает:**
+- Recursively finds all `*.vcxproj` files
+- For each file:
+  1. Creates `<file>.vcxproj.bak` (if `-Backup $true`)
+  2. Replaces `LibraryDirectories`, `IncludeDirectories`, `ExecutableDirectories` with the reference values for the chosen architecture
+  3. Saves the file
+
+**To restore / Откат:**
+Rename each `.bak` file back to `.vcxproj` or delete the modified files and restore from version control.
+
+Переименуйте каждый `.bak` файл обратно в `.vcxproj` или удалите изменённые файлы и восстановите их из системы контроля версий.
+
+---
+
+### Step 5 — Manual edit / Шаг 5 — Ручное редактирование
+
+Only use this if the previous steps fail or you need to adjust a single setting.
+
+Применяйте только если предыдущие шаги не помогли или нужно отредактировать одну настройку.
+
+**Where to go / Где идти:**
+1. Right‑click the project → **Properties**
+2. Navigate to **Configuration Properties → VC++ Directories**
+3. Edit the following fields (values differ by architecture):
+
+| Property | x64 reference value |
+|---|---|
+| **Library Directories** | `$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64` |
+| **Include Directories** | `$(VC_IncludePath);$(WindowsSDK_IncludePath);` |
+| **Executable Directories** | `$(VC_ExecutablePath_x64);$(CommonExecutablePath)` |
+
+4. Click **OK** → **Rebuild**.
+
+**Tip / Совет:** Keep a copy of the original values before changing, in case you need to revert.
+
+Совет: Сохраните копию исходных значений перед изменением, чтобы можно было откатиться.
+
+---
+
+### Step 6 — Reinstall SDK / Visual Studio / Шаг 6 — Переустановка SDK / Visual Studio
+
+Use this only if diagnostics show that files are missing or corrupted.
+
+Применяйте только если диагностика показывает отсутствие или повреждение файлов.
+
+**Reinstall Windows SDK:**
+1. Open **Visual Studio Installer**
+2. Click **Modify** on your VS instance
+3. Go to **Individual components**
+4. Find and check:
+   - `Windows 10 SDK (10.0.19041.0)` or latest
+   - `Windows 11 SDK (10.0.22621.0)` (if using VS 2022+)
+5. Click **Modify** to install
+
+**Repair Visual Studio Build Tools:**
+In the same installer, choose **Repair** instead of Modify.
+
+**Alternative — use .vsconfig:**  
+The file `.vsconfig` in the repository root lists the exact components needed for native C++ development. Import it via **Modify → Import** in the Visual Studio Installer to get a consistent set.
+
+Файл `.vsconfig` в корне репозитория содержит точный список необходимых компонентов. Импортируйте его через **Modify → Import** в Visual Studio Installer, чтобы получить согласованный набор.
+
+---
+
+## 📚 Reference Configuration / Эталонная конфигурация
+
+The files in the repository root describe the exact baseline values for the most important project property groups.
+
+Файлы в корне репозитория описывают точные эталонные значения для самых важных групп свойств проекта.
 
 | File | Description |
 |---|---|
-| `vc++-directories.md` | VC++ Directories — the most critical section for `kernel32.lib` resolution |
-| `general.md` | General Properties — output dirs, platform toolset, SDK version |
-| `advanced.md` | Advanced + C++/CLI Properties — debug libs, character set, WPO |
-| `debugging.md` | Debugger Settings — working dir, debugger type, environment |
+| `vc++-directories.md` | **VC++ Directories** — controls where the compiler/linker look for headers, libs, and tools. The `Library Directories` entry is the key to fixing `kernel32.lib`. |
+| `general.md` | **General Properties** — output directories, intermediate directory, platform toolset, Windows SDK version, configuration type. |
+| `advanced.md` | **Advanced Properties** — debug library usage, character set, whole program optimization, MFC, C++/CLI settings. |
+| `debugging.md` | **Debugger Settings** — working directory, debugger type, environment variables, accelerator for C++ AMP. |
 
-### Property Sheets (.props)
+These files are meant for **reference** — compare them to your project settings or use the provided `.props` files/scripts to apply them.
 
-These are MSBuild XML files you can import via **Property Manager**
-(`View → Other Windows → Property Manager` → right-click → Add Existing Property Sheet).
-They apply reference settings to any `.vcxproj` without modifying the project file itself.
+Эти файлы предназначены для **справочного использования** — сравнивайте их с настройками вашего проекта или применяйте через предоставленные `.props` файлы и скрипты.
+
+---
+
+## 🧩 Property Sheets (.props) / Property Sheets (.props)
+
+Property Sheets are MSBuild XML files that can be attached to any `.vcxproj` via **Property Manager**. They apply settings without modifying the project file itself.
+
+Property Sheets — это MSBuild XML-файлы, которые можно подключать к любому `.vcxproj` через **Property Manager**. Они применяют настройки без изменения самого файла проекта.
 
 | File | Platform | Purpose |
 |---|---|---|
 | `props/DefaultPaths.props` | x64 | Reference VC++ Directories (most common) |
-| `props/DefaultPaths-x86.props` | x86 | Reference VC++ Directories for 32-bit |
-| `props/DefaultPaths-ARM64.props` | ARM64 | Reference VC++ Directories for ARM64 |
+| `props/DefaultPaths-x86.props` | x86 | Reference VC++ Directories for 32‑bit projects |
+| `props/DefaultPaths-ARM64.props` | ARM64 | Reference VC++ Directories for ARM64 projects |
 | `props/DebugSettings.props` | any | Debugger configuration reference |
 | `props/AdvancedSettings.props` | any | Advanced + C++/CLI settings reference |
 | `props/DLL.props` | x64 | Minimal setup for Dynamic Library (.dll) |
 | `props/StaticLib.props` | x64 | Minimal setup for Static Library (.lib) |
 | `props/Driver.props` | x64 | Minimal setup for Kernel Driver (.sys) |
 
-### Scripts
-
-| Script | What it does |
-|---|---|
-| `scripts/verify-environment.ps1` | Checks if VS, Windows SDK, MSVC are installed and `kernel32.lib` exists |
-| `scripts/diff-project-settings.ps1` | Compares a `.vcxproj` against reference paths |
-| `scripts/apply-default-paths.ps1` | Automatically restores reference paths in all `.vcxproj` files |
-
-### Version-Specific Configs
-
-Visual Studio versions differ in Platform Toolset and default paths.
-
-| Folder | Toolset | Notes |
-|---|---|---|
-| `vs2017/` | v141 | MSVC 14.1x, `Windows Kits\10` |
-| `vs2022/` | v143 | MSVC 14.3x, matches root reference exactly |
-| `vs2025/` | v144 | MSVC 14.4x, may use Windows SDK 11.0 |
-
-### Linker Error Reference
-
-| Folder / File | Error | Quick fix |
-|---|---|---|
-| `errors/lnk1104-cannot-open-file.md` | LNK1104 | Restore Library Directories or reinstall SDK |
-| `errors/lnk2019-unresolved-external.md` | LNK2019 | Check Library Directories & Additional Dependencies |
-| `errors/lnk2001-unresolved-external.md` | LNK2001 | Check /SUBSYSTEM matches entry point |
-| `errors/lnk1120-link-failed.md` | LNK1120 | Look at the underlying LNK2019/2001/1104 error |
-
-### .vsconfig — VS Component Manifest
-
-Import `.vsconfig` into **Visual Studio Installer** (`Modify → Import`) to automatically
-select the required components: MSVC toolsets (v141, v143), Windows 10/11 SDKs,
-CMake support, ATL, MFC, Clang, and MSBuild.
-
-### Support
-
-This repository provides only configuration files and documentation — no binaries
-or installers. For issues beyond path configuration, refer to:
-
-- [Visual Studio documentation](https://docs.microsoft.com/en-us/visualstudio/)
-- [Windows SDK documentation](https://docs.microsoft.com/en-us/windows/win32/)
-- [Microsoft Q&A — Visual Studio](https://docs.microsoft.com/en-us/answers/topics/visual-studio.html)
+### Example .props content (DefaultPaths.props)
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2004">
+  <PropertyGroup>
+    <ExecutableDirectories>$(VC_ExecutablePath_x64);$(CommonExecutablePath)</ExecutableDirectories>
+    <IncludeDirectories>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludeDirectories>
+    <ExternalIncludeDirectories>$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludeDirectories>
+    <ReferenceDirectories>$(VC_ReferencesPath_x64);</ReferenceDirectories>
+    <LibraryDirectories>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryDirectories>
+    <LibraryWinRTDirectories>$(WindowsSDK_MetadataPath);</LibraryWinRTDirectories>
+    <SourceDirectories>$(VC_SourcePath);</SourceDirectories>
+    <ExcludeDirectories>$(VC_SourcePath);</ExcludeDirectories>
+  </PropertyGroup>
+</Project>
+```
 
 ---
 
-<br>
+## ⚙️ PowerShell Scripts / PowerShell‑скрипты
+
+The `scripts/` folder contains three utilities for diagnosing and fixing VS project configurations.
+
+Папка `scripts/` содержит три утилиты для диагностики и исправления конфигураций проектов VS.
+
+| Script | What it does | Parameters |
+|---|---|---|
+| `scripts/verify-environment.ps1` | Checks VS, Windows SDK, MSVC installation and `kernel32.lib` presence | None |
+| `scripts/diff-project-settings.ps1` | Compares a `.vcxproj` against the reference VC++ Directories | `-ProjectPath <string>` (required) |
+| `scripts/apply-default-paths.ps1` | Applies reference paths to all `.vcxproj` files in a folder | `-Path <string>` (default: `.`)<br>`-Architecture <x64\|x86\|ARM64>` (default: `x64`)<br>`-Backup <bool>` (default: `$true`) |
+
+All scripts are **comment‑free** — only executable code and parameter definitions remain.
+
+Все скрипты **без комментариев** — остался только исполняемый код и определения параметров.
 
 ---
 
-## Русский
+## 🏷️ Version‑Specific Configs / Конфиги по версиям VS
 
-### Описание
+Different Visual Studio versions use different Platform Toolsets and may have slight path variations.
 
-Репозиторий содержит **эталонные конфигурации Visual Studio** — проверенные настройки
-путей к заголовочным файлам, библиотекам и линковщику, которые можно использовать
-для быстрого восстановления сборки после повреждения конфигурации проекта.
-Наиболее частый сценарий — исправление ошибок, связанных с `kernel32.lib`.
+Разные версии Visual Studio используют разные Platform Toolset и могут иметь небольшие различия в путях.
 
-### Быстрый старт
+| Folder | VS Version | Platform Toolset | Notes |
+|---|---|---|---|
+| `vs2017/` | Visual Studio 2017 | v141 | MSVC 14.1x, Windows Kits\10 |
+| `vs2022/` | Visual Studio 2022 | v143 | MSVC 14.3x — matches root reference exactly |
+| `vs2025/` | Visual Studio 2025 | v144 | MSVC 14.4x — may use Windows SDK 11.0 |
 
-#### Ситуация: сборка падает с LNK1120 / LNK2019
+Each version folder contains `general.md` and `vc++-directories.md` tailored to that toolset.
 
-**Шаг 1 — диагностика окружения:**
-```powershell
-.\scripts\verify-environment.ps1
-```
-Если не хватает компонентов — установить через `.vsconfig`.
-
-**Шаг 2 — сравнить с эталоном:**
-```powershell
-.\scripts\diff-project-settings.ps1 -ProjectPath "ВашПроект.vcxproj"
-```
-Посмотреть, какие пути отличаются от эталонных.
-
-**Шаг 3 — применить эталонные пути:**
-```powershell
-# Автоматически:
-.\scripts\apply-default-paths.ps1 -Path "C:\SolutionDir" -Architecture x64
-
-# Или через Property Manager (рекомендуется):
-#   Добавить props/DefaultPaths.props к проекту
-```
-
-**Шаг 4 — пересобрать:**
-```powershell
-# Clean + Rebuild в студии, или через MSBuild:
-msbuild ВашПроект.vcxproj /t:Rebuild /p:Configuration=Release
-```
-
-#### Ситуация: новая установка VS
-
-1. Импортировать `.vsconfig` в Visual Studio Installer.
-2. Установить компоненты.
-3. Подключить `DefaultPaths.props` через Property Manager.
+В каждой папке версии находятся файлы `general.md` и `vc++-directories.md`, адаптированные под соответствующий toolset.
 
 ---
 
-### Эталонная конфигурация
+## 🔗 Linker Error Reference / Справочник ошибок линковки
 
-Файлы в корне репозитория описывают точные эталонные значения
-для каждой важной группы свойств — те настройки, которые VS выставляет
-по умолчанию при чистой установке.
+The `errors/` folder contains detailed explanations of common linker failures, their symptoms, causes, and fixes.
 
-| Файл | Описание |
-|---|---|
-| `vc++-directories.md` | **VC++ Directories** — критический раздел для `kernel32.lib` |
-| `general.md` | General Properties — выходные папки, toolset, версия SDK |
-| `advanced.md` | Advanced + C++/CLI — debug-библиотеки, кодировка, WPO |
-| `debugging.md` | Debugger Settings — рабочая папка, тип отладчика, окружение |
+Папка `errors/` содержит подробные объяснения распространённых ошибок линковки, их симптомов, причин и способов решения.
 
-### Property Sheets (.props)
+| File | Error | Typical symptoms | Quick fix |
+|---|---|---|---|
+| `errors/lnk1104-cannot-open-file.md` | **LNK1104** | `fatal error LNK1104: cannot open file 'kernel32.lib'` | Restore Library Directories or reinstall Windows SDK |
+| `errors/lnk2019-unresolved-external.md` | **LNK2019** | `error LNK2019: unresolved external symbol _WinMain@16` | Check Library Directories and Additional Dependencies |
+| `errors/lnk2001-unresolved-external.md` | **LNK2001** | `LNK2001: unresolved external symbol _main` | Verify `/SUBSYSTEM` matches entry point (`console` vs `windows`) |
+| `errors/lnk1120-link-failed.md` | **LNK1120** | `fatal error LNK1120: 1 unresolved externals` | Look at the underlying LNK2019/2001/1104 error |
 
-MSBuild XML-файлы для импорта через **Property Manager**
-(`View → Other Windows → Property Manager` → правый клик → Add Existing Property Sheet).
-Применяют эталонные настройки без изменения `.vcxproj`.
+Each file includes:
+- A brief description of the error
+- Common causes
+- Step‑by‑step resolution instructions
+- Notes on when to escalate to the next troubleshooting step
 
-| Файл | Платформа | Назначение |
-|---|---|---|
-| `props/DefaultPaths.props` | x64 | Эталонные VC++ Directories (основной) |
-| `props/DefaultPaths-x86.props` | x86 | Эталонные пути для 32-битных проектов |
-| `props/DefaultPaths-ARM64.props` | ARM64 | Эталонные пути для ARM64 |
-| `props/DebugSettings.props` | любая | Эталонные настройки отладчика |
-| `props/AdvancedSettings.props` | любая | Advanced + C++/CLI свойства |
-| `props/DLL.props` | x64 | Динамическая библиотека (.dll) |
-| `props/StaticLib.props` | x64 | Статическая библиотека (.lib) |
-| `props/Driver.props` | x64 | Драйвер ядра (.sys) |
+В каждом файле:
+- Краткое описание ошибки
+- Типичные причины
+- Пошаговые инструкции по устранению
+- Примечания о том, когда следует переходить к следующему шагу диагностики
 
-### Скрипты
+---
 
-| Скрипт | Что делает |
-|---|---|
-| `scripts/verify-environment.ps1` | Проверяет установку VS, Windows SDK, MSVC, наличие `kernel32.lib` |
-| `scripts/diff-project-settings.ps1` | Сравнивает `.vcxproj` с эталонными путями |
-| `scripts/apply-default-paths.ps1` | Автоматически восстанавливает эталонные пути в `.vcxproj` |
+## 🧩 .vsconfig — VS Component Manifest / .vsconfig — манифест компонентов VS
 
-### Конфиги по версиям
+The file `.vsconfig` in the repository root tells the **Visual Studio Installer** which components to install for native C++ development.
 
-| Папка | Toolset | Особенности |
-|---|---|---|
-| `vs2017/` | v141 | MSVC 14.1x, `Windows Kits\10` |
-| `vs2022/` | v143 | MSVC 14.3x, полностью совпадает с корневым эталоном |
-| `vs2025/` | v144 | MSVC 14.4x, может использовать Windows SDK 11.0 |
+Файл `.vsconfig` в корне репозитория указывает **Visual Studio Installer**, какие компоненты установить для разработки нативного C++.
 
-### Справочник ошибок линковки
+### How to use / Как использовать
+1. Open **Visual Studio Installer**
+2. Click **Modify** on your VS instance
+3. Select the **Import** tab
+4. Browse to and select `.vsconfig` from this repository
+5. Click **Install** (or **Update**) to apply the component list
 
-| Файл | Ошибка | Быстрое решение |
-|---|---|---|
-| `errors/lnk1104-cannot-open-file.md` | LNK1104 | Восстановить Library Directories или SDK |
-| `errors/lnk2019-unresolved-external.md` | LNK2019 | Проверить Library Directories и зависимости |
-| `errors/lnk2001-unresolved-external.md` | LNK2001 | Проверить /SUBSYSTEM и точку входа |
-| `errors/lnk1120-link-failed.md` | LNK1120 | Смотреть первопричину в LNK2019/2001/1104 |
+### What it includes / Что включает
+The manifest selects:
+- **Workload**: `.NET Desktop Development` and `Desktop development with C++`
+- **Individual components**:
+  - MSVC v141 and v143 toolsets (x86, x64, ARM64)
+  - Windows 10 SDK (10.0.19041.0) and Windows 11 SDK (10.0.22621.0)
+  - CMake, ATL, MFC, Clang/LLVM for Windows
+  - MSBuild and related build tools
 
-### .vsconfig — манифест компонентов VS
+Using `.vsconfig` ensures you have the exact toolsets and SDKs that match the reference configurations in this repository.
 
-Импортируйте `.vsconfig` в **Visual Studio Installer** (`Modify → Import`), чтобы
-автоматически отметить необходимые компоненты: MSVC (v141, v143), Windows 10/11 SDK,
-CMake, ATL, MFC, Clang и MSBuild.
+Использование `.vsconfig` гарантирует, что у вас установлены точно те наборы инструментов и SDK, которые соответствуют эталонным конфигурациям в этом репозитории.
 
-### Поддержка
+---
 
-Репозиторий предоставляет только конфигурационные файлы и документацию —
-без бинарников и установщиков. Для проблем, выходящих за рамки путей:
+## 📄 License / Лицензия
 
-- [Документация Visual Studio](https://docs.microsoft.com/en-us/visualstudio/)
-- [Документация Windows SDK](https://docs.microsoft.com/en-us/windows/win32/)
-- [Microsoft Q&A — Visual Studio](https://docs.microsoft.com/en-us/answers/topics/visual-studio.html)
+This repository provides only configuration files and documentation.  
+No binaries, installers, or proprietary code are included.  
+You are free to use, copy, and modify the files for your own projects.
+
+Данный репозиторий предоставляет только конфигурационные файлы и документацию.  
+Бинарные файлы, установщики и проприетарный код не включены.  
+Вы можете свободно использовать, копировать и изменять файлы для своих проектов.
+
