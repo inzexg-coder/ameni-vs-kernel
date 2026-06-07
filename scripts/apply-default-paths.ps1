@@ -1,18 +1,4 @@
-<#
-.SYNOPSIS
-    Применяет эталонные пути VC++ Directories к .vcxproj файлам в указанной директории.
-.DESCRIPTION
-    Скрипт сканирует .vcxproj файлы и заменяет секции LibraryDirectories, IncludeDirectories
-    и другие на эталонные значения из репозитория visual-studio-fixing.
-.PARAMETER Path
-    Путь к директории с .vcxproj файлами (по умолчанию текущая директория).
-.PARAMETER Architecture
-    Целевая архитектура: x64, x86 или ARM64 (по умолчанию x64).
-.PARAMETER Backup
-    Создавать .bak копии перед изменением (по умолчанию $true).
-.EXAMPLE
-    .\scripts\apply-default-paths.ps1 -Path "C:\MyProject" -Architecture x64
-#>
+
 
 param(
     [string]$Path = ".",
@@ -53,8 +39,7 @@ foreach ($proj in $projFiles) {
         Write-Host "  -> Бэкап: $backupPath" -ForegroundColor Gray
     }
 
-    # Замена LibraryDirectories
-    if ($content -match '<LibraryDirectories>[^<]*</LibraryDirectories>') {
+        if ($content -match '<LibraryDirectories>[^<]*</LibraryDirectories>') {
         $content = $content -replace '<LibraryDirectories>[^<]*</LibraryDirectories>',
             "<LibraryDirectories>$($libraryDirs[$Architecture])</LibraryDirectories>"
         Write-Host "  [OK] LibraryDirectories -> $($libraryDirs[$Architecture])" -ForegroundColor Green
@@ -62,15 +47,13 @@ foreach ($proj in $projFiles) {
         Write-Host "  [SKIP] LibraryDirectories не найдена в XML" -ForegroundColor Yellow
     }
 
-    # Замена IncludeDirectories
-    if ($content -match '<IncludeDirectories>[^<]*</IncludeDirectories>') {
+        if ($content -match '<IncludeDirectories>[^<]*</IncludeDirectories>') {
         $content = $content -replace '<IncludeDirectories>[^<]*</IncludeDirectories>',
             "<IncludeDirectories>$includeDirs</IncludeDirectories>"
         Write-Host "  [OK] IncludeDirectories -> эталон" -ForegroundColor Green
     }
 
-    # Замена ExecutableDirectories
-    if ($content -match '<ExecutableDirectories>[^<]*</ExecutableDirectories>') {
+        if ($content -match '<ExecutableDirectories>[^<]*</ExecutableDirectories>') {
         $content = $content -replace '<ExecutableDirectories>[^<]*</ExecutableDirectories>',
             "<ExecutableDirectories>$($execDirs[$Architecture])</ExecutableDirectories>"
         Write-Host "  [OK] ExecutableDirectories -> эталон" -ForegroundColor Green

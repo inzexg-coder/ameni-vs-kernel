@@ -1,14 +1,4 @@
-<#
-.SYNOPSIS
-    Сравнивает текущие настройки .vcxproj с эталонными из репозитория.
-.DESCRIPTION
-    Выводит различия между текущими VC++ Directory путями в проекте и эталонными
-    значениями, рекомендованными для исправления ошибок линковки.
-.PARAMETER ProjectPath
-    Путь к .vcxproj файлу.
-.EXAMPLE
-    .\scripts\diff-project-settings.ps1 -ProjectPath "C:\MyProject\MyProject.vcxproj"
-#>
+
 
 param(
     [Parameter(Mandatory=$true)]

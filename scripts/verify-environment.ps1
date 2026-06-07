@@ -1,12 +1,4 @@
-<#
-.SYNOPSIS
-    Проверяет окружение Visual Studio и Windows SDK на наличие критических компонентов.
-.DESCRIPTION
-    Диагностический скрипт для поиска причин ошибок линковки (kernel32.lib и др.).
-    Проверяет: установленные версии VS / Windows SDK / MSVC toolchain, наличие файлов.
-.EXAMPLE
-    .\scripts\verify-environment.ps1
-#>
+
 
 $ErrorActionPreference = "Continue"
 $foundIssues = @()
@@ -14,7 +6,6 @@ $foundIssues = @()
 Write-Host "=== Visual Studio Environment Verification ===" -ForegroundColor Cyan
 Write-Host ""
 
-# --- Проверка VS где угодно ---
 $vsWhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
 $vsPreviewWhere = "${env:ProgramFiles}\Microsoft Visual Studio\Installer\vswhere.exe"
 
@@ -38,7 +29,6 @@ if ($vswherePath) {
 
 Write-Host ""
 
-# --- Проверка Windows SDK ---
 $sdkPath = "${env:ProgramFiles(x86)}\Windows Kits\10"
 $sdkPath2 = "${env:ProgramFiles}\Windows Kits\10"
 
@@ -67,11 +57,9 @@ if ($kitPath) {
 
 Write-Host ""
 
-# --- Проверка MSVC toolchain ---
 $msvcBase = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC"
 $msvcBase2 = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2019\BuildTools\VC\Tools\MSVC"
 $msvcBase3 = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2017\BuildTools\VC\Tools\MSVC"
-# Также проверим редакции Community/Professional/Enterprise
 $editions = @("Community", "Professional", "Enterprise", "BuildTools")
 $vsYears = @("2025", "2022", "2019", "2017")
 
@@ -105,7 +93,6 @@ if (-not $msvcFound) {
 
 Write-Host ""
 
-# --- Проверка переменных окружения ---
 $envVars = @("VC_IncludePath", "VC_LibraryPath_x64", "WindowsSDK_IncludePath",
              "WindowsSDK_LibraryPath_x64", "NETFXKitsDir", "VC_ExecutablePath_x64")
 foreach ($var in $envVars) {
