@@ -1,0 +1,237 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly AMENI_HOME="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly AMENI_REPO_URL="https://github.com/inzexg-coder/ameni-vs-kernel"
+readonly AMENI_SCRIPTS="$(cd "$AMENI_HOME/.." && pwd)/scripts"
+
+readonly CLR_RESET='\033[0m'
+readonly CLR_RED='\033[0;31m'
+readonly CLR_GREEN='\033[0;32m'
+readonly CLR_YELLOW='\033[1;33m'
+readonly CLR_CYAN='\033[0;36m'
+readonly CLR_BOLD='\033[1m'
+readonly CLR_DIM='\033[2m'
+
+_info()   { echo -e "${CLR_GREEN}[INFO]${CLR_RESET}  $*"; }
+_warn()   { echo -e "${CLR_YELLOW}[WARN]${CLR_RESET}  $*"; }
+_error()  { echo -e "${CLR_RED}[ERROR]${CLR_RESET} $*" >&2; }
+_header() { echo -e "${CLR_CYAN}=== $* ===${CLR_RESET}"; }
+
+_detect_os() {
+  case "$(uname -s)" in
+    Linux)   echo "linux" ;;
+    Darwin)  echo "macos" ;;
+    CYGWIN*|MINGW*|MSYS*) echo "windows" ;;
+    *)       echo "unknown" ;;
+  esac
+}
+
+_require_pwsh() {
+  if command -v pwsh &>/dev/null; then
+    return 0
+  elif command -v powershell &>/dev/null; then
+    return 0
+  else
+    _warn "PowerShell Core (pwsh) not found."
+    _warn "On Arch Linux: sudo pacman -S powershell"
+    _warn "The agent will use built-in diagnostics instead."
+    return 1
+  fi
+}
+
+# ---------------------------------------------------------------------------
+#  diagnose — cross-platform environment check
+# ---------------------------------------------------------------------------
+_cmd_diagnose() {
+  local os
+  os="$(_detect_os)"
+  _header "Environment Diagnostics"
+  echo "Platform: ${os} ($(uname -m))"
+
+  if [ "$os" = "windows" ]; then
+    if _require_pwsh; then
+      pwsh -NoProfile -ExecutionPolicy Bypass -File "$AMENI_SCRIPTS/verify-environment.ps1"
+    else
+      _error "PowerShell required on Windows. Install from https://github.com/PowerShell/PowerShell"
+      exit 1
+    fi
+  else
+    _info "Running Linux diagnostics"
+
+    # Check dotnet SDK
+    if command -v dotnet &>/dev/null; then
+      local sdk_ver dotnet_ver
+      sdk_ver=$(dotnet --list-sdks 2>/dev/null | head -1 || echo "none")
+      dotnet_ver=$(dotnet --version 2>/dev/null || echo "none")
+      _info "dotnet SDK: ${dotnet_ver} (${sdk_ver})"
+    else
+      _warn "dotnet SDK not found. Install: sudo pacman -S dotnet-sdk"
+    fi
+
+    # Check mono (for .NET Framework compatibility)
+    if command -v mono &>/dev/null; then
+      local mono_ver
+      mono_ver=$(mono --version 2>/dev/null | head -1 || echo "unknown")
+      _info "Mono: ${mono_ver}"
+    else
+      _warn "Mono not found (optional, for .NET Framework builds)"
+    fi
+
+    # Check pwsh
+    if command -v pwsh &>/dev/null; then
+      _info "PowerShell Core: $(pwsh --version 2>/dev/null)"
+      _info "PowerShell scripts can be used via pwsh"
+    else
+      _warn "PowerShell Core not found"
+      _warn "  Install: sudo pacman -S powershell"
+      _warn "  Then:    ameni vs diagnose"
+    fi
+
+    # Check wine (for running windows binaries)
+    if command -v wine &>/dev/null; then
+      _info "Wine: $(wine --version 2>/dev/null || echo 'installed')"
+    fi
+
+    # Check Visual Studio Code for C++ development
+    if command -v code &>/dev/null; then
+      _info "VS Code available for C++ editing"
+      _info "  Extensions recommended: C/C++ (ms-vscode.cpptools), CMake"
+    fi
+
+    # Check common build tools
+    _header "Build Tools"
+    for tool in gcc g++ make cmake clang lldb; do
+      if command -v "$tool" &>/dev/null; then
+        _info "${tool}: $(command -v "$tool")"
+      fi
+    done
+
+    _header "Diagnostic Summary"
+    _info "This system runs Arch Linux. Visual Studio is a Windows-native IDE."
+    _info "Use cases for this repository on Linux:"
+    _info "  1. Reference documentation for VS build configuration"
+    _info "  2. .props files can be inspected and adapted"
+    _info "  3. .NET projects via dotnet SDK"
+    _info "  4. Cross-compilation setup guides"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+#  check — verify project structure on any platform
+# ---------------------------------------------------------------------------
+_cmd_check() {
+  local path="${1:-.}"
+  _header "Project Structure Check"
+  echo "Path: $(cd "$path" && pwd)"
+  echo ""
+
+  local issues=0
+  local props_count=0
+
+  # Check for .vcxproj files
+  local vcxproj_files
+  vcxproj_files=$(find "$path" -name "*.vcxproj" -type f 2>/dev/null | head -10 || true)
+  if [ -n "$vcxproj_files" ]; then
+    _info "Found .vcxproj files:"
+    while IFS= read -r f; do
+      echo "    ${f##*/}"
+    done <<< "$vcxproj_files"
+
+    # Check LibraryDirectories in each
+    while IFS= read -r proj; do
+      if grep -q 'LibraryDirectories' "$proj" 2>/dev/null; then
+        local ld
+        ld=$(grep -oP '<LibraryDirectories>[^<]*</LibraryDirectories>' "$proj" 2>/dev/null || echo "")
+        if [ -n "$ld" ] && echo "$ld" | grep -qv 'VC_LibraryPath'; then
+          _warn "  ${proj##*/}: LibraryDirectories may need review"
+          _warn "    ${ld}"
+          issues=$((issues + 1))
+        fi
+      fi
+    done <<< "$vcxproj_files"
+  else
+    _warn "No .vcxproj files found in ${path}"
+  fi
+
+  # Check .props files
+  props_count=$(find "$path" -name "*.props" -type f 2>/dev/null | wc -l)
+  if [ "$props_count" -gt 0 ]; then
+    _info "Found ${props_count} .props files (reference configurations available)"
+  fi
+
+  if [ "$issues" -eq 0 ]; then
+    _info "No obvious issues detected"
+  else
+    _warn "Found ${issues} potential issue(s)"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+#  help — show commands
+# ---------------------------------------------------------------------------
+_cmd_help() {
+  echo ""
+  echo -e "${CLR_BOLD}NAME${CLR_RESET}"
+  echo "  ameni vs - Visual Studio build diagnostic agent"
+  echo ""
+  echo -e "${CLR_BOLD}SYNOPSIS${CLR_RESET}"
+  echo "  ameni vs diagnose          — full environment check"
+  echo "  ameni vs check [path]      — inspect project vcxproj files"
+  echo "  ameni vs about             — agent information"
+  echo "  ameni vs help              — this message"
+  echo ""
+  echo -e "${CLR_BOLD}DESCRIPTION${CLR_RESET}"
+  echo "  Cross-platform diagnostic toolkit for Visual Studio build"
+  echo "  configuration. On Windows runs PowerShell verification;"
+  echo "  on Linux/macOS reports available toolchain and inspects"
+  echo "  project files for common issues."
+  echo ""
+  echo -e "${CLR_BOLD}EXAMPLES${CLR_RESET}"
+  echo "  ameni vs diagnose"
+  echo "  ameni vs check /path/to/project"
+  echo ""
+  echo -e "${CLR_BOLD}FILES${CLR_RESET}"
+  echo "  scripts/verify-environment.ps1    Windows environment check"
+  echo "  scripts/diff-project-settings.ps1  Compare vcxproj vs reference"
+  echo "  scripts/apply-default-paths.ps1    Auto-fix vcxproj paths"
+  echo "  props/*.props                      Reference property sheets"
+  echo "  errors/*.md                        Linker error reference"
+  echo "  vs20*/                             Version-specific configs"
+  echo ""
+  echo -e "${CLR_BOLD}REFERENCE${CLR_RESET}"
+  echo "  ${AMENI_REPO_URL}"
+  echo ""
+}
+
+# ---------------------------------------------------------------------------
+#  about
+# ---------------------------------------------------------------------------
+_cmd_about() {
+  echo ""
+  echo "Ameni VS Kernel"
+  echo "Visual Studio Configuration Archive & Diagnostic Agent"
+  echo "${AMENI_REPO_URL}"
+  echo ""
+  echo "Domains: Windows (VS), Linux (reference, dotnet, mono)"
+  echo ""
+  echo "Commands:"
+  echo "  diagnose     Full environment diagnostics"
+  echo "  check        Inspect project files"
+  echo "  help         Show detailed usage"
+  echo "  about        Display this information"
+  echo ""
+}
+
+# ---------------------------------------------------------------------------
+#  Main
+# ---------------------------------------------------------------------------
+command="${1:-help}"
+shift 2>/dev/null || true
+
+case "$command" in
+  diagnose|diag) _cmd_diagnose "$@" ;;
+  check)         _cmd_check "$@" ;;
+  about)         _cmd_about ;;
+  help|--help|-h|*) _cmd_help ;;
+esac
