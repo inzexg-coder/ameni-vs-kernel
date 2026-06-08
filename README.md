@@ -111,61 +111,119 @@ echo 'export PATH="$PATH:'"$(pwd)"'/.ameni/bin"' >> ~/.bashrc
 
 ### ameni vs diagnose
 
-**Полная диагностика окружения.** Автоматически определяет платформу и запускает соответствующие проверки.
+**Кроссплатформенная диагностика.** Определяет ОС и запускает соответствующие проверки.
 
+**Arch Linux:**
 ```
 $ ameni vs diagnose
 
 === Environment Diagnostics ===
-Platform: linux (x86_64)
-[INFO]  Running Linux diagnostics
-[INFO]  dotnet SDK: 9.0.201 (9.0.102-preview.1...)
-[INFO]  Mono: Mono JIT compiler version 6.12.0
-[INFO]  PowerShell Core: PowerShell 7.4.0
-[INFO]  VS Code available for C++ editing
-[INFO]  gcc: /usr/bin/gcc
-[INFO]  g++: /usr/bin/g++
-[INFO]  make: /usr/bin/make
-[INFO]  cmake: /usr/bin/cmake
-[INFO]  clang: /usr/bin/clang
+OS: Linux (x86_64)
+[INFO]  dotnet: 9.0.201
+[INFO]  mono: Mono JIT compiler version 6.12.0
+[INFO]  pwsh: PowerShell 7.4.0
+[INFO]  node: v22.0.0
+
+=== Build Tools ===
+[INFO]  gcc: gcc (GCC) 14.2.0
+[INFO]  g++: g++ (GCC) 14.2.0
+[INFO]  make: GNU Make 4.4.1
+[INFO]  cmake: cmake version 3.30.0
+[INFO]  clang: clang version 18.0.0
 ```
 
-На Windows переключается на PowerShell-скрипт проверки:
-
+**Windows (Git Bash / WSL):**
 ```
 $ ameni vs diagnose
 
 === Environment Diagnostics ===
-Platform: windows (AMD64)
+OS: MINGW64_NT-10.0 (x86_64)
+
+# PowerShell Core required for full VS diagnostics:
+$ pwsh ./scripts/verify-environment.ps1
 [OK] vswhere.exe found: Visual Studio Community 2022 [17.x]
 [OK] Windows Kits 10: kernel32.lib found
 [OK] MSVC 14.35 (VS 2022): vcruntime.lib found
 ```
 
+**Windows (PowerShell):**
+```powershell
+PS> .ameni/bin/ameni.ps1 diagnose
+```
+
 ### ameni vs check
 
-**Инспекция .vcxproj файлов.** Проверяет корректность путей VC++ Directories.
+**Инспекция .vcxproj файлов.** Проверяет корректность путей LibraryDirectories.
 
 ```
 $ ameni vs check ./MyProject
 
 === Project Structure Check ===
 Path: /home/user/MyProject
-
 [INFO]  Found .vcxproj files:
     MyProject.vcxproj
-    MyProject.vcxproj.filters
-[INFO]  Found 12 .props files (reference configurations available)
-[INFO]  No obvious issues detected
+[INFO]  Check complete.
+```
+
+**PowerShell:**
+```powershell
+PS> .ameni/bin/ameni.ps1 check ./MyProject
+```
+
+### ameni vs props
+
+**Список Property Sheets.** Показывает доступные .props файлы с описанием.
+
+```
+$ ameni vs props
+
+=== Available Property Sheets ===
+  DefaultPaths          no description
+  DefaultPaths-x86      no description
+  DefaultPaths-ARM64    no description
+  AdvancedSettings      no description
+  DLL                   no description
+  StaticLib             no description
+  DebugSettings         no description
+  Driver                no description
+
+[INFO]  Usage: Add props via Visual Studio Property Manager
+```
+
+### ameni vs errors
+
+**Справочник ошибок линковки.**
+
+```
+$ ameni vs errors
+
+=== Linker Error Reference ===
+  lnk1104-cannot-open-file              fatal error LNK1104: cannot open file 'kernel32.lib'
+  lnk2019-unresolved-external           error LNK2019: unresolved external symbol
+  lnk2001-unresolved-external           LNK2001: unresolved external symbol _main
+  lnk1120-link-failed                   fatal error LNK1120: 1 unresolved externals
+
+Usage: ameni vs errors <error-name>
+Example: ameni vs errors lnk1104-cannot-open-file
 ```
 
 ### ameni vs help
 
 ```
-ameni vs diagnose          — полная диагностика окружения
-ameni vs check [path]      — проверка .vcxproj проекта
-ameni vs about             — информация об агенте
-ameni vs help              — справка
+ameni vs diagnose             полная диагностика (Linux/Windows)
+ameni vs check [path]         проверка .vcxproj
+ameni vs props                список property sheets
+ameni vs errors [name]        справочник ошибок
+ameni vs about                информация об агенте
+ameni vs help                 справка
+```
+
+**PowerShell (Windows):** все команды доступны через `ameni.ps1`
+```powershell
+.ameni/bin/ameni.ps1 diagnose
+.ameni/bin/ameni.ps1 check C:\MyProject
+.ameni/bin/ameni.ps1 props
+.ameni/bin/ameni.ps1 errors lnk1104-cannot-open-file
 ```
 
 <br>
@@ -331,24 +389,15 @@ pwsh ./scripts/verify-environment.ps1
 
 ---
 
-## Arch Linux
+## Кроссплатформенное использование
 
-### Назначение репозитория на Linux
-
-Данный репозиторий предназначен в первую очередь для диагностики Visual Studio под Windows. На Arch Linux он служит:
-
-1. **Эталонная документация** — все описания путей, переменных и конфигураций доступны для чтения
-2. **Property Sheets** — `.props` файлы можно адаптировать для кросс-компиляции
-3. **Справочник ошибок** — описания LNK-ошибок актуальны независимо от платформы
-4. **CLI агент** — `ameni vs` предоставляет диагностику Linux-окружения и проверку проектов
-
-### Установка на Arch Linux
+### Arch Linux
 
 **Зависимости:**
 
 ```bash
-sudo pacman -S dotnet-sdk       # .NET SDK  (рекомендуется)
-sudo pacman -S powershell       # PowerShell Core (для запуска PS1-скриптов)
+sudo pacman -S dotnet-sdk       # .NET SDK (рекомендуется)
+sudo pacman -S powershell       # PowerShell Core (для запуска PS1)
 sudo pacman -S mono             # Mono (опционально)
 ```
 
@@ -358,39 +407,60 @@ sudo pacman -S mono             # Mono (опционально)
 git clone https://github.com/inzexg-coder/ameni-vs-kernel.git
 cd ameni-vs-kernel
 makepkg -si
+ameni vs diagnose
 ```
 
-**Или ручная установка:**
+**Или вручную:**
 
 ```bash
 git clone https://github.com/inzexg-coder/ameni-vs-kernel.git
 cd ameni-vs-kernel
-sudo ln -s "$(pwd)/.ameni/bin/ameni" /usr/local/bin/ameni
-```
-
-### Диагностика через ameni
-
-```bash
+export PATH="$PATH:$(pwd)/.ameni/bin"
 ameni vs diagnose
 ```
 
-Вывод включает: версию dotnet SDK, Mono, PowerShell Core, наличие build-инструментов (gcc, g++, make, cmake, clang).
-
-### Полезные пакеты Arch для C++ разработки
+**Полезные пакеты:**
 
 ```bash
-# Основные инструменты
-sudo pacman -S base-devel cmake
-
-# Компиляторы
-sudo pacman -S gcc clang lldb
-
-# Библиотеки
-sudo pacman -S boost fmt spdlog nlohmann-json
-
-# .NET
+sudo pacman -S base-devel cmake gcc clang lldb boost
 sudo pacman -S dotnet-sdk dotnet-runtime
 ```
+
+### Windows
+
+**Требования:** Git Bash, WSL или PowerShell Core (pwsh).
+
+**Git Bash / WSL:**
+
+```bash
+git clone https://github.com/inzexg-coder/ameni-vs-kernel.git
+cd ameni-vs-kernel
+export PATH="$PATH:$(pwd)/.ameni/bin"
+ameni vs diagnose
+```
+
+**PowerShell (без bash):**
+
+```powershell
+git clone https://github.com/inzexg-coder/ameni-vs-kernel.git
+cd ameni-vs-kernel
+.ameni/bin/ameni.ps1 diagnose
+.ameni/bin/ameni.ps1 check C:\MyProject
+.ameni/bin/ameni.ps1 props
+.ameni/bin/ameni.ps1 errors lnk1104-cannot-open-file
+```
+
+### Соответствие команд
+
+| Команда | Arch Linux (bash) | Windows (PowerShell) |
+|---------|-------------------|---------------------|
+| `diagnose` | `ameni vs diagnose` | `.ameni/bin/ameni.ps1 diagnose` |
+| `check` | `ameni vs check ./path` | `.ameni/bin/ameni.ps1 check ./path` |
+| `props` | `ameni vs props` | `.ameni/bin/ameni.ps1 props` |
+| `errors` | `ameni vs errors lnk1104` | `.ameni/bin/ameni.ps1 errors lnk1104` |
+| `help` | `ameni vs help` | `.ameni/bin/ameni.ps1 help` |
+
+Все команды идентичны по функционалу на обеих платформах.
 
 ---
 
