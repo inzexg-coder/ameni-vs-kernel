@@ -18,8 +18,8 @@
 
 <p align="center">
   <a href="#как-это-работает">Как это работает</a> &middot;
-  <a href="#windows-чайникам">Windows (чайникам)</a> &middot;
-  <a href="#arch-linux-разработчикам">Arch Linux (разработчикам)</a> &middot;
+  <a href="#windows">Windows</a> &middot;
+  <a href="#arch-linux">Arch Linux</a> &middot;
   <a href="#cli-агент">CLI агент</a> &middot;
   <a href="#полный-справочник">Полный справочник</a>
 </p>
@@ -34,7 +34,7 @@
 
 ---
 
-## Windows (чайникам)
+## Windows
 
 Ниже написано, что делать, если Visual Studio ругается на библиотеки. Ничего устанавливать не нужно — у вас уже есть Visual Studio. Просто выполняйте шаги по порядку.
 
@@ -136,7 +136,7 @@ Rename-Item "МойПроект.vcxproj.bak" "МойПроект.vcxproj"
 
 ---
 
-## Arch Linux (разработчикам)
+## Arch Linux
 
 Репозиторий содержит эталонную конфигурацию VC++ Directories, скрипты диагностики PowerShell и манифест .vsconfig для Visual Studio. Нативный use-case — восстановление сборки C++ под Windows. На Arch Linux используется как референсная документация для чтения, а CLI-агент выполняет диагностику окружения.
 
