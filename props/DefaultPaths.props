@@ -3,7 +3,7 @@
   <!--
     DefaultPaths.props
     Эталонные пути VC++ Directories для восстановления линковки kernel32.lib и других системных библиотек.
-    Подключить через Property Manager: View > Other Windows > Property Manager → правый клик → Add Existing Property Sheet.
+    Подключить через CLI: `ameni vs fix <path>` или через Property Manager (View > Other Windows > Property Manager).
   -->
 
   <!-- VC++ Directories -->

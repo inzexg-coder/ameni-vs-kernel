@@ -7,8 +7,10 @@
   Commands:
     diagnose         Full environment diagnostics
     check [path]     Inspect .vcxproj files
+    fix [path]       Auto-fix LibraryDirectories in .vcxproj (creates .bak)
     props            List available property sheets
     errors [name]    Linker error reference
+    vsconfig         Import .vsconfig via VS Installer CLI
     about            Display agent information
     help             Show detailed help
 #>
@@ -65,12 +67,23 @@ function Cmd-Check {
   $projFiles = Get-ChildItem -Path $Path -Filter "*.vcxproj" -Recurse -ErrorAction SilentlyContinue
   if ($projFiles.Count -gt 0) {
     Write-Host "[INFO]  Found .vcxproj files:" -ForegroundColor Green
+    $mismatches = 0
     foreach ($f in $projFiles) {
       Write-Host "    $($f.Name)"
+      $diffScript = "$ScriptsDir/diff-project-settings.ps1"
+      if (Test-Path $diffScript) {
+        $result = & $diffScript -ProjectPath $f.FullName 2>&1
+        if ($result -match '\[!\]' -or $result -match 'расхождений') {
+          $mismatches++
+        }
+      }
     }
     Write-Host ""
-    Write-Host "[INFO]  Run diff-project-settings.ps1 for detailed comparison:" -ForegroundColor Green
-    Write-Host "    pwsh $ScriptsDir/diff-project-settings.ps1 -ProjectPath `"$($projFiles[0].FullName)`""
+    if ($mismatches -gt 0) {
+      Write-Host "[!]  LibraryDirectories non-standard — используйте 'ameni vs fix'" -ForegroundColor Yellow
+    } else {
+      Write-Host "[OK]  Все настройки совпадают с эталоном." -ForegroundColor Green
+    }
   } else {
     Write-Host "[WARN]  No .vcxproj files found in $Path" -ForegroundColor Yellow
   }
@@ -93,6 +106,75 @@ function Cmd-Props {
   } else {
     Write-Host "[WARN]  props/ directory not found" -ForegroundColor Yellow
   }
+}
+
+function Cmd-Fix {
+  param([string]$Path = ".", [string]$Arch = "x64")
+  if (-not (Test-Path $Path)) {
+    Write-Host "[ERROR] Path not found: $Path" -ForegroundColor Red
+    exit 1
+  }
+  $Path = Resolve-Path $Path
+  Write-Host "=== Auto-fix .vcxproj paths ===" -ForegroundColor Cyan
+  Write-Host "Path: $Path"
+  Write-Host "Architecture: $Arch"
+  Write-Host ""
+
+  $fixScript = "$ScriptsDir/apply-default-paths.ps1"
+  if (Test-Path $fixScript) {
+    & $fixScript -Path $Path -Architecture $Arch
+  } else {
+    Write-Host "[ERROR] Script not found: $fixScript" -ForegroundColor Red
+    exit 1
+  }
+}
+
+function Cmd-VsConfig {
+  Write-Host "=== Import .vsconfig via VS Installer CLI ===" -ForegroundColor Cyan
+  Write-Host ""
+
+  $vsconfigPath = "$RepoRoot/.vsconfig"
+  if (-not (Test-Path $vsconfigPath)) {
+    Write-Host "[ERROR] .vsconfig not found at $vsconfigPath" -ForegroundColor Red
+    exit 1
+  }
+
+  $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+  $vswherePreview = "${env:ProgramFiles}\Microsoft Visual Studio\Installer\vswhere.exe"
+
+  $vswherePath = $null
+  if (Test-Path $vswhere) { $vswherePath = $vswhere }
+  elseif (Test-Path $vswherePreview) { $vswherePath = $vswherePreview }
+
+  if (-not $vswherePath) {
+    Write-Host "[ERROR] vswhere.exe not found. Visual Studio may not be installed." -ForegroundColor Red
+    exit 1
+  }
+
+  Write-Host "[OK] vswhere.exe found" -ForegroundColor Green
+  $vsInfo = & $vswherePath -products * -format json | ConvertFrom-Json
+  if (-not $vsInfo) {
+    Write-Host "[ERROR] No Visual Studio installations found." -ForegroundColor Red
+    exit 1
+  }
+
+  $installer = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vs_installer.exe"
+  if (-not (Test-Path $installer)) {
+    Write-Host "[ERROR] vs_installer.exe not found at $installer" -ForegroundColor Red
+    exit 1
+  }
+
+  foreach ($vs in $vsInfo) {
+    $installPath = $vs.installationPath
+    $displayName = $vs.displayName
+    Write-Host "  Found: $displayName at $installPath" -ForegroundColor Gray
+    Write-Host "  Running: vs_installer.exe modify --installPath `"$installPath`" --configFile `"$vsconfigPath`"" -ForegroundColor Cyan
+    Write-Host "  Starting installation (this may take a while)..." -ForegroundColor Yellow
+    & $installer modify --installPath $installPath --configFile $vsconfigPath --quiet --norestart
+    Write-Host "  [OK] Done for $displayName" -ForegroundColor Green
+  }
+  Write-Host ""
+  Write-Host "Готово. Перезапустите Visual Studio если потребуется." -ForegroundColor Green
 }
 
 function Cmd-Errors {
@@ -155,6 +237,8 @@ function Cmd-Help {
   Write-Host "EXAMPLES"
   Write-Host "  ameni vs diagnose"
   Write-Host "  ameni vs check /path/to/project"
+  Write-Host "  ameni vs fix /path/to/project -arch x64"
+  Write-Host "  ameni vs vsconfig"
   Write-Host "  ameni vs errors lnk1104-cannot-open-file"
   Write-Host ""
   Write-Host "REFERENCE"
@@ -165,8 +249,10 @@ function Cmd-Help {
 switch ($Command) {
   "diagnose"  { Cmd-Diagnose }
   "check"     { Cmd-Check $Argument }
+  "fix"       { Cmd-Fix $Argument }
   "props"     { Cmd-Props }
   "errors"    { Cmd-Errors $Argument }
+  "vsconfig"  { Cmd-VsConfig }
   "about"     { Cmd-About }
   "help"      { Cmd-Help }
   default     { Cmd-Help }
