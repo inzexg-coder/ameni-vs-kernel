@@ -12,36 +12,16 @@
 <h1 align="center">Ameni VS Kernel</h1>
 
 <p align="center">
-  Агент диагностики и восстановления настроек Visual Studio.<br>
-  Пошаговое руководство по исправлению ошибок линковки (LNK2019, LNK1104, LNK1120)<br>
-  и приведению VC++ Directories к эталонной конфигурации.
+  Полное пошаговое руководство по исправлению ошибок линковки<br>
+  LNK2019, LNK1104, LNK1120 и восстановлению Visual Studio C++ сборки.
 </p>
 
 <p align="center">
-  <a href="#быстрый-старт">Быстрый старт</a> &middot;
   <a href="#установка">Установка</a> &middot;
+  <a href="#план-исправления">План исправления</a> &middot;
   <a href="#cli-агент">CLI агент</a> &middot;
-  <a href="#диагностика">Диагностика</a> &middot;
-  <a href="#property-sheets-props">Property Sheets</a> &middot;
-  <a href="#скрипты">Скрипты</a> &middot;
-  <a href="#справочник-ошибок-линковки">Ошибки</a> &middot;
-  <a href="#arch-linux">Arch Linux</a>
+  <a href="#архитектура">Архитектура</a>
 </p>
-
-<br>
-
-## Быстрый старт
-
-Если сборка падает с ошибками `LNK1120`, `LNK2019` или `LNK1104`, следуйте этим шагам по порядку — от самых простых и безопасных к более сложным.
-
-| Шаг | Действие | Описание |
-|-----|----------|----------|
-| 1 | **Диагностика окружения** | Проверить установку VS, Windows SDK, MSVC toolchain и наличие `kernel32.lib` |
-| 2 | **Сравнение с эталоном** | Сверить текущие настройки .vcxproj с эталонными из репозитория |
-| 3 | **Применить эталон через .props** | Импортировать property sheet для исправления VC++ Directories без редактирования .vcxproj |
-| 4 | **Применить эталон через скрипт** | Автоматически исправить все .vcxproj в папке |
-| 5 | **Ручное редактирование** | Открыть свойства проекта и исправить пути вручную |
-| 6 | **Переустановка SDK/VS** | Переустановить или восстановить Windows SDK или инструменты сборки VS |
 
 <br>
 
@@ -49,206 +29,100 @@
 
 ## Установка
 
-### Windows (Visual Studio)
+### Шаг A — Клонирование репозитория
 
-```powershell
-git clone https://github.com/inzexg-coder/ameni-vs-kernel.git
-cd ameni-vs-kernel
-.\scripts\verify-environment.ps1
-```
+Выберите вашу операционную систему и выполните команды.
 
-### Arch Linux (and derivatives)
-
-**Через AUR (PKGBUILD из репозитория):**
-
+**Arch Linux:**
 ```bash
-git clone https://github.com/inzexg-coder/ameni-vs-kernel.git
-cd ameni-vs-kernel
-makepkg -si
-```
-
-**Или напрямую:**
-
-```bash
-sudo pacman -S powershell       # опционально, для PowerShell-скриптов
+sudo pacman -S git           # если git ещё не установлен
 git clone https://github.com/inzexg-coder/ameni-vs-kernel.git
 cd ameni-vs-kernel
 export PATH="$PATH:$(pwd)/.ameni/bin"
 ameni vs about
 ```
 
-**Зависимости Arch Linux:**
+Если команда `ameni vs about` вывела информацию об агенте — установка завершена.
 
+**Windows (Git Bash / WSL):**
 ```bash
-sudo pacman -S dotnet-sdk       # .NET SDK (опционально)
-sudo pacman -S mono             # Mono для .NET Framework (опционально)
-sudo pacman -S powershell       # PowerShell Core для запуска PS1-скриптов
-```
-
-### CLI агент
-
-**Через symlink (рекомендуется):**
-
-```bash
-sudo ln -s "$(pwd)/.ameni/bin/ameni" /usr/local/bin/ameni
-ameni vs diagnose
-```
-
-**Или через PATH:**
-
-```bash
+# Откройте Git Bash (или WSL)
+git clone https://github.com/inzexg-coder/ameni-vs-kernel.git
+cd ameni-vs-kernel
 export PATH="$PATH:$(pwd)/.ameni/bin"
-echo 'export PATH="$PATH:'"$(pwd)"'/.ameni/bin"' >> ~/.bashrc
+ameni vs about
 ```
 
-<br>
+**Windows (PowerShell, без Git Bash):**
+```powershell
+git clone https://github.com/inzexg-coder/ameni-vs-kernel.git
+cd ameni-vs-kernel
+.\ameni\bin\ameni.ps1 about
+```
+
+### Шаг B — Установка зависимостей для CLI
+
+**Arch Linux (опционально — для полной диагностики):**
+```bash
+sudo pacman -S powershell       # чтобы запускать .ps1 скрипты
+sudo pacman -S dotnet-sdk       # .NET SDK
+```
+
+**Windows (обязательно — для VS диагностики):**
+```powershell
+# PowerShell Core
+winget install Microsoft.PowerShell
+# или скачайте с https://github.com/PowerShell/PowerShell
+```
+
+### Шаг C — Проверка, что всё готово
+
+```bash
+ameni vs help
+```
+
+Эта команда покажет все доступные команды. Вы должны увидеть: `diagnose`, `check`, `props`, `errors`, `about`, `help`.
+
+Если команда не найдена — проверьте, что вы добавили `.ameni/bin` в PATH или используйте полный путь:
+```bash
+./.ameni/bin/ameni vs help        # если вы в корне репозитория
+```
+
+Для PowerShell:
+```powershell
+.\ameni\bin\ameni.ps1 help
+```
 
 ---
 
-## CLI агент
+## План исправления
 
-`ameni vs` предоставляет команды диагностики и проверки через единый интерфейс.
+Если Visual Studio выдаёт ошибки LNK1120, LNK2019 или LNK1104 — не паникуйте. Следуйте плану строго по порядку. Каждый шаг либо исправляет проблему, либо говорит, что делать дальше.
 
-### ameni vs diagnose
+<br>
 
-**Кроссплатформенная диагностика.** Определяет ОС и запускает соответствующие проверки.
+### Шаг 1 — Диагностика окружения
+
+**Цель:** понять, какие компоненты Visual Studio установлены, а каких не хватает.
+
+**Что делает:** проверяет наличие VS, Windows SDK, MSVC toolchain и ключевых библиотек (kernel32.lib, vcruntime.lib).
 
 **Arch Linux:**
+```bash
+ameni vs diagnose
 ```
-$ ameni vs diagnose
-
-=== Environment Diagnostics ===
-OS: Linux (x86_64)
-[INFO]  dotnet: 9.0.201
-[INFO]  mono: Mono JIT compiler version 6.12.0
-[INFO]  pwsh: PowerShell 7.4.0
-[INFO]  node: v22.0.0
-
-=== Build Tools ===
-[INFO]  gcc: gcc (GCC) 14.2.0
-[INFO]  g++: g++ (GCC) 14.2.0
-[INFO]  make: GNU Make 4.4.1
-[INFO]  cmake: cmake version 3.30.0
-[INFO]  clang: clang version 18.0.0
-```
+Вывод сообщит, какие инструменты доступны (dotnet, mono, pwsh, gcc, cmake). Если вы не собираетесь чинить VS напрямую — переходите к Шагу 2 (сверка конфигурации).
 
 **Windows (Git Bash / WSL):**
+```bash
+ameni vs diagnose
 ```
-$ ameni vs diagnose
+Скрипт запустит проверку через PowerShell. Вывод будет выглядеть так:
 
+```
 === Environment Diagnostics ===
 OS: MINGW64_NT-10.0 (x86_64)
 
-# PowerShell Core required for full VS diagnostics:
-$ pwsh ./scripts/verify-environment.ps1
-[OK] vswhere.exe found: Visual Studio Community 2022 [17.x]
-[OK] Windows Kits 10: kernel32.lib found
-[OK] MSVC 14.35 (VS 2022): vcruntime.lib found
-```
-
-**Windows (PowerShell):**
-```powershell
-PS> .ameni/bin/ameni.ps1 diagnose
-```
-
-### ameni vs check
-
-**Инспекция .vcxproj файлов.** Проверяет корректность путей LibraryDirectories.
-
-```
-$ ameni vs check ./MyProject
-
-=== Project Structure Check ===
-Path: /home/user/MyProject
-[INFO]  Found .vcxproj files:
-    MyProject.vcxproj
-[INFO]  Check complete.
-```
-
-**PowerShell:**
-```powershell
-PS> .ameni/bin/ameni.ps1 check ./MyProject
-```
-
-### ameni vs props
-
-**Список Property Sheets.** Показывает доступные .props файлы с описанием.
-
-```
-$ ameni vs props
-
-=== Available Property Sheets ===
-  DefaultPaths          no description
-  DefaultPaths-x86      no description
-  DefaultPaths-ARM64    no description
-  AdvancedSettings      no description
-  DLL                   no description
-  StaticLib             no description
-  DebugSettings         no description
-  Driver                no description
-
-[INFO]  Usage: Add props via Visual Studio Property Manager
-```
-
-### ameni vs errors
-
-**Справочник ошибок линковки.**
-
-```
-$ ameni vs errors
-
-=== Linker Error Reference ===
-  lnk1104-cannot-open-file              fatal error LNK1104: cannot open file 'kernel32.lib'
-  lnk2019-unresolved-external           error LNK2019: unresolved external symbol
-  lnk2001-unresolved-external           LNK2001: unresolved external symbol _main
-  lnk1120-link-failed                   fatal error LNK1120: 1 unresolved externals
-
-Usage: ameni vs errors <error-name>
-Example: ameni vs errors lnk1104-cannot-open-file
-```
-
-### ameni vs help
-
-```
-ameni vs diagnose             полная диагностика (Linux/Windows)
-ameni vs check [path]         проверка .vcxproj
-ameni vs props                список property sheets
-ameni vs errors [name]        справочник ошибок
-ameni vs about                информация об агенте
-ameni vs help                 справка
-```
-
-**PowerShell (Windows):** все команды доступны через `ameni.ps1`
-```powershell
-.ameni/bin/ameni.ps1 diagnose
-.ameni/bin/ameni.ps1 check C:\MyProject
-.ameni/bin/ameni.ps1 props
-.ameni/bin/ameni.ps1 errors lnk1104-cannot-open-file
-```
-
-<br>
-
----
-
-## Диагностика
-
-### Шаг 1 — Проверка окружения (Windows)
-
-Запустите скрипт проверки, чтобы убедиться, что инструменты сборки установлены и `kernel32.lib` доступен.
-
-**PowerShell:**
-```powershell
-.\scripts\verify-environment.ps1
-```
-
-**Что проверяет:**
-- Наличие `vswhere.exe` и установки VS
-- Папку Windows SDK (`Windows Kits\10`) и файл `kernel32.lib`
-- Директории MSVC toolchain и файл `vcruntime.lib`
-- Ключевые переменные окружения (`VC_IncludePath`, `VC_LibraryPath_x64` и т.д.)
-
-**Пример вывода:**
-```
 === Visual Studio Environment Verification ===
 [OK] vswhere.exe найден
      Установка: Visual Studio Community 2022 [17.x]
@@ -258,209 +132,388 @@ ameni vs help                 справка
      vcruntime.lib найден
 ```
 
-Если скрипт сообщает о недостающих компонентах — переходите к шагу 6 (переустановка) или используйте `.vsconfig`.
-
-### Шаг 2 — Сравнение с эталоном
-
-Запустите скрипт сравнения, чтобы увидеть, какие свойства VC++ Directories отличаются от эталонных.
-
-**PowerShell:**
+**Windows (PowerShell):**
 ```powershell
-.\scripts\diff-project-settings.ps1 -ProjectPath "C:\MyProject\MyProject.vcxproj"
+.\ameni\bin\ameni.ps1 diagnose
 ```
 
-**Формат вывода:**
+**Что искать в выводе:**
+- `[OK]` — компонент найден, всё в порядке
+- `[WARN]` — компонент не найден, но это может быть нормально
+- `[ERROR]` — компонент отсутствует, это требует исправления
+
+**Если есть ошибки — что делать:**
+1. Запомните, чего не хватает (например, kernel32.lib или MSVC)
+2. Переходите к Шагу 6 (переустановка SDK/VS)
+3. Либо воспользуйтесь файлом `.vsconfig` для установки компонентов
+
+**Если всё `[OK]` — переходите к Шагу 2.**
+
+<br>
+
+### Шаг 2 — Сравнение проекта с эталоном
+
+**Цель:** проверить, совпадают ли пути VC++ Directories вашего проекта с правильными.
+
+**Что делает:** читает ваш .vcxproj файл и сравнивает LibraryDirectories, IncludeDirectories и ExecutableDirectories с эталонными значениями.
+
+**Windows (PowerShell):**
+```powershell
+pwsh ./scripts/diff-project-settings.ps1 -ProjectPath "C:\Users\ВашеИмя\Documents\MyProject\MyProject.vcxproj"
+```
+
+**Или через CLI:**
+```bash
+ameni vs check /path/to/project
+```
+
+**Ожидаемый вывод (всё хорошо):**
 ```
 === Diff: проект vs эталон ===
 Файл: C:\MyProject\MyProject.vcxproj
 
   [OK] ExecutableDirectories
+  [OK] IncludeDirectories
+  [OK] LibraryDirectories
+  [OK] LibraryWinRTDirectories
+  [OK] SourceDirectories
+
+Все настройки совпадают с эталоном.
+```
+
+**Ожидаемый вывод (есть проблемы):**
+```
   [!] LibraryDirectories
       Сейчас:   $(VC_LibraryPath_x64);C:\Custom\Lib
       Эталон:  $(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64
-  [OK] IncludeDirectories
 ```
 
-Если все пункты показывают `[OK]` — ваши VC++ Directories совпадают с эталоном. Переходите к справочнику ошибок.
+**Что означает расхождение:** пути в вашем проекте были изменены (возможно, случайно), и компилятор не может найти нужные библиотеки.
 
-### Шаг 3 — Применение эталона через .props (рекомендуется)
+**Что делать:**
+- Если есть расхождения — переходите к Шагу 3
+- Если совпадает, но ошибка остаётся — переходите к Шагу 6
 
-Безопасный метод исправления путей без изменения `.vcxproj`.
+<br>
 
-1. Откройте **Property Manager** в VS (View -> Property Manager)
-2. Кликните правой кнопкой на конфигурации проекта
-3. Выберите **Add Existing Property Sheet...**
-4. Укажите `props/DefaultPaths.props`
-5. При необходимости добавьте `props/AdvancedSettings.props`
+### Шаг 3 — Применение эталонных путей через Property Sheet (безопасно)
 
-### Шаг 4 — Применение эталона через скрипт
+**Цель:** исправить пути, НЕ изменяя ваш .vcxproj файл. Это самый безопасный метод — вы всегда можете отключить property sheet.
 
-Автоматически исправляет все `.vcxproj` в указанной папке.
+**Что делает:** файлы из папки `props/` — это готовые Property Sheets. Импортируйте их в Visual Studio, и они переопределят пути.
 
-**PowerShell:**
+**Пошаговая инструкция:**
+1. Откройте ваш проект в **Visual Studio**
+2. В меню выберите **View → Property Manager** (если не видите — ищите через Ctrl+Q)
+3. В окне Property Manager раскройте вашу конфигурацию (например, Debug | x64)
+4. Кликните **правой кнопкой** на конфигурации
+5. Выберите **Add Existing Property Sheet...**
+6. Найдите в репозитории файл `props/DefaultPaths.props`
+7. Нажмите **Open**
+
+**Дополнительные property sheets (если нужно):**
+- `props/DLL.props` — для проектов, собираемых как DLL
+- `props/StaticLib.props` — для статических библиотек
+- `props/DebugSettings.props` — для отладочных настроек
+- `props/AdvancedSettings.props` — дополнительные параметры C/C++
+
+**После импорта:**
+```bash
+# Запустите проверку снова — пути должны совпасть
+pwsh ./scripts/diff-project-settings.ps1 -ProjectPath "путь\к\вашему\проекту.vcxproj"
+```
+
+**Если ошибки не исчезли — переходите к Шагу 4.**
+
+**Как откатить:**
+1. Откройте Property Manager
+2. Кликните правой кнопкой на добавленном .props файле
+3. Выберите **Remove**
+
+<br>
+
+### Шаг 4 — Автоматическое исправление .vcxproj скриптом
+
+**Цель:** автоматически изменить все .vcxproj файлы в папке проекта, записав эталонные пути напрямую в XML.
+
+**ВНИМАНИЕ:** скрипт изменяет файлы проектов. Он создаёт резервные копии (.bak), но всё равно будьте осторожны.
+
+**Команда:**
 ```powershell
-.\scripts\apply-default-paths.ps1 -Path "C:\Projects\MyApp" -Architecture x64
+pwsh ./scripts/apply-default-paths.ps1 -Path "C:\Users\ВашеИмя\Documents\MyProject" -Architecture x64 -Backup $true
 ```
+
+**Параметры:**
+| Параметр | Что делает | Обязательный | Значение по умолчанию |
+|----------|-----------|-------------|----------------------|
+| `-Path` | Путь к папке с .vcxproj файлами | Нет | `.` (текущая папка) |
+| `-Architecture` | Архитектура: x64, x86 или ARM64 | Нет | x64 |
+| `-Backup` | Создавать .bak файлы | Нет | $true |
+
+**Ожидаемый вывод:**
+```
+Найдено проектов: 3
+Обработка: MyProject.vcxproj
+  -> Бэкап: MyProject.vcxproj.bak
+  [OK] LibraryDirectories -> эталон
+  [OK] IncludeDirectories -> эталон
+  [OK] ExecutableDirectories -> эталон
+Обработка: MyProject.Tests.vcxproj
+  [OK] LibraryDirectories -> эталон
+  ...
+
+Готово! Пути обновлены для архитектуры x64.
+Для отката используйте .bak файлы.
+```
+
+**Как откатить:**
+```powershell
+# Просто переименуйте .bak обратно
+Rename-Item "MyProject.vcxproj.bak" "MyProject.vcxproj"
+```
+
+**Если ошибки остались — переходите к Шагу 5.**
+
+<br>
 
 ### Шаг 5 — Ручное редактирование
 
-Откройте свойства проекта и исправьте пути вручную согласно эталонным значениям.
+**Цель:** вручную проверить и исправить настройки через интерфейс Visual Studio.
 
-### Шаг 6 — Переустановка SDK/VS
+**Пошаговая инструкция:**
+1. Кликните **правой кнопкой** на проекте в Solution Explorer
+2. Выберите **Properties**
+3. Перейдите в **Configuration Properties → VC++ Directories**
+4. Сверьте каждое поле с эталоном:
 
-Используйте `.vsconfig` из корня репозитория:
+| Поле | Эталонное значение |
+|------|-------------------|
+| Executable Directories | `$(VC_ExecutablePath_x64);$(CommonExecutablePath)` |
+| Include Directories | `$(VC_IncludePath);$(WindowsSDK_IncludePath);` |
+| Library Directories | `$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64` |
+| Source Directories | `$(VC_SourcePath);` |
 
+**Как понять, что нужно менять:**
+- Если в Library Directories нет `$(VC_LibraryPath_x64)` — это почти гарантированная причина LNK2019
+- Если там указан жёсткий путь типа `C:\Custom\Lib` — замените на эталонный
+- Не удаляйте существующие пути — просто добавьте эталонные в начало
+
+**Если после ручной правки проблема не ушла — переходите к Шагу 6.**
+
+<br>
+
+### Шаг 6 — Переустановка SDK или Visual Studio
+
+**Цель:** переустановить недостающие компоненты Windows SDK или MSVC toolchain.
+
+**Способ 1 — Через .vsconfig (рекомендуется):**
 1. Откройте **Visual Studio Installer**
-2. Нажмите **Изменить** у вашего экземпляра VS
-3. Выберите вкладку **Импорт**
-4. Найдите и выберите `.vsconfig`
-5. Нажмите **Установить**
+2. Нажмите **Изменить** на вашей версии VS
+3. Перейдите на вкладку **Импорт**
+4. Выберите `.vsconfig` из этого репозитория
+5. Нажмите **Импорт** → **Установить**
 
-<br>
+Файл `.vsconfig` выберет:
+- Рабочую нагрузку "Desktop development with C++"
+- MSVC v141, v143, v144 (для VS 2017, 2022, 2025)
+- Windows 10 SDK (10.0.19041.0) и Windows 11 SDK (10.0.22621.0)
+- ATL, MFC, CMake, Clang/LLVM
 
----
+**Способ 2 — Вручную:**
+1. Откройте **Visual Studio Installer**
+2. Нажмите **Изменить**
+3. Убедитесь, что выбраны:
+   - Desktop development with C++
+   - Windows 10/11 SDK
+   - MSVC v143 (или ваша версия)
+4. Нажмите **Установить**
 
-## Property Sheets (.props)
-
-Папка `props/` содержит эталонные Property Sheets.
-
-| Файл | Назначение |
-|------|------------|
-| `DefaultPaths.props` | Базовые пути для x64 (VC++ Directories) |
-| `DefaultPaths-x86.props` | Базовые пути для x86 |
-| `DefaultPaths-ARM64.props` | Базовые пути для ARM64 |
-| `AdvancedSettings.props` | Дополнительные настройки C/C++ |
-| `DLL.props` | Настройки для сборки DLL |
-| `StaticLib.props` | Настройки для сборки статической библиотеки |
-| `DebugSettings.props` | Отладочные настройки |
-| `Driver.props` | Настройки для драйверов |
-
-<br>
-
----
-
-## Скрипты
-
-Папка `scripts/` содержит PowerShell-скрипты.
-
-| Скрипт | Назначение | Параметры |
-|--------|------------|-----------|
-| `verify-environment.ps1` | Проверяет установку VS, Windows SDK, MSVC и наличие `kernel32.lib` | Нет |
-| `diff-project-settings.ps1` | Сравнивает `.vcxproj` с эталонными VC++ Directories | `-ProjectPath <string>` (обязательно) |
-| `apply-default-paths.ps1` | Применяет эталонные пути ко всем `.vcxproj` в папке | `-Path <string>` (по умолч. `.`), `-Architecture <x64\|x86\|ARM64>`, `-Backup <bool>` |
-
-На **Arch Linux** скрипты выполняются через PowerShell Core:
-
-```bash
-sudo pacman -S powershell
-pwsh ./scripts/verify-environment.ps1
+**Способ 3 — Чистая переустановка:**
+```
+1. Панель управления → Программы и компоненты
+2. Найдите "Windows Software Development Kit"
+3. Кликните правой кнопкой → Изменить → Удалить
+4. Установите заново через Visual Studio Installer
 ```
 
-<br>
+**Arch Linux (альтернативный подход — используйте dotnet):**
+```bash
+sudo pacman -S dotnet-sdk       # для .NET проектов
+sudo pacman -S mono             # для .NET Framework
+sudo pacman -S wine             # для запуска VS (ограниченно)
+```
+
+Если после переустановки ошибка остаётся — повторите план с Шага 1, но теперь проблема может быть в коде проекта (например, пропущенные header-файлы или неверные #pragma comment).
+
+---
+
+## Справочник Property Sheets
+
+Файлы в папке `props/` — готовые конфигурации для импорта в Visual Studio.
+
+| Файл | Когда использовать | Что делает |
+|------|-------------------|------------|
+| `DefaultPaths.props` | Всегда, для x64 проектов | Исправляет VC++ Directories на эталонные |
+| `DefaultPaths-x86.props` | Если собираете под x86 | То же, но для 32-битных проектов |
+| `DefaultPaths-ARM64.props` | Если собираете под ARM64 | Пути для ARM64 |
+| `AdvancedSettings.props` | Для тонкой настройки C/C++ | Дополнительные опции компилятора |
+| `DLL.props` | Для DLL проектов | Настройки экспорта и линковки DLL |
+| `StaticLib.props` | Для статических библиотек | Настройки lib-проектов |
+| `DebugSettings.props` | Для отладки | Символы, PDB, оптимизация |
+| `Driver.props` | Для драйверов | WDK-специфичные настройки |
+
+### Как добавить Property Sheet
+
+1. **Visual Studio:** View → Property Manager → Правый клик на конфигурации → Add Existing Property Sheet → выберите .props файл
+2. **Вручную:** добавьте в .vcxproj:
+   ```xml
+   <Import Project="путь\к\DefaultPaths.props" />
+   ```
 
 ---
 
 ## Справочник ошибок линковки
 
-Папка `errors/` содержит объяснения распространённых ошибок.
+Каждый файл в папке `errors/` содержит: описание ошибки, типичные причины, пошаговое решение, примеры диагностики.
 
-| Файл | Ошибка | Быстрое решение |
-|------|--------|-----------------|
-| `errors/lnk1104-cannot-open-file.md` | LNK1104 | Восстановить Library Directories или переустановить Windows SDK |
-| `errors/lnk2019-unresolved-external.md` | LNK2019 | Проверить Library Directories и Additional Dependencies |
-| `errors/lnk2001-unresolved-external.md` | LNK2001 | Проверить /SUBSYSTEM (console vs windows) |
-| `errors/lnk1120-link-failed.md` | LNK1120 | Посмотреть на первопричину в LNK2019/2001/1104 |
+| Ошибка | Симптом | Причина | Что делать |
+|--------|---------|---------|------------|
+| **LNK1104** | `cannot open file 'kernel32.lib'` | SDK не установлен или пути сбиты | Шаг 3 или Шаг 6 |
+| **LNK2019** | `unresolved external symbol _WinMain@16` | Неправильные Library Directories | Шаг 2 → Шаг 3 |
+| **LNK2001** | `unresolved external symbol _main` | Неверный /SUBSYSTEM | Шаг 5 (проверить subsystem) |
+| **LNK1120** | `1 unresolved externals` | Следствие LNK2019/2001/1104 | Смотреть первопричину |
 
-<br>
+```bash
+# Просмотр описания конкретной ошибки
+ameni vs errors lnk1104-cannot-open-file
+```
 
 ---
 
-## Конфиги по версиям VS
+## Конфигурации по версиям Visual Studio
 
-| Папка | Версия VS | Platform Toolset |
-|-------|-----------|------------------|
-| `vs2017/` | Visual Studio 2017 | v141 |
-| `vs2022/` | Visual Studio 2022 | v143 |
-| `vs2025/` | Visual Studio 2025 | v144 |
+В папках `vs2017/`, `vs2022/`, `vs2025/` находятся конфигурации, адаптированные под конкретные версии.
 
-В каждой папке — `general.md` и `vc++-directories.md` под соответствующий toolset.
+| Папка | Версия VS | Platform Toolset | MSVC версия |
+|-------|-----------|------------------|-------------|
+| `vs2017/` | Visual Studio 2017 | v141 | 14.1x |
+| `vs2022/` | Visual Studio 2022 | v143 | 14.3x |
+| `vs2025/` | Visual Studio 2025 | v144 | 14.4x |
 
-<br>
+В каждой папке:
+- `general.md` — общие настройки проекта
+- `vc++-directories.md` — специфичные для версии VC++ Directory пути
 
 ---
 
-## Кроссплатформенное использование
+## Скрипты
 
-### Arch Linux
+Все скрипты в папке `scripts/` написаны на PowerShell и запускаются на обеих платформах.
 
-**Зависимости:**
+| Скрипт | Команда | Что делает |
+|--------|---------|------------|
+| `verify-environment.ps1` | `pwsh scripts/verify-environment.ps1` | Проверяет VS, SDK, MSVC |
+| `diff-project-settings.ps1` | `pwsh scripts/diff-project-settings.ps1 -ProjectPath "..."` | Сравнивает .vcxproj с эталоном |
+| `apply-default-paths.ps1` | `pwsh scripts/apply-default-paths.ps1 -Path "..."` | Автоматически исправляет пути |
 
+**Arch Linux:**
 ```bash
-sudo pacman -S dotnet-sdk       # .NET SDK (рекомендуется)
-sudo pacman -S powershell       # PowerShell Core (для запуска PS1)
-sudo pacman -S mono             # Mono (опционально)
+sudo pacman -S powershell
+pwsh ./scripts/verify-environment.ps1
 ```
 
-**Установка из PKGBUILD:**
-
-```bash
-git clone https://github.com/inzexg-coder/ameni-vs-kernel.git
-cd ameni-vs-kernel
-makepkg -si
-ameni vs diagnose
-```
-
-**Или вручную:**
-
-```bash
-git clone https://github.com/inzexg-coder/ameni-vs-kernel.git
-cd ameni-vs-kernel
-export PATH="$PATH:$(pwd)/.ameni/bin"
-ameni vs diagnose
-```
-
-**Полезные пакеты:**
-
-```bash
-sudo pacman -S base-devel cmake gcc clang lldb boost
-sudo pacman -S dotnet-sdk dotnet-runtime
-```
-
-### Windows
-
-**Требования:** Git Bash, WSL или PowerShell Core (pwsh).
-
-**Git Bash / WSL:**
-
-```bash
-git clone https://github.com/inzexg-coder/ameni-vs-kernel.git
-cd ameni-vs-kernel
-export PATH="$PATH:$(pwd)/.ameni/bin"
-ameni vs diagnose
-```
-
-**PowerShell (без bash):**
-
+**Windows (PowerShell):**
 ```powershell
-git clone https://github.com/inzexg-coder/ameni-vs-kernel.git
-cd ameni-vs-kernel
-.ameni/bin/ameni.ps1 diagnose
-.ameni/bin/ameni.ps1 check C:\MyProject
-.ameni/bin/ameni.ps1 props
-.ameni/bin/ameni.ps1 errors lnk1104-cannot-open-file
+pwsh ./scripts/verify-environment.ps1
 ```
 
-### Соответствие команд
+---
 
-| Команда | Arch Linux (bash) | Windows (PowerShell) |
-|---------|-------------------|---------------------|
-| `diagnose` | `ameni vs diagnose` | `.ameni/bin/ameni.ps1 diagnose` |
-| `check` | `ameni vs check ./path` | `.ameni/bin/ameni.ps1 check ./path` |
-| `props` | `ameni vs props` | `.ameni/bin/ameni.ps1 props` |
-| `errors` | `ameni vs errors lnk1104` | `.ameni/bin/ameni.ps1 errors lnk1104` |
-| `help` | `ameni vs help` | `.ameni/bin/ameni.ps1 help` |
+## CLI агент
 
-Все команды идентичны по функционалу на обеих платформах.
+Все команды `ameni vs` доступны на обеих платформах.
+
+### ameni vs diagnose
+
+**Arch Linux:**
+```bash
+ameni vs diagnose
+
+=== Environment Diagnostics ===
+OS: Linux (x86_64)
+[INFO]  dotnet: 9.0.201
+[INFO]  mono: Mono JIT compiler version 6.12.0
+[INFO]  pwsh: PowerShell 7.4.0
+
+=== Build Tools ===
+[INFO]  gcc: gcc (GCC) 14.2.0
+[INFO]  g++: g++ (GCC) 14.2.0
+[INFO]  make: GNU Make 4.4.1
+[INFO]  cmake: cmake version 3.30.0
+[INFO]  clang: clang version 18.0.0
+```
+
+**Windows (Git Bash):**
+```bash
+ameni vs diagnose
+# автоматически запускает pwsh ./scripts/verify-environment.ps1
+```
+
+**Windows (PowerShell):**
+```powershell
+.\ameni\bin\ameni.ps1 diagnose
+```
+
+### ameni vs check
+
+```bash
+ameni vs check ./MyProject
+```
+
+Проверяет .vcxproj файлы на нестандартные пути LibraryDirectories.
+
+### ameni vs props
+
+```bash
+ameni vs props
+```
+
+Показывает список всех доступных Property Sheets с краткими описаниями.
+
+### ameni vs errors
+
+```bash
+ameni vs errors                  # список всех ошибок
+ameni vs errors lnk1104-cannot-open-file  # описание конкретной ошибки
+```
+
+### ameni vs help / about
+
+```bash
+ameni vs help                    # полный мануал
+ameni vs about                   # краткая информация
+```
+
+---
+
+## Архитектура репозитория
+
+```
+ameni-vs-kernel/
+  .ameni/
+    assets/          - логотип
+    bin/
+      ameni          - CLI агент (bash, кроссплатформенный)
+      ameni.ps1      - CLI агент (PowerShell, Windows)
+  props/             - Property Sheets для импорта
+  scripts/           - PowerShell скрипты диагностики
+  errors/            - документация по ошибкам линковки
+  vs2017/            - конфигурации для VS 2017
+  vs2022/            - конфигурации для VS 2022
+  vs2025/            - конфигурации для VS 2025
+  .vsconfig          - манифест компонентов VS Installer
+  PKGBUILD           - для сборки на Arch Linux
+```
 
 ---
 
