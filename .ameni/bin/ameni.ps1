@@ -26,14 +26,19 @@ $ScriptsDir = "$RepoRoot/scripts"
 
 function Cmd-Diagnose {
   Write-Host "=== Environment Diagnostics ===" -ForegroundColor Cyan
-  Write-Host "OS: $([Environment]::OSVersion.VersionString) ($(if ([Environment]::Is64BitOperatingSystem) { 'x64' } else { 'x86' }))"
+  $osInfo = [Environment]::OSVersion.VersionString
+  if ([Environment]::Is64BitOperatingSystem) {
+    $arch = "x64"
+  } else {
+    $arch = "x86"
+  }
+  Write-Host "OS: $osInfo ($arch)"
   Write-Host ""
 
   $psScript = "$ScriptsDir/verify-environment.ps1"
   if (Test-Path $psScript) {
     & $psScript
-  }
-  else {
+  } else {
     Write-Host "[INFO]  Running standalone diagnostics" -ForegroundColor Green
     $dotnet = Get-Command dotnet -ErrorAction SilentlyContinue
     if ($dotnet) {
@@ -78,9 +83,9 @@ function Cmd-Check {
     }
     Write-Host ""
     if ($mismatches -gt 0) {
-      Write-Host "[!]  LibraryDirectories non-standard — используйте 'ameni vs fix'" -ForegroundColor Yellow
+      Write-Host "[!]  LibraryDirectories non-standard - use 'ameni vs fix'" -ForegroundColor Yellow
     } else {
-      Write-Host "[OK]  Все настройки совпадают с эталоном." -ForegroundColor Green
+      Write-Host "[OK]  All settings match reference." -ForegroundColor Green
     }
   } else {
     Write-Host "[WARN]  No .vcxproj files found in $Path" -ForegroundColor Yellow
@@ -97,9 +102,11 @@ function Cmd-Props {
       $name = $p.BaseName
       $content = Get-Content $p.FullName -TotalCount 1 -ErrorAction SilentlyContinue
       Write-Host "  $name" -NoNewline
-      if ($content -match '<(\w+)>(.*)</\1>') {
+      if ($content -match "<(\w+)>(.*)</\1>") {
         Write-Host "  -  $($matches[1])" -ForegroundColor Gray
-      } else { Write-Host "" }
+      } else {
+        Write-Host ""
+      }
     }
   } else {
     Write-Host "[WARN]  props/ directory not found" -ForegroundColor Yellow
@@ -154,13 +161,13 @@ function Cmd-VsConfig {
   Write-Host "[OK] vswhere.exe found" -ForegroundColor Green
   $vswhereOutput = & $vswherePath -products * -format json 2>$null
   if (-not $vswhereOutput) {
-    Write-Host "[ERROR] vswhere вернул пустой результат. Visual Studio не установлена?" -ForegroundColor Red
+    Write-Host "[ERROR] vswhere returned empty result. Visual Studio not installed?" -ForegroundColor Red
     exit 1
   }
   try {
     $vsInfo = $vswhereOutput | ConvertFrom-Json -ErrorAction Stop
   } catch {
-    Write-Host "[ERROR] Не удалось разобрать вывод vswhere: $_" -ForegroundColor Red
+    Write-Host "[ERROR] Could not parse vswhere output: $_" -ForegroundColor Red
     exit 1
   }
   if (-not $vsInfo) {
@@ -184,7 +191,7 @@ function Cmd-VsConfig {
     Write-Host "  [OK] Done for $displayName" -ForegroundColor Green
   }
   Write-Host ""
-  Write-Host "Готово. Перезапустите Visual Studio если потребуется." -ForegroundColor Green
+  Write-Host "Done. Restart Visual Studio if needed." -ForegroundColor Green
 }
 
 function Cmd-Errors {
@@ -201,20 +208,23 @@ function Cmd-Errors {
     }
   } else {
     $errors = Get-ChildItem -Path $errorsDir -Filter "*.md" -ErrorAction SilentlyContinue
-    foreach ($e in $errors) {
-      $name = $e.BaseName
-      $desc = (Get-Content $e.FullName -TotalCount 1 -ErrorAction SilentlyContinue) -replace '# ',''
-      Write-Host ("  {0,-35} {1}" -f $name, ($desc -join ''))
+    if ($errors) {
+      foreach ($e in $errors) {
+        $name = $e.BaseName
+        $desc = (Get-Content $e.FullName -TotalCount 1 -ErrorAction SilentlyContinue) -replace '# ',''
+        Write-Host ("  {0,-35} {1}" -f $name, ($desc -join ''))
+      }
     }
     Write-Host ""
-    Write-Host "Usage: ameni vs errors <error-name>"
+    Write-Host "Usage: ameni vs errors [error-name]"
   }
 }
 
 function Cmd-About {
   Write-Host ""
   Write-Host "Ameni VS Kernel"
-  Write-Host "Visual Studio Configuration Archive & Diagnostic Agent"
+  $aboutLine = "Visual Studio Configuration Archive and Diagnostic Agent"
+  Write-Host $aboutLine
   Write-Host "https://github.com/inzexg-coder/ameni-vs-kernel"
   Write-Host ""
   Write-Host "Platforms: Windows, Arch Linux, macOS"
@@ -257,17 +267,43 @@ function Cmd-Help {
 }
 
 switch ($Command) {
-  "diagnose"  { Cmd-Diagnose }
-  "check"     { if ($Argument) { Cmd-Check $Argument } else { Cmd-Check } }
-  "fix"       { 
-    $fixPath = if ($Argument) { $Argument } else { "." }
-    $fixArch = if ($args.Count -gt 0) { $args[0] } else { "x64" }
-    Cmd-Fix $fixPath $fixArch 
-}
-  "props"     { Cmd-Props }
-  "errors"    { Cmd-Errors $Argument }
-  "vsconfig"  { Cmd-VsConfig }
-  "about"     { Cmd-About }
-  "help"      { Cmd-Help }
-  default     { Cmd-Help }
+  "diagnose" {
+    Cmd-Diagnose
+  }
+  "check" {
+    if ($Argument) {
+      Cmd-Check $Argument
+    } else {
+      Cmd-Check
+    }
+  }
+  "fix" {
+    $fixPath = "."
+    if ($Argument) {
+      $fixPath = $Argument
+    }
+    $fixArch = "x64"
+    if ($args.Count -gt 0) {
+      $fixArch = $args[0]
+    }
+    Cmd-Fix $fixPath $fixArch
+  }
+  "props" {
+    Cmd-Props
+  }
+  "errors" {
+    Cmd-Errors $Argument
+  }
+  "vsconfig" {
+    Cmd-VsConfig
+  }
+  "about" {
+    Cmd-About
+  }
+  "help" {
+    Cmd-Help
+  }
+  default {
+    Cmd-Help
+  }
 }
