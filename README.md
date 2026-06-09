@@ -53,7 +53,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 ### Всегда используйте префикс `.\` в PowerShell
 
-В PowerShell для запуска локальных файлов нужен префикс `.\`:
+Все команды выполняются **только в PowerShell** (не в cmd.exe). В PowerShell для запуска локальных файлов нужен префикс `.\`:
 
 | Правильно | Неправильно |
 |-----------|-------------|
@@ -62,8 +62,68 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 > Без префикса `.\` PowerShell выдаст ошибку «не удается распознать команду».
 
+> **Важно:** Команды с префиксом `.\` работают только в PowerShell. Обычная командная строка (cmd.exe) их не выполнит.
+
 ---
 
+
+
+### Что вы увидите при диагностике
+
+После выполнения `.\ameni\bin\ameni.ps1 diagnose` вы получите в консоли отчёт.
+Вот что означают его части:
+
+```
+=== Environment Diagnostics ===
+OS: Microsoft Windows 10.0.19045 (x64)
+```
+
+В первой строке выводится версия вашей операционной системы.
+
+#### Статусы `[OK]`, `[WARN]`, `[ERROR]`
+
+| Метка | Цвет | Значение |
+|-------|------|----------|
+| `[OK]` | Зелёный | ✅ Компонент найден, всё в порядке. Можно ничего не делать |
+| `[WARN]` | Жёлтый | ⚠️ Скрипт чего-то не нашёл, но это **не ошибка**. Многие предупреждения нормальны и не влияют на сборку |
+| `[ERROR]` | Красный | ❌ Проблема, которую нужно исправить. Обычно означает, что компонент не установлен |
+
+#### Раздел vswhere
+
+```
+[OK] vswhere.exe: C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe
+       Visual Studio Community 2022 [17.x]
+```
+
+Проверяется, установлена ли Visual Studio. Если `[OK]` — студия найдена. Если `[WARN]` — vswhere не обнаружен (значит, Visual Studio Installer не установлен или VS не установлена).
+
+#### Раздел Windows SDK
+
+```
+[OK] Windows Kits: C:\Program Files (x86)\Windows Kits\10
+       SDK 10.0.19041.0: kernel32.lib найден
+```
+
+Проверяются Windows SDK и наличие `kernel32.lib`. Если `[OK]` — системные библиотеки доступны. Если `[WARN]` — какой-то SDK не содержит `kernel32.lib` (возможно, не установлен нужный компонент).
+
+#### Раздел MSVC (компилятор C++)
+
+```
+[OK] MSVC 14.35 (VS 2022 Community)
+       vcruntime.lib найден
+```
+
+Проверяется компилятор Microsoft Visual C++. Если `[OK]` — компилятор и его библиотеки найдены.
+
+#### Прочие сообщения
+
+```
+[WARN] pwsh не найден. Используется Windows PowerShell.
+```
+
+`pwsh` — это PowerShell Core (кроссплатформенная версия). Если его нет — это **нормально**, используется встроенный в Windows PowerShell 5.1. На работу скриптов это не влияет.
+
+---
 Ниже написано, что делать, если Visual Studio ругается на библиотеки. Ничего устанавливать не нужно — у вас уже есть Visual Studio. Просто выполняйте шаги по порядку.
 
 ### Шаг 1 — Скачать репозиторий через консоль
@@ -72,12 +132,16 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 **Способ A — через Git (рекомендуется):**
 
+> Перед выполнением любых команд откройте **PowerShell** и выполните `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`.
+
 ```powershell
 git clone https://github.com/inzexg-coder/ameni-vs-kernel.git
 cd ameni-vs-kernel
 ```
 
 *Если Git не установлен — скачайте и распакуйте ZIP через консоль:*
+
+> Не забудьте сначала выполнить `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`.
 
 ```powershell
 Invoke-WebRequest -Uri "https://github.com/inzexg-coder/ameni-vs-kernel/archive/refs/heads/main.zip" -OutFile "ameni-vs-kernel.zip"
@@ -88,6 +152,10 @@ cd ameni-vs-kernel-main
 Готово — вы в директории с проектом, все команды ниже работают.
 
 ### Шаг 2 — Проверить, чего не хватает
+
+> **Важно:** Все команды выполняются в **PowerShell**. Если вы открыли обычную командную строку (cmd.exe) — закройте её и откройте PowerShell (Пуск → напишите `PowerShell` → Enter).
+>
+> Перед запуском не забудьте: `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`.
 
 Вставьте эту команду в PowerShell и нажмите Enter:
 
@@ -105,14 +173,10 @@ cd ameni-vs-kernel-main
      SDK 10.0.19041.0: kernel32.lib найден
 [OK] MSVC 14.35 (VS 2022 Community)
      vcruntime.lib найден
+[WARN] pwsh не найден. Используется Windows PowerShell.
 ```
 
-Зелёные `[OK]` — всё хорошо. Красные `[ERROR]` — чего-то не хватает.
-
-> **Важно:** Жёлтые `[WARN]` — это нормально. Они означают, что скрипт чего-то не нашёл,
-> но это не ошибка. Например, `[WARN] pwsh не найден` — это просто значит, что у вас
-> не установлен PowerShell Core, а используется встроенный Windows PowerShell 5.1.
-> Только красные `[ERROR]` требуют внимания.
+Подробное описание всех строк вывода — см. раздел [«Что вы увидите при диагностике»](#что-вы-увидите-при-диагностике).
 
 Если написано `[ERROR] kernel32.lib ОТСУТСТВУЕТ` — переходите к Шагу 5. Если всё зелёное — переходите к Шагу 3.
 
