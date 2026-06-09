@@ -36,6 +36,21 @@
 
 ## Windows
 
+### Перед началом — разрешите запуск скриптов
+
+PowerShell по умолчанию блокирует запуск неподписанных скриптов. Перед любыми
+командами откройте PowerShell и выполните (одна строка):
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+> Эта команда действует только в текущем сеансе PowerShell. При каждом новом
+> открытии PowerShell выполняйте её снова.
+
+---
+
+
 Ниже написано, что делать, если Visual Studio ругается на библиотеки. Ничего устанавливать не нужно — у вас уже есть Visual Studio. Просто выполняйте шаги по порядку.
 
 ### Шаг 1 — Скачать репозиторий через консоль
@@ -49,13 +64,6 @@ git clone https://github.com/inzexg-coder/ameni-vs-kernel.git
 cd ameni-vs-kernel
 ```
 
-> **Важно:** PowerShell может блокировать запуск неподписанных скриптов.
-> Временно разрешите (только для этого сеанса PowerShell):
-> 
-> ```powershell
-> Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-> ```
-
 *Если Git не установлен — скачайте и распакуйте ZIP через консоль:*
 
 ```powershell
@@ -63,13 +71,6 @@ Invoke-WebRequest -Uri "https://github.com/inzexg-coder/ameni-vs-kernel/archive/
 Expand-Archive -Path "ameni-vs-kernel.zip" -DestinationPath "."
 cd ameni-vs-kernel-main
 ```
-
-> **Важно:** PowerShell может блокировать запуск неподписанных скриптов.
-> Временно разрешите (только для этого сеанса PowerShell):
-> 
-> ```powershell
-> Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-> ```
 
 Готово — вы в директории с проектом, все команды ниже работают.
 
@@ -94,6 +95,11 @@ cd ameni-vs-kernel-main
 ```
 
 Зелёные `[OK]` — всё хорошо. Красные `[ERROR]` — чего-то не хватает.
+
+> **Важно:** Жёлтые `[WARN]` — это нормально. Они означают, что скрипт чего-то не нашёл,
+> но это не ошибка. Например, `[WARN] pwsh не найден` — это просто значит, что у вас
+> не установлен PowerShell Core, а используется встроенный Windows PowerShell 5.1.
+> Только красные `[ERROR]` требуют внимания.
 
 Если написано `[ERROR] kernel32.lib ОТСУТСТВУЕТ` — переходите к Шагу 5. Если всё зелёное — переходите к Шагу 3.
 

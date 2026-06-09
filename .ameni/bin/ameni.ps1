@@ -26,7 +26,7 @@ $ScriptsDir = "$RepoRoot/scripts"
 
 function Cmd-Diagnose {
   Write-Host "=== Environment Diagnostics ===" -ForegroundColor Cyan
-  Write-Host "OS: $([Environment]::OSVersion.VersionString) ($([Environment]::Is64BitOperatingSystem ? 'x64' : 'x86'))"
+  Write-Host "OS: $([Environment]::OSVersion.VersionString) ($(if ([Environment]::Is64BitOperatingSystem) { 'x64' } else { 'x86' }))"
   Write-Host ""
 
   $psScript = "$ScriptsDir/verify-environment.ps1"
@@ -99,7 +99,7 @@ function Cmd-Props {
       $name = $p.BaseName
       $content = Get-Content $p.FullName -TotalCount 1 -ErrorAction SilentlyContinue
       Write-Host "  $name" -NoNewline
-      if ($content -match '<\w+>(.*)</\w+>') {
+      if ($content -match '<(\w+)>(.*)</\1>') {
         Write-Host "  -  $($matches[1])" -ForegroundColor Gray
       } else { Write-Host "" }
     }
@@ -154,7 +154,7 @@ function Cmd-VsConfig {
   }
 
   Write-Host "[OK] vswhere.exe found" -ForegroundColor Green
-  $vsInfo = & $vswherePath -products * -format json | ConvertFrom-Json
+  $vsInfo = & $vswherePath -products * -format json 2>$null | ConvertFrom-Json
   if (-not $vsInfo) {
     Write-Host "[ERROR] No Visual Studio installations found." -ForegroundColor Red
     exit 1
@@ -250,8 +250,8 @@ function Cmd-Help {
 
 switch ($Command) {
   "diagnose"  { Cmd-Diagnose }
-  "check"     { Cmd-Check $Argument }
-  "fix"       { if ($args.Count -gt 0) { Cmd-Fix $Argument $args[0] } else { Cmd-Fix $Argument } }
+  "check"     { if ($Argument) { Cmd-Check $Argument } else { Cmd-Check } }
+  "fix"       { if ($args.Count -gt 0) { if ($Argument) { Cmd-Fix $Argument $args[0] } else { Cmd-Fix "." $args[0] } } else { if ($Argument) { Cmd-Fix $Argument } else { Cmd-Fix } } }
   "props"     { Cmd-Props }
   "errors"    { Cmd-Errors $Argument }
   "vsconfig"  { Cmd-VsConfig }
