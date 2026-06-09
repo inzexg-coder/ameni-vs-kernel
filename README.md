@@ -49,6 +49,13 @@ git clone https://github.com/inzexg-coder/ameni-vs-kernel.git
 cd ameni-vs-kernel
 ```
 
+> **Важно:** PowerShell может блокировать запуск неподписанных скриптов.
+> Временно разрешите (только для этого сеанса PowerShell):
+> 
+> ```powershell
+> Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+> ```
+
 *Если Git не установлен — скачайте и распакуйте ZIP через консоль:*
 
 ```powershell
@@ -57,6 +64,13 @@ Expand-Archive -Path "ameni-vs-kernel.zip" -DestinationPath "."
 cd ameni-vs-kernel-main
 ```
 
+> **Важно:** PowerShell может блокировать запуск неподписанных скриптов.
+> Временно разрешите (только для этого сеанса PowerShell):
+> 
+> ```powershell
+> Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+> ```
+
 Готово — вы в директории с проектом, все команды ниже работают.
 
 ### Шаг 2 — Проверить, чего не хватает
@@ -64,7 +78,7 @@ cd ameni-vs-kernel-main
 Вставьте эту команду в PowerShell и нажмите Enter:
 
 ```powershell
-.\ameni\bin\ameni.ps1 diagnose
+.\.ameni\bin\ameni.ps1 diagnose
 ```
 
 Вы увидите примерно такое:
@@ -88,7 +102,7 @@ cd ameni-vs-kernel-main
 Найдите ваш .vcxproj файл (он лежит в папке с вашим проектом, рядом с .sln). Запустите:
 
 ```powershell
-.\ameni\bin\ameni.ps1 check C:\Путь\к\вашему\проекту
+.\.ameni\bin\ameni.ps1 check C:\Путь\к\вашему\проекту
 ```
 
 Если после этой команды написано `[OK]  Все настройки совпадают с эталоном.` — всё в порядке, проблема не в путях.
@@ -100,7 +114,7 @@ cd ameni-vs-kernel-main
 Эта команда сама пропишет правильные пути прямо в ваш файл проекта. Она сделает резервную копию (`.bak`), так что ничего не сломается.
 
 ```powershell
-.\ameni\bin\ameni.ps1 fix C:\Путь\к\вашему\проекту x64
+.\.ameni\bin\ameni.ps1 fix C:\Путь\к\вашему\проекту x64
 ```
 
 Параметр `x64` — это архитектура. Если ваш проект 32-битный — укажите `x86`, если ARM64 — `ARM64`.
@@ -119,7 +133,7 @@ Rename-Item "МойПроект.vcxproj.bak" "МойПроект.vcxproj"
 Если `fix` не помог — возможно, не установлены нужные компоненты Visual Studio. Импортируйте `.vsconfig` через VS Installer CLI:
 
 ```powershell
-.\ameni\bin\ameni.ps1 vsconfig
+.\.ameni\bin\ameni.ps1 vsconfig
 ```
 
 Эта команда найдёт вашу установку Visual Studio через vswhere и запустит установщик с конфигурацией из `.vsconfig`. Никаких кнопок — всё через консоль.
@@ -220,10 +234,10 @@ ameni vs help              — полный мануал
 ### Windows (PowerShell)
 
 ```powershell
-.\ameni\bin\ameni.ps1 diagnose
-.\ameni\bin\ameni.ps1 check C:\MyProject
-.\ameni\bin\ameni.ps1 props
-.\ameni\bin\ameni.ps1 errors lnk1104-cannot-open-file
+.\.ameni\bin\ameni.ps1 diagnose
+.\.ameni\bin\ameni.ps1 check C:\MyProject
+.\.ameni\bin\ameni.ps1 props
+.\.ameni\bin\ameni.ps1 errors lnk1104-cannot-open-file
 ```
 
 ### Arch Linux (bash)

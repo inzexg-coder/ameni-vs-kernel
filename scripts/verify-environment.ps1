@@ -1,119 +1,164 @@
-
-
 $ErrorActionPreference = "Continue"
+
+function Write-Warn {
+    param([string]$Message)
+    Write-Host "[WARN] $Message" -ForegroundColor Yellow
+}
+
+function Write-Ok {
+    param([string]$Message)
+    Write-Host "[OK] $Message" -ForegroundColor Green
+}
+
+function Write-Info {
+    param([string]$Message)
+    Write-Host "       $Message" -ForegroundColor Gray
+}
+
 $foundIssues = @()
 
 Write-Host "=== Visual Studio Environment Verification ===" -ForegroundColor Cyan
 Write-Host ""
 
-$vsWhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-$vsPreviewWhere = "${env:ProgramFiles}\Microsoft Visual Studio\Installer\vswhere.exe"
-
+# ── vswhere ────────────────────────────────────────────
+$vswherePaths = @(
+    "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe",
+    "${env:ProgramFiles}\Microsoft Visual Studio\Installer\vswhere.exe"
+)
 $vswherePath = $null
-if (Test-Path $vsWhere) { $vswherePath = $vsWhere }
-elseif (Test-Path $vsPreviewWhere) { $vswherePath = $vsPreviewWhere }
+foreach ($p in $vswherePaths) {
+    if (Test-Path $p) { $vswherePath = $p; break }
+}
 
 if ($vswherePath) {
-    Write-Host "[OK] vswhere.exe найден: $vswherePath" -ForegroundColor Green
-    $vsInfo = & $vswherePath -products * -format json | ConvertFrom-Json
-    if ($vsInfo) {
-        foreach ($vs in $vsInfo) {
-            Write-Host "     Установка: $($vs.displayName) [$($vs.catalog.productLineVersion)]" -ForegroundColor Gray
-            Write-Host "     Путь: $($vs.installationPath)" -ForegroundColor Gray
+    Write-Ok "vswhere.exe: $vswherePath"
+    try {
+        $vsInfo = & $vswherePath -products * -format json 2>$null | ConvertFrom-Json
+        if ($vsInfo -and $vsInfo.Count -gt 0) {
+            foreach ($vs in $vsInfo) {
+                Write-Info "$($vs.displayName) [$($vs.catalog.productLineVersion)]"
+            }
+        } else {
+            Write-Warn "Visual Studio не найдена через vswhere (возможно, не запускалась ни разу)"
         }
+    } catch {
+        Write-Warn "Ошибка при вызове vswhere: $_"
     }
 } else {
-    Write-Host "[WARN] vswhere.exe не найден. Visual Studio может быть не установлена." -ForegroundColor Yellow
-    $foundIssues += "vswhere.exe not found"
+    Write-Warn "vswhere.exe не найден. Visual Studio не обнаружена."
 }
 
 Write-Host ""
 
-$sdkPath = "${env:ProgramFiles(x86)}\Windows Kits\10"
-$sdkPath2 = "${env:ProgramFiles}\Windows Kits\10"
-
+# ── Windows SDK ────────────────────────────────────────
+$sdkPaths = @(
+    "${env:ProgramFiles(x86)}\Windows Kits\10",
+    "${env:ProgramFiles}\Windows Kits\10"
+)
 $kitPath = $null
-if (Test-Path $sdkPath) { $kitPath = $sdkPath }
-elseif (Test-Path $sdkPath2) { $kitPath = $sdkPath2 }
+foreach ($p in $sdkPaths) {
+    if (Test-Path $p) { $kitPath = $p; break }
+}
 
 if ($kitPath) {
-    Write-Host "[OK] Windows Kits найден: $kitPath" -ForegroundColor Green
-    $sdkVersions = Get-ChildItem "$kitPath\lib" -Directory -ErrorAction SilentlyContinue
-    if ($sdkVersions) {
-        foreach ($ver in $sdkVersions) {
-            $umPath = "$kitPath\lib\$($ver.Name)\um\x64\kernel32.lib"
-            if (Test-Path $umPath) {
-                Write-Host "     SDK $($ver.Name): kernel32.lib найден" -ForegroundColor Green
-            } else {
-                Write-Host "     SDK $($ver.Name): kernel32.lib ОТСУТСТВУЕТ!" -ForegroundColor Red
-                $foundIssues += "kernel32.lib not found for SDK $($ver.Name)"
+    Write-Ok "Windows Kits: $kitPath"
+    try {
+        $sdkVersions = Get-ChildItem "$kitPath\lib" -Directory -ErrorAction SilentlyContinue
+        if ($sdkVersions) {
+            foreach ($ver in $sdkVersions) {
+                $umPath = "$kitPath\lib\$($ver.Name)\um\x64\kernel32.lib"
+                if (Test-Path $umPath) {
+                    Write-Info "SDK $($ver.Name): kernel32.lib найден"
+                } else {
+                    Write-Warn "SDK $($ver.Name): kernel32.lib не найден (возможно, не установлен компонент)"
+                    $foundIssues += "kernel32.lib not found for SDK $($ver.Name)"
+                }
             }
+        } else {
+            Write-Warn "В Windows Kits нет lib/ — SDK не установлен"
+            $foundIssues += "Windows SDK libraries not found"
         }
+    } catch {
+        Write-Warn "Ошибка при проверке Windows Kits: $_"
     }
 } else {
-    Write-Host "[ERROR] Windows Kits 10 не найден!" -ForegroundColor Red
-    $foundIssues += "Windows Kits 10 not found"
+    Write-Warn "Windows Kits 10 не установлены"
 }
 
 Write-Host ""
 
-$msvcBase = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC"
-$msvcBase2 = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2019\BuildTools\VC\Tools\MSVC"
-$msvcBase3 = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2017\BuildTools\VC\Tools\MSVC"
+# ── MSVC ────────────────────────────────────────────────
 $editions = @("Community", "Professional", "Enterprise", "BuildTools")
 $vsYears = @("2025", "2022", "2019", "2017")
-
 $msvcFound = $false
+
 foreach ($year in $vsYears) {
     foreach ($ed in $editions) {
         $base = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\$year\$ed\VC\Tools\MSVC"
         if (Test-Path $base) {
-            $versions = Get-ChildItem $base -Directory -ErrorAction SilentlyContinue
-            if ($versions) {
-                $msvcFound = $true
-                foreach ($v in $versions) {
-                    Write-Host "[OK] MSVC $($v.Name) (VS $year $ed)" -ForegroundColor Green
-                    $libPath = "$base\$($v.Name)\lib\x64"
-                    if (Test-Path "$libPath\vcruntime.lib") {
-                        Write-Host "     vcruntime.lib найден" -ForegroundColor Green
-                    } else {
-                        Write-Host "     vcruntime.lib ОТСУТСТВУЕТ!" -ForegroundColor Red
-                        $foundIssues += "vcruntime.lib not found in $libPath"
+            try {
+                $versions = Get-ChildItem $base -Directory -ErrorAction SilentlyContinue
+                if ($versions) {
+                    $msvcFound = $true
+                    foreach ($v in $versions) {
+                        Write-Ok "MSVC $($v.Name) (VS $year $ed)"
+                        $libPath = "$base\$($v.Name)\lib\x64"
+                        if (Test-Path "$libPath\vcruntime.lib") {
+                            Write-Info "vcruntime.lib найден"
+                        } else {
+                            Write-Warn "vcruntime.lib не найден в $libPath"
+                            $foundIssues += "vcruntime.lib not found in $libPath"
+                        }
                     }
                 }
+            } catch {
+                # silently continue
             }
         }
     }
 }
 
 if (-not $msvcFound) {
-    Write-Host "[ERROR] MSVC toolchain не найден!" -ForegroundColor Red
-    $foundIssues += "MSVC toolchain not found"
+    Write-Warn "MSVC toolchain не найден (возможно, не установлен компонент 'Desktop development with C++')"
+    $foundIssues += "MSVC toolchain not found — установите через VS Installer"
 }
 
 Write-Host ""
 
+# ── Environment variables ──────────────────────────────
 $envVars = @("VC_IncludePath", "VC_LibraryPath_x64", "WindowsSDK_IncludePath",
              "WindowsSDK_LibraryPath_x64", "NETFXKitsDir", "VC_ExecutablePath_x64")
 foreach ($var in $envVars) {
     $val = [Environment]::GetEnvironmentVariable($var, "Process")
     if ($val) {
-        Write-Host "[OK] $var = $val" -ForegroundColor Green
+        Write-Ok "$var = $val"
     } else {
-        Write-Host "[INFO] $var не задана (нормально вне dev-командной строки)" -ForegroundColor Yellow
+        Write-Info "$var не задана (нормально вне dev-командной строки)"
     }
 }
 
 Write-Host ""
+
+# ── Summary ────────────────────────────────────────────
 Write-Host "=== Итог ===" -ForegroundColor Cyan
 if ($foundIssues.Count -eq 0) {
     Write-Host "Проблем не обнаружено." -ForegroundColor Green
 } else {
-    Write-Host "Найдено проблем: $($foundIssues.Count)" -ForegroundColor Red
-    foreach ($issue in $foundIssues) {
-        Write-Host "  - $issue" -ForegroundColor Red
+    if ($foundIssues.Count -le 2) {
+        Write-Host "Найдено несоответствий: $($foundIssues.Count)" -ForegroundColor Yellow
+        foreach ($issue in $foundIssues) {
+            Write-Host "  - $issue" -ForegroundColor Yellow
+        }
+        Write-Host ""
+        Write-Host "Подсказка: запустите Visual Studio Installer и проверьте компонент" -ForegroundColor Cyan
+        Write-Host "'Desktop development with C++' (или выполните ameni vs vsconfig)." -ForegroundColor Cyan
+    } else {
+        Write-Host "Найдено несоответствий: $($foundIssues.Count)" -ForegroundColor Red
+        foreach ($issue in $foundIssues) {
+            Write-Host "  - $issue" -ForegroundColor Red
+        }
+        Write-Host ""
+        Write-Host "Рекомендация: запустите Visual Studio Installer и убедитесь, что компоненты" -ForegroundColor Yellow
+        Write-Host "'Desktop development with C++' и Windows SDK установлены." -ForegroundColor Yellow
     }
-    Write-Host ""
-    Write-Host "Рекомендация: запустите Visual Studio Installer и убедитесь, что компоненты" -ForegroundColor Yellow
-    Write-Host "'Desktop development with C++' и Windows SDK установлены." -ForegroundColor Yellow
 }

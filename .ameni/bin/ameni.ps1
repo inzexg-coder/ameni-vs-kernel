@@ -139,12 +139,14 @@ function Cmd-VsConfig {
     exit 1
   }
 
-  $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-  $vswherePreview = "${env:ProgramFiles}\Microsoft Visual Studio\Installer\vswhere.exe"
-
+  $vswherePaths = @(
+    "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe",
+    "${env:ProgramFiles}\Microsoft Visual Studio\Installer\vswhere.exe"
+  )
   $vswherePath = $null
-  if (Test-Path $vswhere) { $vswherePath = $vswhere }
-  elseif (Test-Path $vswherePreview) { $vswherePath = $vswherePreview }
+  foreach ($p in $vswherePaths) {
+    if (Test-Path $p) { $vswherePath = $p; break }
+  }
 
   if (-not $vswherePath) {
     Write-Host "[ERROR] vswhere.exe not found. Visual Studio may not be installed." -ForegroundColor Red
@@ -249,7 +251,7 @@ function Cmd-Help {
 switch ($Command) {
   "diagnose"  { Cmd-Diagnose }
   "check"     { Cmd-Check $Argument }
-  "fix"       { Cmd-Fix $Argument }
+  "fix"       { if ($args.Count -gt 0) { Cmd-Fix $Argument $args[0] } else { Cmd-Fix $Argument } }
   "props"     { Cmd-Props }
   "errors"    { Cmd-Errors $Argument }
   "vsconfig"  { Cmd-VsConfig }
