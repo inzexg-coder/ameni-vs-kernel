@@ -35,7 +35,6 @@ function Cmd-Diagnose {
   }
   else {
     Write-Host "[INFO]  Running standalone diagnostics" -ForegroundColor Green
-    # Check dotnet
     $dotnet = Get-Command dotnet -ErrorAction SilentlyContinue
     if ($dotnet) {
       $dv = & dotnet --version
@@ -43,7 +42,6 @@ function Cmd-Diagnose {
     } else {
       Write-Host "[WARN]  dotnet not found in PATH" -ForegroundColor Yellow
     }
-    # Check pwsh
     $pwsh = Get-Command pwsh -ErrorAction SilentlyContinue
     if ($pwsh) {
       Write-Host "[INFO]  PowerShell Core: $($pwsh.Source)" -ForegroundColor Green
@@ -154,7 +152,17 @@ function Cmd-VsConfig {
   }
 
   Write-Host "[OK] vswhere.exe found" -ForegroundColor Green
-  $vsInfo = & $vswherePath -products * -format json 2>$null | ConvertFrom-Json
+  $vswhereOutput = & $vswherePath -products * -format json 2>$null
+  if (-not $vswhereOutput) {
+    Write-Host "[ERROR] vswhere вернул пустой результат. Visual Studio не установлена?" -ForegroundColor Red
+    exit 1
+  }
+  try {
+    $vsInfo = $vswhereOutput | ConvertFrom-Json -ErrorAction Stop
+  } catch {
+    Write-Host "[ERROR] Не удалось разобрать вывод vswhere: $_" -ForegroundColor Red
+    exit 1
+  }
   if (-not $vsInfo) {
     Write-Host "[ERROR] No Visual Studio installations found." -ForegroundColor Red
     exit 1
@@ -251,7 +259,11 @@ function Cmd-Help {
 switch ($Command) {
   "diagnose"  { Cmd-Diagnose }
   "check"     { if ($Argument) { Cmd-Check $Argument } else { Cmd-Check } }
-  "fix"       { if ($args.Count -gt 0) { if ($Argument) { Cmd-Fix $Argument $args[0] } else { Cmd-Fix "." $args[0] } } else { if ($Argument) { Cmd-Fix $Argument } else { Cmd-Fix } } }
+  "fix"       { 
+    $fixPath = if ($Argument) { $Argument } else { "." }
+    $fixArch = if ($args.Count -gt 0) { $args[0] } else { "x64" }
+    Cmd-Fix $fixPath $fixArch 
+}
   "props"     { Cmd-Props }
   "errors"    { Cmd-Errors $Argument }
   "vsconfig"  { Cmd-VsConfig }

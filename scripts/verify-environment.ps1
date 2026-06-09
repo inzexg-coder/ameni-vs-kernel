@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = "Continue"
+﻿$ErrorActionPreference = "SilentlyContinue"
 
 function Write-Warn {
     param([string]$Message)
@@ -32,17 +32,21 @@ foreach ($p in $vswherePaths) {
 
 if ($vswherePath) {
     Write-Ok "vswhere.exe: $vswherePath"
-    try {
-        $vsInfo = & $vswherePath -products * -format json 2>$null | ConvertFrom-Json
+    $vswhereOutput = & $vswherePath -products * -format json 2>$null
+    if ($vswhereOutput) {
+        try {
+            $vsInfo = $vswhereOutput | ConvertFrom-Json -ErrorAction Stop
+        } catch {
+            Write-Warn "Не удалось разобрать вывод vswhere: $_"
+            $vsInfo = $null
+        }
         if ($vsInfo -and $vsInfo.Count -gt 0) {
             foreach ($vs in $vsInfo) {
                 Write-Info "$($vs.displayName) [$($vs.catalog.productLineVersion)]"
             }
         } else {
-            Write-Warn "Visual Studio не найдена через vswhere (возможно, не запускалась ни разу)"
+            Write-Warn "Visual Studio не найдена через vswhere (возможно, не установлена)"
         }
-    } catch {
-        Write-Warn "Ошибка при вызове vswhere: $_"
     }
 } else {
     Write-Warn "vswhere.exe не найден. Visual Studio не обнаружена."
@@ -142,23 +146,14 @@ Write-Host ""
 # ── Summary ────────────────────────────────────────────
 Write-Host "=== Итог ===" -ForegroundColor Cyan
 if ($foundIssues.Count -eq 0) {
-    Write-Host "Проблем не обнаружено." -ForegroundColor Green
+    Write-Host "Проблем не обнаружено. Всё в порядке." -ForegroundColor Green
 } else {
-    if ($foundIssues.Count -le 2) {
-        Write-Host "Найдено несоответствий: $($foundIssues.Count)" -ForegroundColor Yellow
-        foreach ($issue in $foundIssues) {
-            Write-Host "  - $issue" -ForegroundColor Yellow
-        }
-        Write-Host ""
-        Write-Host "Подсказка: запустите Visual Studio Installer и проверьте компонент" -ForegroundColor Cyan
-        Write-Host "'Desktop development with C++' (или выполните ameni vs vsconfig)." -ForegroundColor Cyan
-    } else {
-        Write-Host "Найдено несоответствий: $($foundIssues.Count)" -ForegroundColor Red
-        foreach ($issue in $foundIssues) {
-            Write-Host "  - $issue" -ForegroundColor Red
-        }
-        Write-Host ""
-        Write-Host "Рекомендация: запустите Visual Studio Installer и убедитесь, что компоненты" -ForegroundColor Yellow
-        Write-Host "'Desktop development with C++' и Windows SDK установлены." -ForegroundColor Yellow
+    $color = if ($foundIssues.Count -le 2) { "Yellow" } else { "Red" }
+    Write-Host "Найдено несоответствий: $($foundIssues.Count)" -ForegroundColor $color
+    foreach ($issue in $foundIssues) {
+        Write-Host "  - $issue" -ForegroundColor $color
     }
+    Write-Host ""
+    Write-Host "Подсказка: запустите Visual Studio Installer и проверьте компонент" -ForegroundColor Cyan
+    Write-Host "'Desktop development with C++' (или выполните .\.ameni\bin\ameni.ps1 vsconfig)." -ForegroundColor Cyan
 }

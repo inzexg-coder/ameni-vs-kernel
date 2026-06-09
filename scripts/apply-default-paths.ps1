@@ -1,6 +1,4 @@
-﻿
-
-param(
+﻿param(
     [string]$Path = ".",
     [ValidateSet("x64", "x86", "ARM64")]
     [string]$Architecture = "x64",
