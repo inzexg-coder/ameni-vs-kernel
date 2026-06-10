@@ -398,9 +398,7 @@ PKGBUILD           — Arch Linux
 
 | Скилл | Описание |
 |-------|----------|
-| [**ameni-tg-parser**](https://github.com/inzexg-coder/ameni-tg-parser) | Telegram Message Parser — анализ и визуализация чатов |
 | [**ameni-vs-kernel**](https://github.com/inzexg-coder/ameni-vs-kernel) | VS Kernel — диагностика Visual Studio, LNK-ошибки, .vcxproj |
-| [**fide-rating-calc**](https://github.com/inzexg-coder/fide-rating-calc) | FIDE Rating Calculator — оценка FIDE-рейтинга по партиям |
 
 </p>
 

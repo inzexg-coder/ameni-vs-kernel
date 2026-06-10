@@ -1,15 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
   <defs>
-    <linearGradient id="fg" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="vs" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#a78bfa"/>
-      <stop offset="100%" stop-color="#5C2D91"/>
-    </linearGradient>
-    <linearGradient id="bg" x1="0" y1="1" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0a0a0f"/>
-      <stop offset="100%" stop-color="#1a0a2e"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
     </linearGradient>
   </defs>
-  <circle cx="50" cy="50" r="45" stroke="url(#fg)" stroke-width="3" fill="url(#bg)"/>
-  <path d="M35 35 L45 50 L35 65" stroke="url(#fg)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M55 35 L65 50 L55 65" stroke="url(#fg)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="50" cy="50" r="45" stroke="url(#vs)" stroke-width="3" fill="#0a0a0f"/>
+  <path d="M32 35L50 28l18 7v22L50 72 32 57V35z" stroke="url(#vs)" stroke-width="3" fill="none" stroke-linejoin="round"/>
+  <path d="M38 42l12-5 12 5v14l-12 7-12-7V42z" stroke="url(#vs)" stroke-width="2" fill="none" stroke-linejoin="round"/>
 </svg>
