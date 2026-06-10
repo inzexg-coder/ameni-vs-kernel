@@ -24,7 +24,6 @@
   <a href="#полный-справочник">Полный справочник</a>
 </p>
 
----
 
 ## Как это работает
 
@@ -32,7 +31,6 @@
 
 В репозитории лежат эталонные настройки путей и скрипты, которые возвращают всё как было.
 
----
 
 ## Windows
 
@@ -49,7 +47,6 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 > открытии PowerShell выполняйте её снова. Без неё PowerShell выдаст ошибку
 > «не удается загрузить файл, так как выполнение сценариев отключено».
 
----
 
 ### Всегда используйте префикс `.\` в PowerShell
 
@@ -64,7 +61,6 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 > **Важно:** Команды с префиксом `.\` работают только в PowerShell. Обычная командная строка (cmd.exe) их не выполнит.
 
----
 
 
 
@@ -123,7 +119,6 @@ OS: Microsoft Windows 10.0.19045 (x64)
 
 `pwsh` — это PowerShell Core (кроссплатформенная версия). Если его нет — это **нормально**, используется встроенный в Windows PowerShell 5.1. На работу скриптов это не влияет.
 
----
 Ниже написано, что делать, если Visual Studio ругается на библиотеки. Ничего устанавливать не нужно — у вас уже есть Visual Studio. Просто выполняйте шаги по порядку.
 
 ### Шаг 1 — Скачать репозиторий через консоль
@@ -230,7 +225,6 @@ Rename-Item "МойПроект.vcxproj.bak" "МойПроект.vcxproj"
 
 <br>
 
----
 
 ## Arch Linux
 
@@ -297,7 +291,6 @@ ameni vs check ./path/to/project
 
 <br>
 
----
 
 ## CLI агент
 
@@ -334,7 +327,6 @@ ameni vs errors lnk1104-cannot-open-file
 
 <br>
 
----
 
 ## Полный справочник
 
@@ -393,7 +385,6 @@ PKGBUILD           — Arch Linux
 .vsconfig          — манифест VS Installer
 ```
 
----
 
 <p align="center">
   <img src=".ameni/assets/ameni-logo.svg" alt="Ameni" width="32">
@@ -401,23 +392,7 @@ PKGBUILD           — Arch Linux
   <a href="https://github.com/inzexg-coder">@inzexg-coder</a>
 </p>
 
----
 
-## Связанные скиллы
-
-<p align="center">
-  <a href="https://github.com/inzexg-coder/ameni-tg-parser">
-    <img src=".ameni/assets/skill-tg.svg" width="64" alt="TG Parser">
-  </a>
-  &nbsp;&nbsp;&nbsp;
-  <a href="https://github.com/inzexg-coder/ameni-vs-kernel">
-    <img src=".ameni/assets/skill-vs.svg" width="64" alt="VS Kernel">
-  </a>
-  &nbsp;&nbsp;&nbsp;
-  <a href="https://github.com/inzexg-coder/fide-rating-calc">
-    <img src=".ameni/assets/skill-fide.svg" width="64" alt="FIDE Calc">
-  </a>
-</p>
 
 <p align="center">
 
