@@ -1,0 +1,7 @@
+interface:
+  display_name: "Ameni VS Kernel"
+  short_description: "VS C++ diagnostics & LNK error repair toolkit"
+  default_prompt: "Use $ameni-vs-kernel to diagnose and fix Visual Studio C++ build errors (LNK2019, LNK1104, LNK1120) and restore VC++ library paths."
+
+policy:
+  allow_implicit_invocation: true
