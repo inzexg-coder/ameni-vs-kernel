@@ -1,5 +1,8 @@
 <p align="center">
   <img src=".ameni/assets/ameni-logo.svg" alt="Ameni" width="100">
+<p align="center">
+  <img src="https://img.shields.io/badge/version-1.0.0-a78bfa?labelColor=222" alt="Version 1.0.0">
+</p>
 </p>
 
 <p align="center">
@@ -388,6 +391,9 @@ PKGBUILD           — Arch Linux
 
 <p align="center">
   <img src=".ameni/assets/ameni-logo.svg" alt="Ameni" width="32">
+<p align="center">
+  <img src="https://img.shields.io/badge/version-1.0.0-a78bfa?labelColor=222" alt="Version 1.0.0">
+</p>
   <br>
   <a href="https://github.com/inzexg-coder">@inzexg-coder</a>
 </p>
