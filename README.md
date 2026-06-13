@@ -96,7 +96,6 @@ GET /api/monitor/cpu       CPU
 GET /api/monitor/memory    RAM + Swap
 GET /api/monitor/disk      Диски
 GET /api/monitor/network   Сеть
-GET /api/monitor/history   История (премиум)
 GET /api/premium           Статус премиум
 GET /api/system            Информация о системе
 ```
@@ -112,19 +111,7 @@ GET /api/system            Информация о системе
 }
 ```
 
-<br>
-
-## Премиум
-
-```bash
-AMENI_PREMIUM=1 ameni
-touch ~/.ameni/premium.key && ameni
-```
-
-- Буфер истории на 30 минут
-- График CPU на Canvas
-
----
+<br>---
 
 <p align="center">
   <a href="https://github.com/inzexg-coder/ameni-vs-kernel">github.com/inzexg-coder/ameni-vs-kernel</a>
