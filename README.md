@@ -1,52 +1,24 @@
-<p align="center">
-  <pre>
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢲⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠄⠂⢉⠤⠐⠋⠈⠡⡈⠉⠐⠠⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠀⠀⠀⠀⢀⡀⢠⣤⠔⠁⢀⠀⠀⠀⠀⠀⠀⠀⠈⢢⠀⠀⠈⠱⡤⣤⠄⣀⠀⠀⠀⠀⠀
-    ⠀⠀⠰⠁⠀⣰⣿⠃⠀⢠⠃⢸⠀⠀⠀⠀⠀⠀⠀⠀⠁⠀⠀⠀⠈⢞⣦⡀⠈⡇⠀⠀⠀
-    ⠀⠀⠀⢇⣠⡿⠁⠀⢀⡃⠀⣈⠀⠀⠀⠀⢰⡀⠀⠀⠀⠀⢢⠰⠀⠀⢺⣧⢰⠀⠀⠀⠀
-    ⠀⠀⠀⠈⣿⠁⡘⠀⡌⡇⠀⡿⠸⠀⠀⠀⠈⡕⡄⠀⠐⡀⠈⠀⢃⠀⠀⠾⠇⠀⠀⠀⠀
-    ⠀⠀⠀⠀⠇⡇⠃⢠⠀⠶⡀⡇⢃⠡⡀⠀⠀⠡⠈⢂⡀⢁⠀⡁⠸⠀⡆⠘⡀⠀⠀⠀⠀
-    ⠀⠀⠀⠸⠀⢸⠀⠘⡜⠀⣑⢴⣀⠑⠯⡂⠄⣀⣣⢀⣈⢺⡜⢣⠀⡆⡇⠀⢣⠀⠀⠀⠀
-    ⠀⠀⠀⠇⠀⢸⠀⡗⣰⡿⡻⠿⡳⡅⠀⠀⠀⠀⠈⡵⠿⠿⡻⣷⡡⡇⡇⠀⢸⣇⠀⠀⠀
-    ⠀⠀⢰⠀⠀⡆⡄⣧⡏⠸⢠⢲⢸⠁⠀⠀⠀⠀⠐⢙⢰⠂⢡⠘⣇⡇⠃⠀⠀⢹⡄⠀⠀
-    ⠀⠀⠟⠀⠀⢰⢁⡇⠇⠰⣀⢁⡜⠀⠀⠀⠀⠀⠀⠘⣀⣁⠌⠀⠃⠰⠀⠀⠀⠈⠰⠀⠀
-    ⠀⡘⠀⠀⠀⠀⢊⣤⠀⠀⠤⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠤⠄⠀⢸⠃⠀⠀⠀⠀⠀⠃⠀
-    ⢠⠁⢀⠀⠀⠀⠈⢿⡀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⠀⠀⠀⢀⠏⠀⠀⠀⠀⠀⠀⠸⠀
-    ⠘⠸⠘⡀⠀⠀⠀⠀⢣⠀⠀⠀⠀⠀⠀⠁⠀⠃⠀⠀⠀⠀⢀⠎⠀⠀⠀⠀⠀⢠⠀⠀⡇
-    ⠀⠇⢆⢃⠀⠀⠀⠀⠀⡏⢲⢤⢀⡀⠀⠀⠀⠀⠀⢀⣠⠄⡚⠀⠀⠀⠀⠀⠀⣾⠀⠀⠀
-    ⢰⠈⢌⢎⢆⠀⠀⠀⠀⠁⣌⠆⡰⡁⠉⠉⠀⠉⠁⡱⡘⡼⠇⠀⠀⠀⠀⢀⢬⠃⢠⠀⡆
-    ⠀⢢⠀⠑⢵⣧⡀⠀⠀⡿⠳⠂⠉⠀⠀⠀⠀⠀⠀⠀⠁⢺⡀⠀⠀⢀⢠⣮⠃⢀⠆⡰⠀
-    ⠀⠀⠑⠄⣀⠙⡭⠢⢀⡀⠀⠁⠄⣀⣀⠀⢀⣀⣀⣀⡠⠂⢃⡀⠔⠱⡞⢁⠄⣁⠔⠁⠀
-    ⠀⠀⠀⠀⠀⢠⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠉⠁⠀⠀⠀⠀
-    ⠀⠀⠀⠀⠀⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀
-  </pre>
-</p>
-
-<h1 align="center">ameni monitor — system dashboard</h1>
+<h1 align="center">ameni monitor</h1>
 
 <p align="center">
-  Real-time Linux & Windows system monitoring in your browser<br>
-  CPU / Memory / Disks / Network
+  Панель мониторинга системы в реальном времени<br>
+  CPU / Память / Диски / Сеть
 </p>
 
 <p align="center">
-  <sub>Python 3 · zero dependencies · purple gradient · Arch style</sub>
+  Linux · Windows · Python 3 · zero dependencies
 </p>
 
 ---
 
-## Installation
-
-### Quick
+## Установка
 
 ```bash
 curl -s https://raw.githubusercontent.com/inzexg-coder/ameni-vs-kernel/main/install.sh | bash
 ameni monitor
 ```
 
-### Manual
+Или вручную:
 
 ```bash
 git clone https://github.com/inzexg-coder/ameni-vs-kernel
@@ -54,73 +26,73 @@ cd ameni-vs-kernel
 .ameni/bin/ameni monitor
 ```
 
-Browser opens automatically at `http://localhost:3000`. Dashboard updates every 2 seconds.
+Браузер открывается автоматически на `http://localhost:3000`. Данные обновляются каждые 2 секунды.
 
 ---
 
-## Usage
+## Команды
 
 ```
-ameni monitor                Start dashboard (opens browser)
-ameni monitor --no-browser   Start server without browser
-ameni help                   Show help
+ameni monitor                Запустить панель мониторинга
+ameni monitor --no-browser   Запустить без браузера
+ameni help                   Показать справку
 ```
 
 ---
 
-## Dashboard
+## Панель
 
-Four metric cards in a dark purple gradient grid:
+Четыре карточки с метриками на тёмно-фиолетовом фоне:
 
-**CPU**
-- Usage percentage with animated color bar (<60% green, <85% yellow, >85% red)
-- Load average (1min / 5min / 15min)
-- Core count and per-core frequency (MHz)
-- Temperature (°C)
+**Процессор**
+- Загрузка в процентах с цветным индикатором (<60% зелёный, <85% жёлтый, >85% красный)
+- Load average (1мин / 5мин / 15мин)
+- Количество ядер и частота каждого ядра (MHz)
+- Температура (°C)
 
-**Memory**
-- RAM used percentage with color bar
-- Available / Total (GB)
-- Swap usage percentage with color bar
+**Память**
+- Использование RAM с цветным индикатором
+- Доступно / Всего (GB)
+- Использование Swap с цветным индикатором
 
-**Disks**
-- Per-partition: mount point, usage bar, percentage, used/total
+**Диски**
+- Для каждого раздела: точка монтирования, индикатор заполнения, процент, использовано/всего
 
-**Network**
-- Per-interface: name, RX (down) / TX (up) speeds
+**Сеть**
+- Для каждого интерфейса: имя, RX (приём) / TX (передача)
 
-**History (premium)**
-- Line chart of CPU usage over the last 30 minutes
-- Canvas-based rendering with gradient fill
+**История (премиум)**
+- График загрузки CPU за последние 30 минут
+- Отрисовка на Canvas с градиентной заливкой
 
 ---
 
-## Platform support
+## Поддержка платформ
 
-| Platform | CPU | Memory | Disks | Network | Temperature |
-|----------|-----|--------|-------|---------|-------------|
-| Linux    | /proc/stat | /proc/meminfo | /proc/mounts + statvfs | /proc/net/dev | /sys/class/thermal |
-| Windows  | kernel32.GetSystemTimes | GlobalMemoryStatusEx | PowerShell Get-CimInstance | Get-NetAdapterStatistics | unavailable |
-| macOS    | not implemented | not implemented | not implemented | not implemented | not implemented |
+| Платформа | CPU | Память | Диски | Сеть | Температура |
+|-----------|-----|--------|-------|------|-------------|
+| Linux | /proc/stat | /proc/meminfo | /proc/mounts + statvfs | /proc/net/dev | /sys/class/thermal |
+| Windows | kernel32.GetSystemTimes | GlobalMemoryStatusEx | PowerShell Get-CimInstance | Get-NetAdapterStatistics | нет |
+| macOS | не реализовано | не реализовано | не реализовано | не реализовано | не реализовано |
 
-All system reads are wrapped in try/except. If a metric source is unavailable, the field returns zero or an empty array. The server never crashes on missing data.
+Все чтения системы обёрнуты в try/except. Если источник недоступен, поле возвращает ноль или пустой массив. Сервер никогда не падает при отсутствии данных.
 
 ---
 
 ## API
 
 ```
-GET /api/monitor/all       CPU + RAM + Disk + Network in one response
-GET /api/monitor/cpu       CPU metrics only
-GET /api/monitor/memory    RAM + Swap only
-GET /api/monitor/disk      Disk partitions only
-GET /api/monitor/network   Network interfaces only
-GET /api/monitor/history   Metric history buffer (premium)
-GET /api/premium           Premium status
-GET /api/system            OS, kernel, architecture info
+GET /api/monitor/all       CPU + RAM + Disk + Network одним запросом
+GET /api/monitor/cpu       Только CPU
+GET /api/monitor/memory    Только RAM + Swap
+GET /api/monitor/disk      Только диски
+GET /api/monitor/network   Только сеть
+GET /api/monitor/history   История метрик (премиум)
+GET /api/premium           Статус премиум
+GET /api/system            Информация о системе
 ```
 
-### Response format
+### Формат ответа
 
 ```json
 {
@@ -149,47 +121,42 @@ GET /api/system            OS, kernel, architecture info
 
 ---
 
-## Premium
-
-Enable premium features by setting the environment variable or creating a key file:
+## Премиум
 
 ```bash
 AMENI_PREMIUM=1 ameni monitor
 touch ~/.ameni/premium.key && ameni monitor
 ```
 
-Premium features:
-- Metric history buffer (1800 data points = 30 minutes at 2s interval)
-- `/api/monitor/history` endpoint
-- Canvas-based CPU history chart on the dashboard
+- Буфер истории метрик (1800 точек = 30 минут)
+- Эндпоинт `/api/monitor/history`
+- График CPU на Canvas
 
 ---
 
-## Repository structure
+## Структура репозитория
 
 ```
 ameni-vs-kernel/
-├── server/app.py          HTTP server with embedded HTML page
-├── .ameni/bin/ameni       CLI launcher
-├── index.html             Static standalone page
-├── demo.html              Live demo with random data (no server needed)
-├── install.sh             One-command installer
-├── AGENTS.md              Context for AI agents
-├── SKILL.md               Usage instructions for AI agents
-├── agents/openai.yaml     Metadata for GPT Store / Codex skills
+├── server/app.py          HTTP-сервер с HTML-страницей
+├── .ameni/bin/ameni       CLI запускатор
+├── install.sh             Установщик
+├── demo.html              Автономная демка (без сервера)
+├── AGENTS.md              Контекст для AI-агентов
+├── SKILL.md               Инструкция для AI-агентов
+├── agents/openai.yaml     Метаданные для GPT Store
 └── README.md
 ```
 
 ---
 
-## Technology
+## Технологии
 
-- Pure Python 3 — standard library only (http.server, ctypes, json)
-- HTML / CSS / JS — single-page, auto-refresh, canvas chart
-- JetBrains Mono font
-- Purple gradient color scheme (#08040e background, #a855f7 accent)
-- Zero external dependencies on Linux
-- On Windows requires only Python 3 (PowerShell is pre-installed)
+- Python 3 — стандартная библиотека (http.server, ctypes, json)
+- HTML / CSS / JS — single-page, автообновление, Canvas график
+- JetBrains Mono
+- Тёмно-фиолетовая тема (#08040e, #a855f7)
+- Ноль внешних зависимостей
 
 ---
 
