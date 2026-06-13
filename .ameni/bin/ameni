@@ -5,21 +5,24 @@ while [ -h "$SCRIPT" ]; do
     SCRIPT="$(readlink "$SCRIPT")"
 done
 AMENI_HOME="$(cd "$(dirname "$SCRIPT")/../.." && pwd)"
-case "${1:-help}" in
-  monitor|start|"")
+case "${1:-start}" in
+  start|monitor|"")
     shift 2>/dev/null || true
     exec python3 "$AMENI_HOME/server/app.py" "$@"
     ;;
-  help|--help|-h|*)
+  help|--help|-h)
     echo ""
-    echo -e "  \033[38;5;141mameni monitor — system dashboard\033[0m"
+    echo -e "  \033[38;5;141mameni monitor\033[0m"
     echo ""
-    echo -e "  \033[38;5;92mCommands:\033[0m"
-    echo -e "  \033[38;5;92m  ameni monitor\033[0m              Start dashboard (opens browser)"
-    echo -e "  \033[38;5;92m  ameni monitor --no-browser\033[0m  Start server without browser"
-    echo -e "  \033[38;5;92m  ameni help\033[0m                 Show this help"
+    echo -e "  \033[38;5;92mКоманды:\033[0m"
+    echo -e "  \033[38;5;92m  ameni\033[0m                      Запустить панель мониторинга"
+    echo -e "  \033[38;5;92m  ameni --no-browser\033[0m          Запустить без браузера"
+    echo -e "  \033[38;5;92m  ameni help\033[0m                 Это справка"
     echo ""
-    echo -e "  \033[38;5;147mPremium: set AMENI_PREMIUM=1 or touch ~/.ameni/premium.key\033[0m"
+    echo -e "  \033[38;5;147mПремиум: AMENI_PREMIUM=1 или touch ~/.ameni/premium.key\033[0m"
     echo ""
+    ;;
+  *)
+    exec python3 "$AMENI_HOME/server/app.py" "$@"
     ;;
 esac
