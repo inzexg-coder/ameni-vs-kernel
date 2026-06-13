@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ameni monitor — preview</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#08040e;font-family:'JetBrains Mono',monospace;min-height:100vh;color:#c0c0cc;overflow-x:hidden}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+    background:radial-gradient(ellipse at 20% 50%,#1a0a2e 0%,transparent 60%),
+               radial-gradient(ellipse at 80% 20%,#2a1040 0%,transparent 50%);z-index:-1}
+  .container{max-width:900px;margin:0 auto;padding:20px}
+  .ascii{font-size:7px;line-height:1.1;text-align:center;margin:5px 0 12px;white-space:pre;color:#a855f7;opacity:0.6}
+  h1{font-size:20px;font-weight:300;text-align:center;margin:0 0 4px;
+    background:linear-gradient(90deg,#a855f7,#e9d5ff,#a855f7);background-size:200% auto;
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shim 4s linear infinite}
+  @keyframes shim{0%{background-position:0% center}50%{background-position:200% center}100%{background-position:0% center}}
+  .sub{color:#6b4a7b;font-size:10px;text-align:center;margin-bottom:16px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .card{background:linear-gradient(135deg,#12071e,#1a0a2e);border:1px solid #2a1040;border-radius:8px;padding:14px 16px}
+  .card-title{color:#6b4a7b;font-size:9px;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+  .metric{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:12px}
+  .label{color:#6b4a7b;min-width:80px}
+  .value{color:#c084fc;font-weight:700}
+  .bar-wrap{width:100%;height:6px;background:#1a0820;border-radius:3px;overflow:hidden;margin:4px 0}
+  .bar-fill{height:100%;border-radius:3px;transition:width .6s ease}
+  .bar-green{background:linear-gradient(90deg,#22c55e,#4ade80)}
+  .bar-yellow{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+  .bar-red{background:linear-gradient(90deg,#ef4444,#dc2626)}
+  .bar-purple{background:linear-gradient(90deg,#7c3aed,#a855f7)}
+  .disk-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:11px}
+  .disk-row .mount{color:#a855f7;min-width:60px}
+  .disk-row .pct{color:#c084fc;min-width:35px;text-align:right}
+  .net-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px}
+  .net-row .iface{color:#a855f7;min-width:50px}
+  .net-row .speed{color:#c084fc}
+  .footer{text-align:center;margin-top:16px;font-size:9px;color:#4a2a5a}
+  .premium-badge{display:inline-block;background:linear-gradient(90deg,#7c3aed,#a855f7);color:#fff;font-size:8px;padding:2px 6px;border-radius:3px;margin-left:6px;vertical-align:middle}
+
+  .note{text-align:center;margin-top:20px;padding:10px;background:rgba(18,7,30,.6);border:1px dashed #2a1040;border-radius:6px;font-size:10px;color:#6b4a7b}
+  .note a{color:#a855f7}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="ascii">
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢲⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⢀⠄⠂⢉⠤⠐⠋⠈⠡⡈⠉⠐⠠⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢀⡀⢠⣤⠔⠁⢀⠀⠀⠀⠀⠀⠀⠀⠈⢢⠀⠀⠈⠱⡤⣤⠄⣀⠀⠀⠀⠀⠀
+⠀⠀⠰⠁⠀⣰⣿⠃⠀⢠⠃⢸⠀⠀⠀⠀⠀⠀⠀⠀⠁⠀⠀⠀⠈⢞⣦⡀⠈⡇⠀⠀⠀
+⠀⠀⠀⢇⣠⡿⠁⠀⢀⡃⠀⣈⠀⠀⠀⠀⢰⡀⠀⠀⠀⠀⢢⠰⠀⠀⢺⣧⢰⠀⠀⠀⠀
+⠀⠀⠀⠈⣿⠁⡘⠀⡌⡇⠀⡿⠸⠀⠀⠀⠈⡕⡄⠀⠐⡀⠈⠀⢃⠀⠀⠾⠇⠀⠀⠀⠀
+⠀⠀⠀⠀⠇⡇⠃⢠⠀⠶⡀⡇⢃⠡⡀⠀⠀⠡⠈⢂⡀⢁⠀⡁⠸⠀⡆⠘⡀⠀⠀⠀⠀
+⠀⠀⠀⠸⠀⢸⠀⠘⡜⠀⣑⢴⣀⠑⠯⡂⠄⣀⣣⢀⣈⢺⡜⢣⠀⡆⡇⠀⢣⠀⠀⠀⠀
+⠀⠀⠀⠇⠀⢸⠀⡗⣰⡿⡻⠿⡳⡅⠀⠀⠀⠀⠈⡵⠿⠿⡻⣷⡡⡇⡇⠀⢸⣇⠀⠀⠀
+⠀⠀⢰⠀⠀⡆⡄⣧⡏⠸⢠⢲⢸⠁⠀⠀⠀⠀⠐⢙⢰⠂⢡⠘⣇⡇⠃⠀⠀⢹⡄⠀⠀
+⠀⠀⠟⠀⠀⢰⢁⡇⠇⠰⣀⢁⡜⠀⠀⠀⠀⠀⠀⠘⣀⣁⠌⠀⠃⠰⠀⠀⠀⠈⠰⠀⠀
+⠀⡘⠀⠀⠀⠀⢊⣤⠀⠀⠤⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠤⠄⠀⢸⠃⠀⠀⠀⠀⠀⠃⠀
+⢠⠁⢀⠀⠀⠀⠈⢿⡀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⠀⠀⠀⢀⠏⠀⠀⠀⠀⠀⠀⠸⠀
+⠘⠸⠘⡀⠀⠀⠀⠀⢣⠀⠀⠀⠀⠀⠀⠁⠀⠃⠀⠀⠀⠀⢀⠎⠀⠀⠀⠀⠀⢠⠀⠀⡇
+⠀⠇⢆⢃⠀⠀⠀⠀⠀⡏⢲⢤⢀⡀⠀⠀⠀⠀⠀⢀⣠⠄⡚⠀⠀⠀⠀⠀⠀⣾⠀⠀⠀
+⢰⠈⢌⢎⢆⠀⠀⠀⠀⠁⣌⠆⡰⡁⠉⠉⠀⠉⠁⡱⡘⡼⠇⠀⠀⠀⠀⢀⢬⠃⢠⠀⡆
+⠀⢢⠀⠑⢵⣧⡀⠀⠀⡿⠳⠂⠉⠀⠀⠀⠀⠀⠀⠀⠁⢺⡀⠀⠀⢀⢠⣮⠃⢀⠆⡰⠀
+⠀⠀⠑⠄⣀⠙⡭⠢⢀⡀⠀⠁⠄⣀⣀⠀⢀⣀⣀⣀⡠⠂⢃⡀⠔⠱⡞⢁⠄⣁⠔⠁⠀
+⠀⠀⠀⠀⠀⢠⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠉⠁⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀
+</div>
+
+<h1>ameni monitor — system dashboard</h1>
+<div class="sub">Linux 5.10.226-android12-9  |  aarch64</div>
+
+<div class="grid">
+
+  <!-- CPU -->
+  <div class="card">
+    <div class="card-title">cpu</div>
+    <div class="metric"><span class="label">Usage</span><span class="value">34.2%</span></div>
+    <div class="bar-wrap"><div class="bar-fill bar-green" style="width:34%"></div></div>
+    <div class="metric"><span class="label">Load Avg</span><span class="value">1.2  0.8  0.5</span></div>
+    <div class="metric"><span class="label">Cores</span><span class="value">8 cores</span></div>
+    <div class="metric"><span class="label">Freq</span><span class="value">806 806 614 652 MHz</span></div>
+    <div class="metric"><span class="label">Temp</span><span class="value">48.2°C</span></div>
+  </div>
+
+  <!-- Memory -->
+  <div class="card">
+    <div class="card-title">memory <span class="premium-badge">PREMIUM</span></div>
+    <div class="metric"><span class="label">RAM Used</span><span class="value">71.0%</span></div>
+    <div class="bar-wrap"><div class="bar-fill bar-yellow" style="width:71%"></div></div>
+    <div class="metric"><span class="label">Available</span><span class="value">2.0 / 6.9 GB</span></div>
+    <div class="metric"><span class="label">Swap</span><span class="value">79.8%</span></div>
+    <div class="bar-wrap"><div class="bar-fill bar-red" style="width:80%"></div></div>
+  </div>
+
+  <!-- Disks -->
+  <div class="card">
+    <div class="card-title">disks</div>
+    <div class="disk-row">
+      <span class="mount">/</span>
+      <span style="flex:1;margin:0 8px"><div class="bar-wrap" style="height:4px"><div class="bar-fill bar-green" style="width:38%"></div></div></span>
+      <span class="pct">37.8%</span>
+      <span style="color:#6b4a7b;font-size:10px;min-width:50px;text-align:right">84.2/222.9G</span>
+    </div>
+    <div class="disk-row">
+      <span class="mount">/home</span>
+      <span style="flex:1;margin:0 8px"><div class="bar-wrap" style="height:4px"><div class="bar-fill bar-yellow" style="width:72%"></div></div></span>
+      <span class="pct">72.1%</span>
+      <span style="color:#6b4a7b;font-size:10px;min-width:50px;text-align:right">288/400G</span>
+    </div>
+    <div class="disk-row">
+      <span class="mount">/mnt/data</span>
+      <span style="flex:1;margin:0 8px"><div class="bar-wrap" style="height:4px"><div class="bar-fill bar-red" style="width:91%"></div></div></span>
+      <span class="pct">91.2%</span>
+      <span style="color:#6b4a7b;font-size:10px;min-width:50px;text-align:right">910/998G</span>
+    </div>
+  </div>
+
+  <!-- Network -->
+  <div class="card">
+    <div class="card-title">network</div>
+    <div class="net-row"><span class="iface">wlan0</span><span class="speed">↓ 1.2MB  ↑ 340KB</span></div>
+    <div class="net-row"><span class="iface">eth0</span><span class="speed">↓ 0B  ↑ 0B</span></div>
+    <div class="net-row" style="margin-top:4px;border-top:1px solid #1a0820;padding-top:4px">
+      <span class="iface" style="color:transparent">·</span>
+      <span class="speed" style="font-size:10px;color:#6b4a7b">↑↓ total: 1.54MB</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- History (premium) -->
+<div class="card" style="margin-top:10px">
+  <div class="card-title">history <span class="premium-badge">PREMIUM</span></div>
+  <div style="width:100%;height:120px;border-radius:4px;background:#0a0212;padding:10px;display:flex;align-items:flex-end;gap:2px">
+    <div style="flex:1;height:20%;background:linear-gradient(to top,#7c3aed,#a855f7);border-radius:1px;opacity:0.5"></div>
+    <div style="flex:1;height:35%;background:linear-gradient(to top,#7c3aed,#a855f7);border-radius:1px;opacity:0.5"></div>
+    <div style="flex:1;height:28%;background:linear-gradient(to top,#7c3aed,#a855f7);border-radius:1px;opacity:0.5"></div>
+    <div style="flex:1;height:45%;background:linear-gradient(to top,#7c3aed,#a855f7);border-radius:1px;opacity:0.6"></div>
+    <div style="flex:1;height:30%;background:linear-gradient(to top,#7c3aed,#a855f7);border-radius:1px;opacity:0.5"></div>
+    <div style="flex:1;height:55%;background:linear-gradient(to top,#7c3aed,#a855f7);border-radius:1px;opacity:0.6"></div>
+    <div style="flex:1;height:40%;background:linear-gradient(to top,#7c3aed,#a855f7);border-radius:1px;opacity:0.5"></div>
+    <div style="flex:1;height:65%;background:linear-gradient(to top,#7c3aed,#a855f7);border-radius:1px;opacity:0.7"></div>
+    <div style="flex:1;height:48%;background:linear-gradient(to top,#7c3aed,#a855f7);border-radius:1px;opacity:0.6"></div>
+    <div style="flex:1;height:70%;background:linear-gradient(to top,#7c3aed,#a855f7);border-radius:1px;opacity:0.7"></div>
+    <div style="flex:1;height:52%;background:linear-gradient(to top,#7c3aed,#a855f7);border-radius:1px;opacity:0.6"></div>
+    <div style="flex:1;height:38%;background:linear-gradient(to top,#7c3aed,#a855f7);border-radius:1px;opacity:0.5"></div>
+    <div style="flex:1;height:62%;background:linear-gradient(to top,#7c3aed,#a855f7);border-radius:1px;opacity:0.7"></div>
+    <div style="flex:1;height:44%;background:linear-gradient(to top,#7c3aed,#a855f7);border-radius:1px;opacity:0.5"></div>
+    <div style="flex:1;height:58%;background:linear-gradient(to top,#7c3aed,#a855f7);border-radius:1px;opacity:0.6"></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;font-size:8px;color:#4a2a5a;margin-top:4px">
+    <span>14:30</span><span>CPU usage last 30 min</span><span>15:00</span>
+  </div>
+</div>
+
+<div class="footer">updating every 2s</div>
+
+<div class="note">
+  ⚡ Это предпросмотр дизайна. Реальные данные подставляются через API.<br>
+  Запусти <a href="#" onclick="alert('ameni monitor')"><b>ameni monitor</b></a> чтобы увидеть живые метрики
+</div>
+
+</div>
+</body>
+</html>

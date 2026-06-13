@@ -3,17 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>ameni monitor â Ð¿Ð°Ð½ÐµÐ»Ñ Ð¼Ð¾Ð½Ð¸ÑÐ¾ÑÐ¸Ð½Ð³Ð°</title>
+<title>ameni monitor — live demo</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&display=swap');
   *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#08040e;font-family:'JetBrains Mono',monospace;min-height:100vh;color:#c0c0cc}
+  body{background:#08040e;font-family:'JetBrains Mono',monospace;min-height:100vh;color:#c0c0cc;overflow-x:hidden}
   body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
     background:radial-gradient(ellipse at 20% 50%,#1a0a2e 0%,transparent 60%),
                radial-gradient(ellipse at 80% 20%,#2a1040 0%,transparent 50%);z-index:-1}
   .container{max-width:900px;margin:0 auto;padding:20px}
-  .logo{text-align:center;margin:5px 0 8px}
-  .logo svg{width:48px;height:48px}
+  .ascii{font-size:7px;line-height:1.1;text-align:center;margin:5px 0 12px;white-space:pre;color:#a855f7;opacity:0.6}
   h1{font-size:20px;font-weight:300;text-align:center;margin:0 0 4px;
     background:linear-gradient(90deg,#a855f7,#e9d5ff,#a855f7);background-size:200% auto;
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shim 4s linear infinite}
@@ -31,6 +30,7 @@
   .bar-green{background:linear-gradient(90deg,#22c55e,#4ade80)}
   .bar-yellow{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
   .bar-red{background:linear-gradient(90deg,#ef4444,#dc2626)}
+  .bar-purple{background:linear-gradient(90deg,#7c3aed,#a855f7)}
   .disk-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:11px}
   .disk-row .mount{color:#a855f7;min-width:60px}
   .disk-row .pct{color:#c084fc;min-width:35px;text-align:right}
@@ -39,183 +39,216 @@
   .net-row .speed{color:#c084fc}
   .footer{text-align:center;margin-top:16px;font-size:9px;color:#4a2a5a}
   .premium-badge{display:inline-block;background:linear-gradient(90deg,#7c3aed,#a855f7);color:#fff;font-size:8px;padding:2px 6px;border-radius:3px;margin-left:6px}
+  .pulse{animation:pulse 2s ease-in-out infinite}
+  @keyframes pulse{0%{opacity:1}50%{opacity:.4}100%{opacity:1}}
+  .blink{animation:blink 1s step-end infinite}
+  @keyframes blink{0%{opacity:1}50%{opacity:0}}
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="vsbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5b21b6"/><stop offset="100%" stop-color="#a78bfa"/></linearGradient></defs><circle cx="50" cy="50" r="47" fill="url(#vsbg)" stroke="#c4b5fd" stroke-width="2"/><g transform="translate(50,50) scale(1.15)" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M-8-2l-8-8a4 4 0 0 1 0-5.66l4-4a4 4 0 0 1 5.66 0l8 8"/><path d="M-8-2l10 10a4 4 0 0 1 0 5.66l-2 2a4 4 0 0 1-5.66 0l-10-10"/><circle cx="-10" cy="-10" r="2" fill="#fff" stroke="none"/></g></svg></div>
-  <h1>ameni monitor â Ð¿Ð°Ð½ÐµÐ»Ñ Ð¼Ð¾Ð½Ð¸ÑÐ¾ÑÐ¸Ð½Ð³Ð°</h1>
-  <div class="sub" id="sysinfo">Ð·Ð°Ð³ÑÑÐ·ÐºÐ°...</div>
-  <div class="grid">
-    <div class="card">
-      <div class="card-title">Ð¿ÑÐ¾ÑÐµÑÑÐ¾Ñ</div>
-      <div class="metric"><span class="label">ÐÐ°Ð³ÑÑÐ·ÐºÐ°</span><span class="value" id="cpuUsage">--</span></div>
-      <div class="bar-wrap"><div class="bar-fill" id="cpuBar" style="width:0%"></div></div>
-      <div class="metric"><span class="label">Load Avg</span><span class="value" id="cpuLoad">--</span></div>
-      <div class="metric"><span class="label">Ð¯Ð´ÑÐ°</span><span class="value" id="cpuCores">--</span></div>
-      <div class="metric"><span class="label">Ð§Ð°ÑÑÐ¾ÑÐ°</span><span class="value" id="cpuFreq">--</span></div>
-      <div class="metric"><span class="label">Ð¢ÐµÐ¼Ð¿ÐµÑÐ°ÑÑÑÐ°</span><span class="value" id="cpuTemp">--</span></div>
-    </div>
-    <div class="card">
-      <div class="card-title">Ð¿Ð°Ð¼ÑÑÑ <span id="premBadge"></span></div>
-      <div class="metric"><span class="label">RAM</span><span class="value" id="memUsed">--</span></div>
-      <div class="bar-wrap"><div class="bar-fill" id="memBar" style="width:0%"></div></div>
-      <div class="metric"><span class="label">ÐÐ¾ÑÑÑÐ¿Ð½Ð¾</span><span class="value" id="memAvail">--</span></div>
-      <div class="metric"><span class="label">Swap</span><span class="value" id="memSwap">--</span></div>
-      <div class="bar-wrap"><div class="bar-fill" id="swapBar" style="width:0%"></div></div>
-    </div>
-    <div class="card">
-      <div class="card-title">Ð´Ð¸ÑÐºÐ¸</div>
-      <div id="diskContent"></div>
-    </div>
-    <div class="card">
-      <div class="card-title">ÑÐµÑÑ</div>
-      <div id="netContent"></div>
-    </div>
+
+<div class="ascii" id="asciiBlock"></div>
+
+<h1>ameni monitor — system dashboard</h1>
+<div class="sub" id="sysLine">Linux <span id="distro">Arch Linux</span> <span id="kernel">6.5.7</span>  |  <span id="arch">x86_64</span></div>
+
+<div class="grid">
+
+  <!-- CPU -->
+  <div class="card">
+    <div class="card-title">cpu</div>
+    <div class="metric"><span class="label">Usage</span><span class="value" id="cpuUsage">--</span></div>
+    <div class="bar-wrap"><div class="bar-fill" id="cpuBar" style="width:0%"></div></div>
+    <div class="metric"><span class="label">Load Avg</span><span class="value" id="cpuLoad">--</span></div>
+    <div class="metric"><span class="label">Cores</span><span class="value" id="cpuCores">8 cores</span></div>
+    <div class="metric"><span class="label">Freq</span><span class="value" id="cpuFreq">--</span></div>
+    <div class="metric"><span class="label">Temp</span><span class="value" id="cpuTemp">--</span></div>
   </div>
-  <div class="card" style="margin-top:10px;display:none" id="historyCard">
-    <div class="card-title">Ð¸ÑÑÐ¾ÑÐ¸Ñ <span class="premium-badge">ÐÐ ÐÐÐÐ£Ð</span></div>
-    <canvas id="historyCanvas" width="800" height="200" style="width:100%;height:120px;border-radius:4px;background:#0a0212"></canvas>
+
+  <!-- Memory -->
+  <div class="card">
+    <div class="card-title">memory <span class="premium-badge">PREMIUM</span></div>
+    <div class="metric"><span class="label">RAM Used</span><span class="value" id="memUsed">--</span></div>
+    <div class="bar-wrap"><div class="bar-fill" id="memBar" style="width:0%"></div></div>
+    <div class="metric"><span class="label">Available</span><span class="value" id="memAvail">--</span></div>
+    <div class="metric"><span class="label">Swap</span><span class="value" id="memSwap">--</span></div>
+    <div class="bar-wrap"><div class="bar-fill" id="swapBar" style="width:0%"></div></div>
   </div>
-  <div class="footer" id="footer">Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ ÐºÐ°Ð¶Ð´ÑÐµ 2Ñ</div>
+
+  <!-- Disks -->
+  <div class="card">
+    <div class="card-title">disks</div>
+    <div id="diskContent"></div>
+  </div>
+
+  <!-- Network -->
+  <div class="card">
+    <div class="card-title">network</div>
+    <div id="netContent"></div>
+  </div>
+
+</div>
+
+<!-- History (premium) -->
+<div class="card" style="margin-top:10px">
+  <div class="card-title">history (CPU last 30 min) <span class="premium-badge">PREMIUM</span></div>
+  <canvas id="historyCanvas" width="800" height="200" style="width:100%;height:120px;border-radius:4px;background:#0a0212"></canvas>
+  <div style="display:flex;justify-content:space-between;font-size:8px;color:#4a2a5a;margin-top:4px">
+    <span id="timeStart">now</span><span>CPU % over time</span><span id="timeEnd">now</span>
+  </div>
+</div>
+
+<div class="footer" id="footer"><span class="pulse">●</span> live demo &mdash; обновление каждые 2 сек</div>
+
 </div>
 
 <script>
-let prem = false;
-
-function updateSys() {
-  fetch('/api/system').then(function(r){return r.json()}).then(function(s){
-    document.getElementById('sysinfo').textContent = s.os + ' ' + s.release + '  |  ' + s.arch;
+(function() {
+  var ascii = [
+    '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢲⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀',
+    '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀',
+    '⠀⠀⠀⠀⠀⠀⠀⠀⢀⠄⠂⢉⠤⠐⠋⠈⠡⡈⠉⠐⠠⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀',
+    '⠀⠀⠀⠀⢀⡀⢠⣤⠔⠁⢀⠀⠀⠀⠀⠀⠀⠀⠈⢢⠀⠀⠈⠱⡤⣤⠄⣀⠀⠀⠀⠀⠀',
+    '⠀⠀⠰⠁⠀⣰⣿⠃⠀⢠⠃⢸⠀⠀⠀⠀⠀⠀⠀⠀⠁⠀⠀⠀⠈⢞⣦⡀⠈⡇⠀⠀⠀',
+    '⠀⠀⠀⢇⣠⡿⠁⠀⢀⡃⠀⣈⠀⠀⠀⠀⢰⡀⠀⠀⠀⠀⢢⠰⠀⠀⢺⣧⢰⠀⠀⠀⠀',
+    '⠀⠀⠀⠈⣿⠁⡘⠀⡌⡇⠀⡿⠸⠀⠀⠀⠈⡕⡄⠀⠐⡀⠈⠀⢃⠀⠀⠾⠇⠀⠀⠀⠀',
+    '⠀⠀⠀⠀⠇⡇⠃⢠⠀⠶⡀⡇⢃⠡⡀⠀⠀⠡⠈⢂⡀⢁⠀⡁⠸⠀⡆⠘⡀⠀⠀⠀⠀',
+    '⠀⠀⠀⠸⠀⢸⠀⠘⡜⠀⣑⢴⣀⠑⠯⡂⠄⣀⣣⢀⣈⢺⡜⢣⠀⡆⡇⠀⢣⠀⠀⠀⠀',
+    '⠀⠀⠀⠇⠀⢸⠀⡗⣰⡿⡻⠿⡳⡅⠀⠀⠀⠀⠈⡵⠿⠿⡻⣷⡡⡇⡇⠀⢸⣇⠀⠀⠀',
+    '⠀⠀⢰⠀⠀⡆⡄⣧⡏⠸⢠⢲⢸⠁⠀⠀⠀⠀⠐⢙⢰⠂⢡⠘⣇⡇⠃⠀⠀⢹⡄⠀⠀',
+    '⠀⠀⠟⠀⠀⢰⢁⡇⠇⠰⣀⢁⡜⠀⠀⠀⠀⠀⠀⠘⣀⣁⠌⠀⠃⠰⠀⠀⠀⠈⠰⠀⠀',
+    '⠀⡘⠀⠀⠀⠀⢊⣤⠀⠀⠤⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠤⠄⠀⢸⠃⠀⠀⠀⠀⠀⠃⠀',
+    '⢠⠁⢀⠀⠀⠀⠈⢿⡀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⠀⠀⠀⢀⠏⠀⠀⠀⠀⠀⠀⠸⠀',
+    '⠘⠸⠘⡀⠀⠀⠀⠀⢣⠀⠀⠀⠀⠀⠀⠁⠀⠃⠀⠀⠀⠀⢀⠎⠀⠀⠀⠀⠀⢠⠀⠀⡇',
+    '⠀⠇⢆⢃⠀⠀⠀⠀⠀⡏⢲⢤⢀⡀⠀⠀⠀⠀⠀⢀⣠⠄⡚⠀⠀⠀⠀⠀⠀⣾⠀⠀⠀',
+    '⢰⠈⢌⢎⢆⠀⠀⠀⠀⠁⣌⠆⡰⡁⠉⠉⠀⠉⠁⡱⡘⡼⠇⠀⠀⠀⠀⢀⢬⠃⢠⠀⡆',
+    '⠀⢢⠀⠑⢵⣧⡀⠀⠀⡿⠳⠂⠉⠀⠀⠀⠀⠀⠀⠀⠁⢺⡀⠀⠀⢀⢠⣮⠃⢀⠆⡰⠀',
+    '⠀⠀⠑⠄⣀⠙⡭⠢⢀⡀⠀⠁⠄⣀⣀⠀⢀⣀⣀⣀⡠⠂⢃⡀⠔⠱⡞⢁⠄⣁⠔⠁⠀',
+    '⠀⠀⠀⠀⠀⢠⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠉⠁⠀⠀⠀⠀',
+    '⠀⠀⠀⠀⠀⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀'
+  ];
+  var el = document.getElementById('asciiBlock');
+  var colors = ['#a855f7','#c084fc','#d8b4fe','#e9d5ff','#7c3aed','#9333ea'];
+  ascii.forEach(function(l,i){
+    var s = document.createElement('span');
+    s.style.color = colors[i % 6];
+    s.textContent = l;
+    el.appendChild(s);
+    el.appendChild(document.createTextNode('\n'));
   });
-  fetch('/api/premium').then(function(r){return r.json()}).then(function(p){
-    prem = p.premium;
-    document.getElementById('premBadge').innerHTML = prem ? '<span class="premium-badge">ÐÐ ÐÐÐÐ£Ð</span>' : '';
-  });
-}
-
-function barColor(p) {
-  if (p < 60) return 'bar-green';
-  if (p < 85) return 'bar-yellow';
-  return 'bar-red';
-}
-
-function fmtB(b) {
-  if (b > 1073741824) return (b / 1073741824).toFixed(1) + 'GB';
-  if (b > 1048576) return (b / 1048576).toFixed(1) + 'MB';
-  if (b > 1024) return (b / 1024).toFixed(1) + 'KB';
-  return b + 'B';
-}
-
-function update() {
-  fetch('/api/monitor/all').then(function(r){return r.json()}).then(function(d){
-    if (!d.cpu) return;
-    var cpu = d.cpu, mem = d.memory, disk = d.disk, net = d.network;
-
-    document.getElementById('cpuUsage').textContent = cpu.usage + '%';
-    document.getElementById('cpuBar').style.width = Math.min(cpu.usage, 100) + '%';
-    document.getElementById('cpuBar').className = 'bar-fill ' + barColor(cpu.usage);
-    document.getElementById('cpuLoad').textContent = cpu.load_avg.join('  ');
-    document.getElementById('cpuCores').textContent = cpu.cores + ' cores';
-    document.getElementById('cpuFreq').textContent = cpu.freq.filter(function(f){return f > 0}).map(function(f){return f + 'MHz'}).join(', ') || '--';
-    document.getElementById('cpuTemp').textContent = cpu.temp > 0 ? cpu.temp + '\u00b0C' : '--';
-
-    document.getElementById('memUsed').textContent = mem.used_pct + '%';
-    document.getElementById('memAvail').textContent = mem.avail_gb + ' / ' + mem.total_gb + ' GB';
-    document.getElementById('memBar').style.width = Math.min(mem.used_pct, 100) + '%';
-    document.getElementById('memBar').className = 'bar-fill ' + barColor(mem.used_pct);
-    document.getElementById('memSwap').textContent = mem.swap_total_gb > 0 ? mem.swap_used_pct + '%' : 'Ð½ÐµÑ swap';
-    document.getElementById('swapBar').style.width = Math.min(mem.swap_used_pct, 100) + '%';
-    document.getElementById('swapBar').className = 'bar-fill ' + barColor(mem.swap_used_pct);
-
-    var dh = '';
-    if (disk && disk.length) {
-      disk.forEach(function(d){
-        var bc = barColor(d.used_pct);
-        dh += '<div class="disk-row"><span class="mount">' + d.mount + '</span><span style="flex:1;margin:0 8px"><div class="bar-wrap" style="height:4px"><div class="bar-fill ' + bc + '" style="width:' + Math.min(d.used_pct, 100) + '%"></div></div></span><span class="pct">' + d.used_pct + '%</span><span style="color:#6b4a7b;font-size:10px;min-width:50px;text-align:right">' + d.used_gb + '/' + d.total_gb + 'G</span></div>';
-      });
-    }
-    document.getElementById('diskContent').innerHTML = dh;
-
-    var nh = '';
-    if (net && net.length) {
-      net.forEach(function(n){
-        nh += '<div class="net-row"><span class="iface">' + n.iface + '</span><span class="speed">\u2193 ' + fmtB(n.rx_bytes) + '  \u2191 ' + fmtB(n.tx_bytes) + '</span></div>';
-      });
-    }
-    document.getElementById('netContent').innerHTML = nh || '<div style="color:#4a2a5a;font-size:11px">Ð½ÐµÑ Ð°ÐºÑÐ¸Ð²Ð½ÑÑ Ð¸Ð½ÑÐµÑÑÐµÐ¹ÑÐ¾Ð²</div>';
-  });
-}
-
-updateSys();
-update();
-
-
-
-<script>
-let hist = [];
+})();
 
 function rnd(min,max){return Math.round((Math.random()*(max-min)+min)*10)/10}
 function rndI(min,max){return Math.floor(Math.random()*(max-min+1)+min)}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
 
-function update() {
+var hist = [];
+var t0 = Date.now();
+
+function barColor(p){
+  if(p<60) return '#22c55e';
+  if(p<85) return '#f59e0b';
+  return '#ef4444';
+}
+
+function fmtB(b){
+  if(b>1073741824) return (b/1073741824).toFixed(1)+'GB';
+  if(b>1048576) return (b/1048576).toFixed(1)+'MB';
+  if(b>1024) return (b/1024).toFixed(1)+'KB';
+  return b+'B';
+}
+
+function drawHist(){
+  var c = document.getElementById('historyCanvas');
+  if(!c) return;
+  var ctx = c.getContext('2d');
+  var w = c.width, h = c.height;
+  ctx.clearRect(0,0,w,h);
+  if(hist.length<2) return;
+  ctx.beginPath();
+  ctx.moveTo(0, h);
+  for(var i=0;i<hist.length;i++){
+    var x = (i/(hist.length-1))*w;
+    var y = h - (hist[i]/100)*h;
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(w, h);
+  ctx.closePath();
+  var grad = ctx.createLinearGradient(0,0,0,h);
+  grad.addColorStop(0,'rgba(168,85,247,0.4)');
+  grad.addColorStop(1,'rgba(168,85,247,0.02)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(0, h - (hist[0]/100)*h);
+  for(var i=1;i<hist.length;i++){
+    ctx.lineTo((i/(hist.length-1))*w, h - (hist[i]/100)*h);
+  }
+  ctx.strokeStyle = '#a855f7';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+function update(){
   var cu = rnd(10,95);
   document.getElementById('cpuUsage').textContent = cu+'%';
   document.getElementById('cpuBar').style.width = cu+'%';
-  document.getElementById('cpuBar').className = 'bar-fill ' + (cu<60?'bar-green':cu<85?'bar-yellow':'bar-red');
+  document.getElementById('cpuBar').style.background = 'linear-gradient(90deg,'+barColor(cu)+',#4ade80)';
   document.getElementById('cpuLoad').textContent = rnd(0,3)+'  '+rnd(0,2)+'  '+rnd(0,1);
-  document.getElementById('cpuCores').textContent = rndI(4,16)+' cores';
-  var f = []; for(var i=0;i<4;i++) f.push(rndI(400,3200));
-  document.getElementById('cpuFreq').textContent = f.map(function(x){return x+'MHz'}).join(' ');
+  var freqs = [];
+  for(var i=0;i<8;i++) freqs.push(rndI(400,3200));
+  document.getElementById('cpuFreq').textContent = freqs.slice(0,4).map(function(f){return f+'MHz'}).join(' ');
   document.getElementById('cpuTemp').textContent = rnd(35,85)+'\u00b0C';
 
   var mp = rnd(40,92);
+  var mt = rnd(6,32);
+  var ma = mt*(1-mp/100);
   document.getElementById('memUsed').textContent = mp+'%';
   document.getElementById('memBar').style.width = mp+'%';
-  document.getElementById('memBar').className = 'bar-fill ' + (mp<60?'bar-green':mp<85?'bar-yellow':'bar-red');
-  document.getElementById('memAvail').textContent = rnd(1,16)+' / '+rnd(8,32)+' GB';
+  document.getElementById('memBar').style.background = 'linear-gradient(90deg,'+barColor(mp)+',#4ade80)';
+  document.getElementById('memAvail').textContent = ma.toFixed(1)+' / '+mt+' GB';
   var sp = rnd(0,90);
   document.getElementById('memSwap').textContent = sp+'%';
   document.getElementById('swapBar').style.width = sp+'%';
-  document.getElementById('swapBar').className = 'bar-fill ' + (sp<60?'bar-green':sp<85?'bar-yellow':'bar-red');
+  document.getElementById('swapBar').style.background = 'linear-gradient(90deg,'+barColor(sp)+',#4ade80)';
 
   var disks = [
     {m:'/', p:rnd(20,95), u:rnd(10,200), t:240},
-    {m:'/home', p:rnd(20,95), u:rnd(50,400), t:500}
+    {m:'/home', p:rnd(20,95), u:rnd(50,400), t:500},
+    {m:'/mnt/data', p:rnd(20,95), u:rnd(100,900), t:1000}
   ];
   var dh = '';
   disks.forEach(function(d){
-    var bc = d.p<60?'bar-green':d.p<85?'bar-yellow':'bar-red';
-    dh += '<div class="disk-row"><span class="mount">'+d.m+'</span><span style="flex:1;margin:0 8px"><div class="bar-wrap" style="height:4px"><div class="bar-fill '+bc+'" style="width:'+d.p+'%"></div></div></span><span class="pct">'+d.p.toFixed(1)+'%</span><span style="color:#6b4a7b;font-size:10px;min-width:50px;text-align:right">'+d.u.toFixed(1)+'/'+d.t+'G</span></div>';
+    var bc = barColor(d.p);
+    dh += '<div class="disk-row"><span class="mount">'+d.m+'</span>'+
+      '<span style="flex:1;margin:0 8px"><div class="bar-wrap" style="height:4px">'+
+      '<div class="bar-fill" style="width:'+d.p+'%;background:linear-gradient(90deg,'+bc+',#4ade80)"></div></div></span>'+
+      '<span class="pct">'+d.p.toFixed(1)+'%</span>'+
+      '<span style="color:#6b4a7b;font-size:10px;min-width:50px;text-align:right">'+d.u.toFixed(1)+'/'+d.t+'G</span></div>';
   });
   document.getElementById('diskContent').innerHTML = dh;
 
-  var net = [
-    {n:'wlan0', r:rndI(100,5000000), t:rndI(50,1000000)}
+  var ifaces = [
+    {n:'wlan0', r:rndI(100,5000000), t:rndI(50,1000000)},
+    {n:'eth0', r:rndI(0,1000), t:rndI(0,500)}
   ];
   var nh = '';
-  net.forEach(function(n){
-    var fb = function(b){if(b>1073741824)return (b/1073741824).toFixed(1)+'GB';if(b>1048576)return (b/1048576).toFixed(1)+'MB';if(b>1024)return (b/1024).toFixed(1)+'KB';return b+'B';};
-    nh += '<div class="net-row"><span class="iface">'+n.n+'</span><span class="speed">\u2193 '+fb(n.r)+'  \u2191 '+fb(n.t)+'</span></div>';
+  ifaces.forEach(function(n){
+    nh += '<div class="net-row"><span class="iface">'+n.n+'</span>'+
+      '<span class="speed">\u2193 '+fmtB(n.r)+'  \u2191 '+fmtB(n.t)+'</span></div>';
   });
   document.getElementById('netContent').innerHTML = nh;
 
   hist.push(cu);
   if(hist.length>180) hist.shift();
-  var c = document.getElementById('historyCanvas');
-  if(c && hist.length>1){
-    var ctx = c.getContext('2d');
-    ctx.clearRect(0,0,c.width,c.height);
-    ctx.beginPath();ctx.moveTo(0,c.height);
-    for(var i=0;i<hist.length;i++) ctx.lineTo((i/(hist.length-1))*c.width, c.height-(hist[i]/100)*c.height);
-    ctx.lineTo(c.width, c.height);ctx.closePath();
-    var g = ctx.createLinearGradient(0,0,0,c.height);
-    g.addColorStop(0,'rgba(168,85,247,0.4)');g.addColorStop(1,'rgba(168,85,247,0.02)');
-    ctx.fillStyle = g;ctx.fill();
-    ctx.beginPath();ctx.moveTo(0,c.height-(hist[0]/100)*c.height);
-    for(i=1;i<hist.length;i++) ctx.lineTo((i/(hist.length-1))*c.width, c.height-(hist[i]/100)*c.height);
-    ctx.strokeStyle='#a855f7';ctx.lineWidth=2;ctx.stroke();
-  }
+  drawHist();
+
+  var d = new Date();
+  document.getElementById('timeStart').textContent = d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('timeEnd').textContent = d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 }
+
 update();
 setInterval(update, 2000);
 </script>
