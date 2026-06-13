@@ -1,7 +1,7 @@
 interface:
-  display_name: "Ameni VS Kernel"
-  short_description: "VS C++ diagnostics & LNK error repair toolkit"
-  default_prompt: "Use $ameni-vs-kernel to diagnose and fix Visual Studio C++ build errors (LNK2019, LNK1104, LNK1120) and restore VC++ library paths."
+  display_name: "Ameni Monitor — System Dashboard"
+  short_description: "Real-time Linux system monitoring — CPU, RAM, disks, network in a beautiful web dashboard"
+  default_prompt: "Use ameni-monitor to monitor system health in real time. Start with `.ameni/bin/ameni monitor` and open http://localhost:3000."
 
 policy:
   allow_implicit_invocation: true

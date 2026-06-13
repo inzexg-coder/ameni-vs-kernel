@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ameni monitor</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#08040e;font-family:'JetBrains Mono',monospace;min-height:100vh;color:#c0c0cc}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+    background:radial-gradient(ellipse at 20% 50%,#1a0a2e 0%,transparent 60%),
+               radial-gradient(ellipse at 80% 20%,#2a1040 0%,transparent 50%);z-index:-1}
+  .container{max-width:900px;margin:0 auto;padding:20px}
+  .ascii{font-size:8px;line-height:1.12;text-align:center;margin:5px 0 12px;white-space:pre}
+  .ascii span{display:inline-block}
+  .g1{color:#a855f7}.g2{color:#c084fc}.g3{color:#d8b4fe}.g4{color:#e9d5ff}.g5{color:#7c3aed}.g6{color:#9333ea}
+  h1{font-size:20px;font-weight:300;text-align:center;margin:0 0 4px;
+    background:linear-gradient(90deg,#a855f7,#e9d5ff,#a855f7);background-size:200% auto;
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shim 4s linear infinite}
+  @keyframes shim{0%{background-position:0% center}50%{background-position:200% center}100%{background-position:0% center}}
+  .sub{color:#6b4a7b;font-size:10px;text-align:center;margin-bottom:16px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .card{background:linear-gradient(135deg,#12071e,#1a0a2e);border:1px solid #2a1040;border-radius:8px;padding:14px 16px}
+  .card-title{color:#6b4a7b;font-size:9px;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+  .metric{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:12px}
+  .label{color:#6b4a7b;min-width:80px}
+  .value{color:#c084fc;font-weight:700}
+  .bar-wrap{width:100%;height:6px;background:#1a0820;border-radius:3px;overflow:hidden;margin:4px 0}
+  .bar-fill{height:100%;border-radius:3px;transition:width .6s ease}
+  .bar-green{background:linear-gradient(90deg,#22c55e,#4ade80)}
+  .bar-yellow{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+  .bar-red{background:linear-gradient(90deg,#ef4444,#dc2626)}
+  .bar-purple{background:linear-gradient(90deg,#7c3aed,#a855f7)}
+  .disk-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:11px}
+  .disk-row .mount{color:#a855f7;min-width:60px}
+  .disk-row .pct{color:#c084fc;min-width:35px;text-align:right}
+  .net-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px}
+  .net-row .iface{color:#a855f7;min-width:50px}
+  .net-row .speed{color:#c084fc}
+  .footer{text-align:center;margin-top:16px;font-size:9px;color:#4a2a5a}
+  .premium-badge{display:inline-block;background:linear-gradient(90deg,#7c3aed,#a855f7);color:#fff;font-size:8px;padding:2px 6px;border-radius:3px;margin-left:6px;vertical-align:middle}
+  .history-btn{background:#7c3aed;color:#fff;border:none;border-radius:4px;padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="ascii" id="ascii"></div>
+  <h1>ameni monitor â system dashboard</h1>
+  <div class="sub" id="sysinfo">loading...</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-title">cpu</div>
+      <div class="metric"><span class="label">Usage</span><span class="value" id="cpuUsage">--</span></div>
+      <div class="bar-wrap"><div class="bar-fill" id="cpuBar" style="width:0%"></div></div>
+      <div class="metric"><span class="label">Load Avg</span><span class="value" id="cpuLoad">--</span></div>
+      <div class="metric"><span class="label">Cores</span><span class="value" id="cpuCores">--</span></div>
+      <div class="metric"><span class="label">Freq</span><span class="value" id="cpuFreq">--</span></div>
+      <div class="metric"><span class="label">Temp</span><span class="value" id="cpuTemp">--</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">memory <span id="premBadge"></span></div>
+      <div class="metric"><span class="label">RAM Used</span><span class="value" id="memUsed">--</span></div>
+      <div class="bar-wrap"><div class="bar-fill" id="memBar" style="width:0%"></div></div>
+      <div class="metric"><span class="label">Available</span><span class="value" id="memAvail">--</span></div>
+      <div class="metric"><span class="label">Swap</span><span class="value" id="memSwap">--</span></div>
+      <div class="bar-wrap"><div class="bar-fill" id="swapBar" style="width:0%"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">disks</div>
+      <div id="diskContent"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">network</div>
+      <div id="netContent"></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:10px;display:none" id="historyCard">
+    <div class="card-title">history (premium)</div>
+    <canvas id="historyCanvas" width="800" height="200" style="width:100%;height:120px;border-radius:4px;background:#0a0212"></canvas>
+  </div>
+  <div class="footer" id="footer">updating every 2s</div>
+</div>
+
+<script>
+const ASCII = [
+  "\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2832\u2802\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800",
+  "\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2806\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800",
+  "\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2801\u2804\u2802\u2802\u2809\u2824\u2890\u280b\u2881\u2888\u2821\u28a1\u28a0\u2841\u28a8\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800",
+  "\u2800\u2800\u2800\u2800\u2800\u2801\u2801\u2820\u2823\u2924\u2914\u2881\u2801\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2882\u2820\u2800\u2800\u2800\u2800\u2828\u28a4\u28a4\u2804\u2801\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800",
+  "\u2800\u2800\u2800\u2880\u2881\u2800\u2800\u28b0\u28bf\u2883\u2800\u2802\u2883\u2802\u28b8\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2801\u2800\u2800\u2800\u2800\u2800\u2882\u28a6\u28a6\u2800\u2888\u2887\u2800\u2800\u2800\u2800\u2800\u2800\u2800",
+  "\u2800\u2800\u2800\u2807\u2820\u2823\u283f\u2881\u2800\u2801\u2803\u2800\u2808\u2800\u2800\u2800\u2800\u2800\u2802\u2880\u2800\u2800\u2800\u2800\u2802\u2822\u2890\u2800\u2800\u2800\u2800\u282a\u28a7\u28b0\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800"
+];
+
+(function renderAscii() {
+  const el = document.getElementById("ascii");
+  ASCII.forEach(function(line, i) {
+    const s = document.createElement("span");
+    s.className = ["g1","g2","g3","g4","g5","g6"][i % 6];
+    s.textContent = line;
+    el.appendChild(s);
+    el.appendChild(document.createTextNode("\\n"));
+  });
+})();
+
+let prem = false;
+
+function updateSys() {
+  fetch("/api/system").then(function(r){return r.json()}).then(function(s){
+    document.getElementById("sysinfo").textContent = s.os + " " + s.release + "  |  " + s.arch;
+  });
+  fetch("/api/premium").then(function(r){return r.json()}).then(function(p){
+    prem = p.premium;
+    document.getElementById("premBadge").innerHTML = prem ? "<span class=\\"premium-badge\\">PREMIUM</span>" : "";
+  });
+}
+
+function barColor(p) {
+  if (p < 60) return "bar-green";
+  if (p < 85) return "bar-yellow";
+  return "bar-red";
+}
+
+function fmtB(b) {
+  if (b > 1073741824) return (b / 1073741824).toFixed(1) + "GB";
+  if (b > 1048576) return (b / 1048576).toFixed(1) + "MB";
+  if (b > 1024) return (b / 1024).toFixed(1) + "KB";
+  return b + "B";
+}
+
+function update() {
+  fetch("/api/monitor/all").then(function(r){return r.json()}).then(function(d){
+    if (!d.cpu) return;
+    var cpu = d.cpu, mem = d.memory, disk = d.disk, net = d.network;
+
+    document.getElementById("cpuUsage").textContent = cpu.usage + "%";
+    document.getElementById("cpuBar").style.width = Math.min(cpu.usage, 100) + "%";
+    document.getElementById("cpuBar").className = "bar-fill " + barColor(cpu.usage);
+    document.getElementById("cpuLoad").textContent = cpu.load_avg.join("  ");
+    document.getElementById("cpuCores").textContent = cpu.cores + " cores";
+    document.getElementById("cpuFreq").textContent = cpu.freq.filter(function(f){return f > 0}).map(function(f){return f + "MHz"}).join(", ") || "--";
+    document.getElementById("cpuTemp").textContent = cpu.temp > 0 ? cpu.temp + "\u00b0C" : "--";
+
+    document.getElementById("memUsed").textContent = mem.used_pct + "%";
+    document.getElementById("memAvail").textContent = mem.avail_gb + " / " + mem.total_gb + " GB";
+    document.getElementById("memBar").style.width = Math.min(mem.used_pct, 100) + "%";
+    document.getElementById("memBar").className = "bar-fill " + barColor(mem.used_pct);
+    document.getElementById("memSwap").textContent = mem.swap_total_gb > 0 ? mem.swap_used_pct + "%" : "no swap";
+    document.getElementById("swapBar").style.width = Math.min(mem.swap_used_pct, 100) + "%";
+    document.getElementById("swapBar").className = "bar-fill " + barColor(mem.swap_used_pct);
+
+    var dh = "";
+    if (disk && disk.length) {
+      disk.forEach(function(d){
+        var bc = barColor(d.used_pct);
+        dh += "<div class=\\"disk-row\\"><span class=\\"mount\\">" + d.mount + "</span><span style=\\"flex:1;margin:0 8px\\"><div class=\\"bar-wrap\\" style=\\"height:4px\\"><div class=\\"bar-fill " + bc + "\\" style=\\"width:" + Math.min(d.used_pct, 100) + "%\\"></div></div></span><span class=\\"pct\\">" + d.used_pct + "%</span><span style=\\"color:#6b4a7b;font-size:10px;min-width:50px;text-align:right\\">" + d.used_gb + "/" + d.total_gb + "G</span></div>";
+      });
+    }
+    document.getElementById("diskContent").innerHTML = dh;
+
+    var nh = "";
+    if (net && net.length) {
+      net.forEach(function(n){
+        nh += "<div class=\\"net-row\\"><span class=\\"iface\\">" + n.iface + "</span><span class=\\"speed\\">\u2193 " + fmtB(n.rx_bytes) + "  \u2191 " + fmtB(n.tx_bytes) + "</span></div>";
+      });
+    }
+    document.getElementById("netContent").innerHTML = nh || "<div style=\\"color:#4a2a5a;font-size:11px\\">no active interfaces</div>";
+  });
+}
+
+updateSys();
+update();
+setInterval(update, 2000);
+</script>
+</body>
+</html>
