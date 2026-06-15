@@ -23,24 +23,24 @@
   body::after{content:'';position:fixed;top:0;left:0;right:0;height:2px;
     background:rgba(255,255,255,0.06);pointer-events:none;z-index:999;animation:scanline 4s linear infinite}
   
-  .container{max-width:1100px;margin:0 auto;padding:24px;position:relative}
+  .container{max-width:100%;margin:0 auto;padding:8px;position:relative}
   .container::before{content:'';position:absolute;top:0;left:20px;right:20px;height:1px;
     background:linear-gradient(90deg,transparent,#ff00ff,transparent);opacity:.5}
   
-  h1{font-size:28px;font-weight:700;text-align:center;margin:0 0 6px;letter-spacing:4px;
+  h1{font-size:16px;font-weight:700;text-align:center;margin:0 0 2px;letter-spacing:2px;
     background:linear-gradient(90deg,#ff00ff,#00ffff,#ff00ff);background-size:200% auto;
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;
     animation:shim 2s linear infinite;text-shadow:none;filter:drop-shadow(0 0 10px rgba(255,0,255,0.3))}
   h1:hover{animation:glitch .3s infinite,shim 2s linear infinite}
   
-  .sub{font-size:12px;text-align:center;margin:0 0 18px;letter-spacing:2px;color:#555;text-transform:uppercase}
+  .sub{font-size:9px;text-align:center;margin:0 0 6px;letter-spacing:1px;color:#555;text-transform:uppercase}
   .sub span{color:#888}
   
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:4px}
   @media(max-width:640px){.grid{grid-template-columns:1fr}}
   
   .card{background:linear-gradient(135deg,#0a0314 0%,#100620 100%);border:1px solid #ff00ff33;
-    border-radius:0;padding:14px 16px;position:relative;overflow:hidden;
+    border-radius:0;padding:8px 10px;position:relative;overflow:hidden;
     box-shadow:0 0 10px rgba(255,0,255,0.05),inset 0 0 30px rgba(255,0,255,0.02)}
   .card:hover{border-color:#ff00ff66;box-shadow:0 0 15px rgba(255,0,255,0.1),0 0 30px rgba(255,0,255,0.05)}
   .card::after{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
@@ -50,40 +50,40 @@
   
   .card-title{color:#ff00ff;font-size:12px;text-transform:uppercase;letter-spacing:4px;margin-bottom:8px;font-weight:700;text-shadow:0 0 5px rgba(255,0,255,0.3)}
   
-  .metric{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:14px}
+  .metric{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:11px}
   .label{color:#555;font-size:11px;text-transform:uppercase;letter-spacing:1px}
   .value{color:#00ffff;font-weight:700;font-size:16px;text-shadow:0 0 5px rgba(0,255,255,0.3)}
   
-  .bar-wrap{width:100%;height:12px;background:#0a0314;border-radius:0;overflow:hidden;margin:5px 0;border:1px solid #ff00ff22}
+  .bar-wrap{width:100%;height:6px;background:#0a0314;border-radius:0;overflow:hidden;margin:2px 0;border:1px solid #ff00ff22}
   .bar-fill{height:100%;border-radius:0;transition:width .4s ease;
     background:linear-gradient(90deg,#ff00ff,#00ffff);box-shadow:0 0 8px rgba(255,0,255,0.3)}
   .bar-fill.green{background:linear-gradient(90deg,#ff00ff,#00ff88);box-shadow:0 0 8px rgba(0,255,136,0.3)}
   .bar-fill.yellow{background:linear-gradient(90deg,#ff00ff,#ffff00);box-shadow:0 0 8px rgba(255,255,0,0.3)}
   .bar-fill.red{background:linear-gradient(90deg,#ff00ff,#ff0000);box-shadow:0 0 8px rgba(255,0,0,0.3)}
   
-  .disk-row,.net-row,.proc-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;
-    font-size:13px;border-bottom:1px solid rgba(255,0,255,0.1)}
+  .disk-row,.net-row,.proc-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0;
+    font-size:10px;border-bottom:1px solid rgba(255,0,255,0.1)}
   .disk-row:last-child,.net-row:last-child,.proc-row:last-child{border-bottom:none}
   .disk-row .mount,.net-row .iface{color:#00ffff;min-width:50px;font-weight:700;text-shadow:0 0 3px rgba(0,255,255,0.3)}
   .disk-row .pct{color:#888;min-width:35px;text-align:right}
   .net-row .speed{color:#888;font-size:12px}
   .proc-row .idx{color:#ff00ff;min-width:16px;font-weight:700}
-  .proc-row .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#aaa}
+  .proc-row .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#aaa;font-size:10px}
   .proc-row .mem{color:#00ffff;min-width:30px;text-align:right;font-weight:700;text-shadow:0 0 3px rgba(0,255,255,0.3)}
   
-  .footer{text-align:center;margin-top:16px;font-size:9px;color:#333;letter-spacing:2px;text-transform:uppercase}
+  .footer{text-align:center;margin-top:4px;font-size:7px;color:#333;letter-spacing:2px;text-transform:uppercase}
   .footer span{color:#555}
   
   .premium-badge{display:inline-block;background:linear-gradient(90deg,#ff00ff,#00ffff);color:#000;
-    font-size:10px;padding:2px 8px;margin-left:8px;font-weight:900;letter-spacing:2px;
+    font-size:7px;padding:1px 4px;margin-left:4px;font-weight:700;letter-spacing:1px;
     box-shadow:0 0 10px rgba(255,0,255,0.3)}
   
   .pulse{animation:pulse 1.5s ease-in-out infinite}
   
   /* Auth block */
-  .auth-block{margin-top:14px;padding:14px 16px;background:#0a0314;border:1px solid #ff00ff33;
+  .auth-block{margin-top:14px;padding:8px 10px;background:#0a0314;border:1px solid #ff00ff33;
     box-shadow:0 0 10px rgba(255,0,255,0.05)}
-  .auth-block .title{color:#ff00ff;font-size:12px;text-transform:uppercase;letter-spacing:4px;margin-bottom:8px;font-weight:700}
+  .auth-block .title{color:#ff00ff;font-size:8px;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;font-weight:700}
   .auth-block input{background:#050208;border:1px solid #ff00ff33;padding:6px 10px;
     color:#00ffff;font-family:monospace;font-size:13px;outline:none}
   .auth-block input:focus{border-color:#ff00ff66;box-shadow:0 0 8px rgba(255,0,255,0.1)}
@@ -94,13 +94,13 @@
   .auth-block .hint a{color:#555;text-decoration:none}
   .auth-block .error{font-size:11px;color:#ff0044;margin-top:2px;text-shadow:0 0 5px rgba(255,0,68,0.3)}
   
-  .big-text{font-size:36px;font-weight:700;text-align:center;padding:10px 0;
+  .big-text{font-size:20px;font-weight:700;text-align:center;padding:2px 0;
     color:#00ffff;text-shadow:0 0 10px rgba(0,255,255,0.3)}
   
-  canvas{border-radius:0;background:#050208;width:100%;height:90px;border:1px solid #ff00ff22}
+  canvas{border-radius:0;background:#050208;width:100%;height:40px;border:1px solid #ff00ff22}
 
   /* ASCII art glow */
-  .ascii{font-size:7px;line-height:1.05;text-align:center;margin:5px 0 14px;white-space:pre;
+  .ascii{font-size:4px;line-height:1.0;text-align:center;margin:2px 0 4px;white-space:pre;
     opacity:0.8;letter-spacing:0;filter:drop-shadow(0 0 2px rgba(255,0,255,0.3))}
   
   .scanline-bar{position:absolute;top:0;left:0;right:0;height:1px;
@@ -165,7 +165,7 @@
   <!-- Processes -->
   <div class="card">
     <div class="card-title">processes</div>
-    <div id="procContent" style="font-size:14px"></div>
+    <div id="procContent" style="font-size:11px"></div>
   </div>
 
 </div>
@@ -182,7 +182,7 @@
 <!-- Disk I/O (premium) -->
 <div class="card premium-card" id="diskIOCard" style="margin-top:10px;display:none">
   <div class="card-title">disk i/o <span class="premium-badge">PREMIUM</span></div>
-  <div id="diskIOContent" style="font-size:14px"></div>
+  <div id="diskIOContent" style="font-size:11px"></div>
 </div>
   <div style="display:flex;justify-content:space-between;font-size:8px;color:#7a4a8a;margin-top:4px">
     <span id="timeStart">now</span><span>CPU % over time</span><span id="timeEnd">now</span>
@@ -194,17 +194,17 @@
   <div class="card-title">premium <span id="premiumBadge" class="premium-badge" style="display:none">ACTIVE</span></div>
 
   <!-- Account status -->
-  <div id="accountStatus" style="font-size:14px;color:#9a7ab5;margin-bottom:8px">Checking...</div>
+  <div id="accountStatus" style="font-size:11px;color:#9a7ab5;margin-bottom:8px">Checking...</div>
 
   <!-- Login form -->
   <div id="loginForm" style="display:none;flex-direction:column;gap:6px;margin-bottom:10px">
     <input id="loginInput" type="text" placeholder="Username or Email" spellcheck="false"
-      style="background:#1a0a2e;border:1px solid #4a2070;border-radius:4px;padding:6px 8px;color:#c084fc;font-family:inherit;font-size:14px;outline:none">
+      style="background:#1a0a2e;border:1px solid #4a2070;border-radius:4px;padding:6px 8px;color:#c084fc;font-family:inherit;font-size:11px;outline:none">
     <div style="display:flex;gap:6px">
       <input id="passwordInput" type="password" placeholder="Password" spellcheck="false"
-        style="flex:1;background:#1a0a2e;border:1px solid #4a2070;border-radius:4px;padding:6px 8px;color:#c084fc;font-family:inherit;font-size:14px;outline:none">
+        style="flex:1;background:#1a0a2e;border:1px solid #4a2070;border-radius:4px;padding:6px 8px;color:#c084fc;font-family:inherit;font-size:11px;outline:none">
       <button id="loginBtn" onclick="amenokeLogin()"
-        style="background:linear-gradient(90deg,#a855f7,#c084fc);border:none;border-radius:4px;padding:6px 12px;color:#fff;font-family:inherit;font-size:14px;cursor:pointer">Sign In</button>
+        style="background:linear-gradient(90deg,#a855f7,#c084fc);border:none;border-radius:4px;padding:6px 12px;color:#fff;font-family:inherit;font-size:11px;cursor:pointer">Sign In</button>
     </div>
     <div style="font-size:10px;color:#7a4a8a">
       <a href="https://amenoke.ru" target="_blank" style="color:#a855f7;text-decoration:none">Register at amenoke.ru</a>
@@ -213,7 +213,7 @@
   </div>
 
   <!-- Logged in info -->
-  <div id="loggedInInfo" style="display:none;font-size:14px;margin-bottom:8px">
+  <div id="loggedInInfo" style="display:none;font-size:11px;margin-bottom:8px">
     <span id="loggedInUsername" style="color:#c084fc"></span>
     <span id="loggedInPremium" style="color:#9a7ab5"></span>
     <button onclick="amenokeLogout()" style="background:none;border:1px solid #4a2070;border-radius:4px;padding:2px 8px;color:#9a7ab5;font-size:10px;cursor:pointer;margin-left:6px">Logout</button>
@@ -224,9 +224,9 @@
     <div style="font-size:9px;color:#7a4a8a;margin-bottom:4px">offline license key</div>
     <div style="display:flex;gap:6px">
       <input id="licenseInput" type="text" placeholder="Paste your license key" spellcheck="false"
-        style="flex:1;background:#1a0a2e;border:1px solid #4a2070;border-radius:4px;padding:6px 8px;color:#c084fc;font-family:inherit;font-size:14px;outline:none">
+        style="flex:1;background:#1a0a2e;border:1px solid #4a2070;border-radius:4px;padding:6px 8px;color:#c084fc;font-family:inherit;font-size:11px;outline:none">
       <button id="activateBtn" onclick="activateLicense()"
-        style="background:linear-gradient(90deg,#a855f7,#c084fc);border:none;border-radius:4px;padding:6px 12px;color:#fff;font-family:inherit;font-size:14px;cursor:pointer">Activate</button>
+        style="background:linear-gradient(90deg,#a855f7,#c084fc);border:none;border-radius:4px;padding:6px 12px;color:#fff;font-family:inherit;font-size:11px;cursor:pointer">Activate</button>
     </div>
     <div id="premiumResult" style="font-size:10px;margin-top:6px;color:#9a7ab5"></div>
   </div>
