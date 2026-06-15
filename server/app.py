@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ameni monitor — system dashboard"""
+
 import http.server, threading, json, os, socket, webbrowser, sys, time, collections
 
 PORT = 3000
