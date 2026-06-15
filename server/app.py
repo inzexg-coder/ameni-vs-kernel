@@ -421,7 +421,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def log_message(self, format, *args):
         if "/api/" in str(args[0]): print(f"  {args[0]}")
 
-HTML_PAGE = open(os.path.join(os.path.dirname(__file__), "dashboard.html")).read()
+HTML_PAGE = open(os.path.join(os.path.dirname(__file__), "dashboard.html"), encoding="utf-8").read()
 
 def read_uptime():
     if IS_WIN:
