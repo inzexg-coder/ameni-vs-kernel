@@ -499,6 +499,7 @@ def main():
     print("  \033[38;5;147mServer started\033[0m")
     print(f"  \033[38;5;92mLocal:\033[0m   http://127.0.0.1:{PORT}")
     print(f"  \033[38;5;92mNetwork:\033[0m http://{ip}:{PORT}")
+    print(f"  \033[38;5;141mOpen:\033[0m    http://127.0.0.1:{PORT}")
     if _is_premium():
         email = _license_data.get("email", "unknown") if _license_data else "unknown"
         print(f"  \033[38;5;141mPremium:\033[0m enabled for {email}")
