@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ameni monitor — рекламный баннер</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+  *{margin:0;padding:0;box-sizing:border-box}
+
+  body{
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    background:#0f0a1a;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    overflow-x:hidden;
+  }
+
+  body::before{
+    content:'';
+    position:fixed;
+    top:-50%;
+    left:-50%;
+    width:200%;
+    height:200%;
+    background:
+      radial-gradient(ellipse at 30% 20%,rgba(168,85,247,0.15) 0%,transparent 50%),
+      radial-gradient(ellipse at 70% 80%,rgba(124,58,237,0.1) 0%,transparent 50%),
+      radial-gradient(ellipse at 50% 50%,rgba(192,132,252,0.05) 0%,transparent 50%);
+    z-index:-1;
+    animation:bgDrift 20s ease-in-out infinite;
+  }
+
+  @keyframes bgDrift{
+    0%{transform:translate(0,0) rotate(0deg)}
+    33%{transform:translate(2%,-1%) rotate(1deg)}
+    66%{transform:translate(-1%,1%) rotate(-0.5deg)}
+    100%{transform:translate(0,0) rotate(0deg)}
+  }
+
+  .banner{
+    max-width:1100px;
+    width:100%;
+    background:rgba(255,255,255,0.03);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    border:1px solid rgba(168,85,247,0.15);
+    border-radius:32px;
+    padding:48px;
+    position:relative;
+    overflow:hidden;
+    box-shadow:
+      0 0 80px rgba(168,85,247,0.08),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  .banner::before{
+    content:'';
+    position:absolute;
+    top:-2px;
+    left:-2px;
+    right:-2px;
+    height:3px;
+    background:linear-gradient(90deg,transparent,#a855f7,#c084fc,#7c3aed,transparent);
+    background-size:300% 100%;
+    animation:borderFlow 4s linear infinite;
+  }
+
+  @keyframes borderFlow{
+    0%{background-position:0% 0%}
+    100%{background-position:300% 0%}
+  }
+
+  /* Floating particles */
+  .particles{
+    position:absolute;
+    top:0;left:0;right:0;bottom:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:0;
+  }
+
+  .particle{
+    position:absolute;
+    width:6px;
+    height:6px;
+    background:rgba(168,85,247,0.3);
+    border-radius:50%;
+    animation:float linear infinite;
+  }
+
+  .particle:nth-child(1){left:10%;top:20%;width:8px;height:8px;animation-duration:12s;animation-delay:0s}
+  .particle:nth-child(2){left:85%;top:15%;width:5px;height:5px;animation-duration:15s;animation-delay:1s}
+  .particle:nth-child(3){left:20%;top:70%;width:7px;height:7px;animation-duration:10s;animation-delay:2s}
+  .particle:nth-child(4){left:75%;top:80%;width:4px;height:4px;animation-duration:14s;animation-delay:0.5s}
+  .particle:nth-child(5){left:50%;top:10%;width:6px;height:6px;animation-duration:11s;animation-delay:1.5s}
+  .particle:nth-child(6){left:40%;top:90%;width:9px;height:9px;animation-duration:13s;animation-delay:3s}
+  .particle:nth-child(7){left:90%;top:50%;width:5px;height:5px;animation-duration:16s;animation-delay:0.8s}
+  .particle:nth-child(8){left:5%;top:50%;width:7px;height:7px;animation-duration:9s;animation-delay:2.5s}
+
+  @keyframes float{
+    0%{transform:translateY(0) scale(1);opacity:0}
+    10%{opacity:0.6}
+    90%{opacity:0.3}
+    100%{transform:translateY(-400px) scale(0);opacity:0}
+  }
+
+  .content{
+    position:relative;
+    z-index:1;
+  }
+
+  /* Logo + title area */
+  .hero{
+    text-align:center;
+    margin-bottom:40px;
+  }
+
+  .ascii-art{
+    font-family:monospace;
+    font-size:8px;
+    line-height:1.15;
+    text-align:center;
+    white-space:pre;
+    color:#a855f7;
+    opacity:0.5;
+    margin-bottom:12px;
+    letter-spacing:1px;
+  }
+
+  .hero h1{
+    font-size:56px;
+    font-weight:900;
+    letter-spacing:-2px;
+    background:linear-gradient(135deg,#c084fc,#a855f7,#7c3aed);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+    margin-bottom:8px;
+    line-height:1;
+  }
+
+  .hero .tagline{
+    font-size:18px;
+    color:rgba(255,255,255,0.5);
+    font-weight:400;
+    letter-spacing:2px;
+    text-transform:uppercase;
+  }
+
+  .hero .tagline span{
+    color:#c084fc;
+    font-weight:600;
+  }
+
+  /* Divider */
+  .divider{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin:32px 0;
+    opacity:0.3;
+  }
+  .divider-line{
+    flex:1;
+    height:1px;
+    background:linear-gradient(90deg,transparent,rgba(168,85,247,0.5),transparent);
+  }
+  .divider-icon{
+    color:#a855f7;
+    font-size:12px;
+  }
+
+  /* Features grid */
+  .features{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+    margin-bottom:36px;
+  }
+
+  .feature{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(168,85,247,0.1);
+    border-radius:20px;
+    padding:24px;
+    text-align:center;
+    transition:all 0.3s ease;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .feature:hover{
+    background:rgba(255,255,255,0.06);
+    border-color:rgba(168,85,247,0.25);
+    transform:translateY(-4px);
+    box-shadow:0 12px 40px rgba(168,85,247,0.1);
+  }
+
+  .feature::after{
+    content:'';
+    position:absolute;
+    bottom:0;
+    left:10%;
+    right:10%;
+    height:2px;
+    background:linear-gradient(90deg,transparent,#a855f7,transparent);
+    opacity:0;
+    transition:opacity 0.3s;
+  }
+  .feature:hover::after{opacity:0.6}
+
+  .feature-icon{
+    width:52px;
+    height:52px;
+    border-radius:16px;
+    background:linear-gradient(135deg,rgba(168,85,247,0.15),rgba(124,58,237,0.1));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 16px;
+    font-size:22px;
+    color:#c084fc;
+  }
+
+  .feature h3{
+    font-size:16px;
+    font-weight:700;
+    color:#fff;
+    margin-bottom:6px;
+  }
+
+  .feature p{
+    font-size:13px;
+    color:rgba(255,255,255,0.4);
+    line-height:1.5;
+  }
+
+  /* Stats bar */
+  .stats-bar{
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    padding:24px 0;
+    margin-bottom:32px;
+    border-top:1px solid rgba(168,85,247,0.08);
+    border-bottom:1px solid rgba(168,85,247,0.08);
+  }
+
+  .stat-item{
+    text-align:center;
+  }
+
+  .stat-num{
+    font-size:32px;
+    font-weight:900;
+    background:linear-gradient(135deg,#c084fc,#a855f7);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+    line-height:1;
+  }
+
+  .stat-label{
+    font-size:11px;
+    color:rgba(255,255,255,0.3);
+    text-transform:uppercase;
+    letter-spacing:2px;
+    margin-top:4px;
+  }
+
+  /* Mockup preview */
+  .mockup{
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(168,85,247,0.08);
+    border-radius:16px;
+    padding:24px;
+    margin-bottom:36px;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .mockup::before{
+    content:'';
+    position:absolute;
+    top:0;left:0;right:0;bottom:0;
+    background:linear-gradient(135deg,rgba(168,85,247,0.03),transparent);
+    pointer-events:none;
+  }
+
+  .mockup-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+
+  .mockup-block{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(168,85,247,0.06);
+    border-radius:12px;
+    padding:16px;
+  }
+
+  .mockup-block .mtitle{
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:2px;
+    color:rgba(168,85,247,0.5);
+    margin-bottom:8px;
+    font-weight:700;
+  }
+
+  .mockup-block .mvalue{
+    font-size:24px;
+    font-weight:700;
+    color:rgba(255,255,255,0.8);
+    background:linear-gradient(135deg,rgba(192,132,252,0.5),rgba(168,85,247,0.3));
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+    margin-bottom:4px;
+  }
+
+  .mockup-block .mbar{
+    height:6px;
+    background:rgba(255,255,255,0.05);
+    border-radius:3px;
+    overflow:hidden;
+  }
+
+  .mockup-block .mbar-fill{
+    height:100%;
+    border-radius:3px;
+    background:linear-gradient(90deg,#a855f7,#c084fc);
+    animation:barPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes barPulse{
+    0%{opacity:0.6}
+    50%{opacity:1}
+    100%{opacity:0.6}
+  }
+
+  .mockup-block.wide{
+    grid-column:1/3;
+  }
+
+  .mockup-block.wide .mbar-fill{
+    width:42%;
+  }
+  .mockup-block:nth-child(2) .mbar-fill{width:68%}
+  .mockup-block:nth-child(3) .mbar-fill{width:23%}
+
+  /* Commands */
+  .commands{
+    display:flex;
+    gap:12px;
+    justify-content:center;
+    margin-bottom:32px;
+    flex-wrap:wrap;
+  }
+
+  .cmd{
+    background:rgba(168,85,247,0.1);
+    border:1px solid rgba(168,85,247,0.15);
+    border-radius:12px;
+    padding:14px 24px;
+    font-family:monospace;
+    font-size:15px;
+    color:#c084fc;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    transition:all 0.2s;
+  }
+
+  .cmd:hover{
+    background:rgba(168,85,247,0.18);
+    border-color:rgba(168,85,247,0.3);
+    transform:translateY(-2px);
+  }
+
+  .cmd i{font-size:14px;color:rgba(192,132,252,0.5)}
+
+  /* Premium badge */
+  .premium-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:16px;
+    margin-bottom:36px;
+  }
+
+  .premium-badge-lg{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:linear-gradient(135deg,rgba(168,85,247,0.15),rgba(124,58,237,0.1));
+    border:1px solid rgba(168,85,247,0.2);
+    border-radius:30px;
+    padding:10px 24px;
+    font-size:14px;
+    color:#c084fc;
+    font-weight:600;
+  }
+
+  .premium-badge-lg i{color:#fbbf24;font-size:16px}
+
+  .premium-features{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+
+  .premium-feat{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    color:rgba(255,255,255,0.4);
+  }
+
+  .premium-feat i{color:#fbbf24;font-size:12px}
+
+  /* CTA */
+  .cta{
+    text-align:center;
+  }
+
+  .cta-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:12px;
+    background:linear-gradient(135deg,#7c3aed,#a855f7,#c084fc);
+    background-size:200% auto;
+    border:none;
+    border-radius:16px;
+    padding:18px 48px;
+    font-family:inherit;
+    font-size:18px;
+    font-weight:700;
+    color:#fff;
+    cursor:pointer;
+    transition:all 0.3s ease;
+    text-decoration:none;
+    animation:ctaShimmer 4s linear infinite;
+    box-shadow:0 4px 24px rgba(168,85,247,0.25);
+  }
+
+  .cta-btn:hover{
+    transform:translateY(-3px) scale(1.02);
+    box-shadow:0 8px 40px rgba(168,85,247,0.35);
+  }
+
+  @keyframes ctaShimmer{
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+  }
+
+  .cta-sub{
+    font-size:13px;
+    color:rgba(255,255,255,0.25);
+    margin-top:12px;
+  }
+
+  .cta-sub i{color:#a855f7;margin:0 4px}
+
+  /* Footer */
+  .footer{
+    text-align:center;
+    margin-top:36px;
+    padding-top:24px;
+    border-top:1px solid rgba(168,85,247,0.06);
+  }
+
+  .footer a{
+    color:rgba(168,85,247,0.4);
+    text-decoration:none;
+    font-size:13px;
+    transition:color 0.2s;
+  }
+  .footer a:hover{color:rgba(168,85,247,0.7)}
+  .footer span{color:rgba(168,85,247,0.2);margin:0 8px;font-size:10px}
+
+  @media(max-width:768px){
+    .banner{padding:28px 20px}
+    .hero h1{font-size:36px}
+    .features{grid-template-columns:1fr;gap:14px}
+    .mockup-grid{grid-template-columns:1fr}
+    .mockup-block.wide{grid-column:1}
+    .stats-bar{flex-wrap:wrap;gap:12px}
+    .stat-item{flex:1;min-width:80px}
+    .ascii-art{font-size:4px}
+  }
+</style>
+</head>
+<body>
+
+<div class="banner">
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="content">
+
+    <div class="hero">
+      <div class="ascii-art">
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢲⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⠀⠀⠀⢀⠄⠂⢉⠤⠐⠋⠈⠡⡈⠉⠐⠠⡀⠀⠀⠀⠀
+        ⠀⠀⢀⡀⢠⣤⠔⠁⢀⠀⠀⠀⠀⠀⠀⠀⠈⢢⠀⠀⠈⠱⡤⣤
+        ⠀⠰⠁⠀⣰⣿⠃⠀⢠⠃⢸⠀⠀⠀⠀⠀⠀⠀⠀⠁⠀⠀⠀⠈
+        ⠀⠀⢇⣠⡿⠁⠀⢀⡃⠀⣈⠀⠀⠀⠀⢰⡀⠀⠀⠀⠀⢢⠰⠀
+        ⠀⠀⠈⣿⠁⡘⠀⡌⡇⠀⡿⠸⠀⠀⠀⠈⡕⡄⠀⠐⡀⠈⠀⢃
+        ⠀⠀⠀⠇⡇⠃⢠⠀⠶⡀⡇⢃⠡⡀⠀⠀⠡⠈⢂⡀⢁⠀⡁⠸
+        ⠀⠀⠸⠀⢸⠀⠘⡜⠀⣑⢴⣀⠑⠯⡂⠄⣀⣣⢀⣈⢺⡜⢣⠀
+        ⠀⠀⠇⠀⢸⠀⡗⣰⡿⡻⠿⡳⡅⠀⠀⠀⠀⠈⡵⠿⠿⡻⣷⡡
+        ⠀⢰⠀⠀⡆⡄⣧⡏⠸⢠⢲⢸⠁⠀⠀⠀⠀⠐⢙⢰⠂⢡⠘⣇
+        ⠀⠟⠀⠀⢰⢁⡇⠇⠰⣀⢁⡜⠀⠀⠀⠀⠀⠀⠘⣀⣁⠌⠀⠃
+        ⠀⡘⠀⠀⠀⠀⢊⣤⠀⠀⠤⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠤⠄⠀
+        ⢠⠁⢀⠀⠀⠀⠈⢿⡀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⠀⠀⠀⢀
+        ⠘⠸⠘⡀⠀⠀⠀⠀⢣⠀⠀⠀⠀⠀⠀⠁⠀⠃⠀⠀⠀⠀⢀⠎
+        ⠀⠇⢆⢃⠀⠀⠀⠀⠀⡏⢲⢤⢀⡀⠀⠀⠀⠀⠀⢀⣠⠄⡚⠀
+        ⢰⠈⢌⢎⢆⠀⠀⠀⠀⠁⣌⠆⡰⡁⠉⠉⠀⠉⠁⡱⡘⡼⠇⠀
+        ⠀⢢⠀⠑⢵⣧⡀⠀⠀⡿⠳⠂⠉⠀⠀⠀⠀⠀⠀⠀⠁⢺⡀⠀
+      </div>
+      <h1>ameni monitor</h1>
+      <div class="tagline"><span>real-time</span> system dashboard &bull; <span>zero</span> config &bull; <span>one</span> command</div>
+    </div>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-icon"><i class="fas fa-crown"></i></div>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon"><i class="fas fa-microchip"></i></div>
+        <h3>CPU &amp; Memory</h3>
+        <p>Real-time load, frequency, temperature, RAM usage and swap in colored bars</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon"><i class="fas fa-hard-drive"></i></div>
+        <h3>Disk &amp; Network</h3>
+        <p>Partition usage with live bars, network interfaces with RX/TX traffic</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon"><i class="fas fa-clock"></i></div>
+        <h3>Uptime &amp; Battery</h3>
+        <p>System uptime with animated clock, battery level with charging indicator</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+        <h3>History Graph</h3>
+        <p>6-minute CPU history chart with animated line (premium feature)</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon"><i class="fas fa-list"></i></div>
+        <h3>Top Processes</h3>
+        <p>Memory-hungry processes sorted by RAM consumption</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+        <h3>Premium Security</h3>
+        <p>Ed25519 offline license or online auth via amenoke.ru</p>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-num">6</div>
+        <div class="stat-label">metrik blokov</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">2s</div>
+        <div class="stat-label">obnovlenie</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">2</div>
+        <div class="stat-label">platformy</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">0</div>
+        <div class="stat-label">konfigov</div>
+      </div>
+    </div>
+
+    <div class="mockup">
+      <div class="mockup-grid">
+        <div class="mockup-block">
+          <div class="mtitle"><i class="fas fa-microchip" style="margin-right:4px;opacity:0.5"></i> cpu</div>
+          <div class="mvalue">34.2%</div>
+          <div class="mbar"><div class="mbar-fill" style="width:34%"></div></div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:rgba(255,255,255,0.2)">
+            <span>load: 1.2 0.8 0.5</span>
+            <span>48 &deg;C</span>
+          </div>
+        </div>
+        <div class="mockup-block">
+          <div class="mtitle"><i class="fas fa-memory" style="margin-right:4px;opacity:0.5"></i> memory</div>
+          <div class="mvalue">71.0%</div>
+          <div class="mbar"><div class="mbar-fill" style="width:71%"></div></div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:rgba(255,255,255,0.2)">
+            <span>avail: 2.0 / 6.9 GB</span>
+            <span>swap: 79.8%</span>
+          </div>
+        </div>
+        <div class="mockup-block">
+          <div class="mtitle"><i class="fas fa-hard-drive" style="margin-right:4px;opacity:0.5"></i> disk</div>
+          <div class="mvalue">37.8%</div>
+          <div class="mbar"><div class="mbar-fill" style="width:38%"></div></div>
+          <div style="margin-top:6px;font-size:10px;color:rgba(255,255,255,0.2)">84.2 / 222.9 GB</div>
+        </div>
+        <div class="mockup-block">
+          <div class="mtitle"><i class="fas fa-clock" style="margin-right:4px;opacity:0.5"></i> uptime</div>
+          <div class="mvalue">1d 5h 23m</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="commands">
+      <div class="cmd"><i class="fas fa-chevron-right"></i> curl -sL bit.ly/ameni | bash</div>
+      <div class="cmd"><i class="fas fa-chevron-right"></i> ameni</div>
+    </div>
+
+    <div class="premium-row">
+      <div class="premium-badge-lg">
+        <i class="fas fa-crown"></i> premium
+      </div>
+      <div class="premium-features">
+        <div class="premium-feat"><i class="fas fa-chart-area"></i> History Graph</div>
+        <div class="premium-feat"><i class="fas fa-database"></i> Disk I/O</div>
+        <div class="premium-feat"><i class="fas fa-key"></i> Ed25519 License</div>
+      </div>
+    </div>
+
+    <div class="cta">
+      <a class="cta-btn" href="https://github.com/inzexg-coder/ameni-vs-kernel" target="_blank">
+        <i class="fab fa-github"></i> Get it on GitHub
+      </a>
+      <div class="cta-sub">
+        <i class="fas fa-check-circle"></i> open source &bull; <i class="fas fa-check-circle"></i> mit license &bull; <i class="fas fa-check-circle"></i> linux + windows
+      </div>
+    </div>
+
+    <div class="footer">
+      <a href="https://github.com/inzexg-coder/ameni-vs-kernel" target="_blank">
+        <i class="fab fa-github"></i> github.com/inzexg-coder/ameni-vs-kernel
+      </a>
+      <span>&bull;</span>
+      <a href="https://amenoke.ru" target="_blank">amenoke.ru</a>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
