@@ -6,192 +6,213 @@
 <title>ameni monitor</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#08040e;font-family:monospace;min-height:100vh;color:#c084fc;overflow:hidden;padding:8px;font-size:11px;line-height:1.3}
-
-  /* htop-style layout */
-  .hline{display:flex;justify-content:space-between;padding:0 2px;white-space:nowrap}
-  .metric{display:flex;gap:4px;align-items:center}
-  .metric .lbl{color:#4a2070}
-  .metric .val{color:#c084fc;font-weight:700}
-  .metric .val.o{color:#fbbf24}
-  .metric .val.r{color:#ef4444}
-  .metric .val.g{color:#34d399}
-  
-  .bar-line{display:flex;align-items:center;gap:6px;padding:1px 0;font-size:10px}
-  .bar-label{color:#4a2070;min-width:40px}
-  .bar-track{flex:1;height:8px;background:#1a0820;position:relative;overflow:hidden}
-  .bar-fill{height:100%;transition:width .4s ease;position:absolute;left:0;top:0}
-  .bar-pct{color:#c084fc;min-width:30px;text-align:right;font-weight:700}
-  
-  .bar-fill.green{background:linear-gradient(90deg,#22c55e,#4ade80)}
-  .bar-fill.yellow{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
-  .bar-fill.red{background:linear-gradient(90deg,#ef4444,#dc2626)}
-  .bar-fill.cyan{background:linear-gradient(90deg,#06b6d4,#22d3ee)}
-  .bar-fill.blue{background:linear-gradient(90deg,#3b82f6,#60a5fa)}
-  
-  .section-title{color:#4a2070;font-size:9px;text-transform:uppercase;letter-spacing:1px;margin:4px 0 2px;padding:0 2px;font-weight:700}
-  hr{border:none;border-top:1px solid #1a0820;margin:3px 0}
-  
-  .tasks-header{display:flex;justify-content:space-between;padding:2px;color:#4a2070;font-size:9px;text-transform:uppercase;letter-spacing:1px;font-weight:700}
-  .tasks-header span{min-width:0}
-  .tasks-header .pid{min-width:40px}
-  .tasks-header .name{flex:1}
-  .tasks-header .mem{min-width:40px;text-align:right}
-  
-  .proc-row{display:flex;justify-content:space-between;padding:1px 2px;font-size:10px}
-  .proc-row:nth-child(odd){background:rgba(18,7,30,0.3)}
-  .proc-row .pid{color:#4a2070;min-width:40px}
-  .proc-row .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#9a7ab5}
-  .proc-row .mem{color:#c084fc;min-width:40px;text-align:right;font-weight:700}
-  .proc-row .cpu{color:#7a4a8a;min-width:40px;text-align:right}
-  
-  .cpu-bar-container{display:flex;gap:3px;padding:1px 0}
-  .cpu-block{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px}
-  .cpu-block .lbl{color:#4a2070;font-size:7px}
-  .cpu-block .meter{width:100%;height:16px;background:#1a0820;position:relative}
-  .cpu-block .meter .fill{position:absolute;bottom:0;left:0;right:0;transition:height .4s ease}
-  
-  .footer{text-align:center;margin-top:4px;font-size:8px;color:#2a1040}
+  body{background:#0c0618;font-family:monospace;min-height:100vh;color:#f0e8ff;overflow-x:hidden}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+    background:radial-gradient(ellipse at 20% 50%,#1a0a2e 0%,transparent 60%),
+               radial-gradient(ellipse at 80% 20%,#2a1040 0%,transparent 50%);z-index:-1}
+  .container{max-width:1100px;margin:0 auto;padding:24px}
+  .ascii{font-size:6px;line-height:1.0;text-align:center;margin:4px 0 10px;white-space:pre;color:#c084fc;opacity:0.7;letter-spacing:0}
+  h1{font-size:28px;font-weight:700;text-align:center;margin:0 0 6px;
+    background:linear-gradient(90deg,#c084fc,#e9d5ff,#c084fc);background-size:200% auto;
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shim 4s linear infinite}
+  @keyframes shim{0%{background-position:0% center}50%{background-position:200% center}100%{background-position:0% center}}
+  .sub{color:#9a7ab5;font-size:10px;text-align:center;margin-bottom:16px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .card{background:linear-gradient(135deg,#12071e,#1a0a2e);border:1px solid #4a2070;border-radius:8px;padding:14px 16px}
+  .card-title{color:#9a7ab5;font-size:9px;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+  .metric{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:12px}
+  .label{color:#9a7ab5;min-width:80px}
+  .value{color:#c084fc;font-weight:700}
+  .bar-wrap{width:100%;height:12px;background:#2a1040;border-radius:4px;overflow:hidden;margin:5px 0}
+  .bar-fill{height:100%;border-radius:3px;transition:width .6s ease}
+  .bar-green{background:linear-gradient(90deg,#34d399,#4ade80)}
+  .bar-yellow{background:linear-gradient(90deg,#fbbf24,#fbbf24)}
+  .bar-red{background:linear-gradient(90deg,#ef4444,#dc2626)}
+  .bar-purple{background:linear-gradient(90deg,#a855f7,#c084fc)}
+  .disk-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:14px}
+  .disk-row .mount{color:#c084fc;min-width:60px}
+  .disk-row .pct{color:#c084fc;min-width:35px;text-align:right}
+  .net-row{display:flex;justify-content:space-between;padding:3px 0;font-size:14px}
+  .net-row .iface{color:#c084fc;min-width:50px}
+  .net-row .speed{color:#c084fc}
+  .footer{text-align:center;margin-top:16px;font-size:9px;color:#7a4a8a}
+  .premium-badge{display:inline-block;background:linear-gradient(90deg,#a855f7,#c084fc);color:#fff;font-size:11px;padding:3px 8px;border-radius:4px;margin-left:8px;font-weight:700}
+  .pulse{animation:pulse 2s ease-in-out infinite}
+  @keyframes pulse{0%{opacity:1}50%{opacity:.4}100%{opacity:1}}
   .blink{animation:blink 1s step-end infinite}
   @keyframes blink{0%{opacity:1}50%{opacity:0}}
-  
-  .cursor{display:inline-block;width:6px;height:12px;background:#c084fc;animation:blink 1s step-end infinite;vertical-align:middle;margin-left:2px}
-  
-  .pr{color:#4a2070}
-  .pg{color:#34d399}
-  .pc{color:#c084fc}
-  .py{color:#fbbf24}
-  
-  canvas{width:100%;height:30px;border-radius:1px;margin:2px 0}
-  
-  /* login popup style */
-  .auth-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;z-index:1000}
-  .auth-box{background:#0c0618;border:1px solid #4a2070;padding:16px;max-width:320px;width:100%}
-  .auth-box .title{color:#4a2070;font-size:9px;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;font-weight:700}
-  .auth-box input{display:block;width:100%;background:#08040e;border:1px solid #2a1040;padding:6px 8px;color:#c084fc;font-family:monospace;font-size:11px;outline:none;margin-bottom:6px}
-  .auth-box input:focus{border-color:#4a2070}
-  .auth-box button{background:linear-gradient(90deg,#7c3aed,#a855f7);border:none;padding:6px 16px;color:#fff;font-family:monospace;font-size:11px;cursor:pointer;font-weight:700}
-  .auth-box .hint{font-size:9px;color:#2a1040;margin-top:6px}
-  .auth-box .hint a{color:#4a2070;text-decoration:none}
-  .auth-box .error{font-size:10px;color:#ef4444;margin-top:4px}
 </style>
 </head>
 <body>
+<div class="container">
 
-<div id="app">
-  <!-- Header: system info -->
-  <div class="hline">
-    <div class="metric"><span class="lbl">OS</span><span class="val" id="distro">--</span></div>
-    <div class="metric"><span class="lbl">Kernel</span><span class="val" id="kernel">--</span></div>
-    <div class="metric"><span class="lbl">Arch</span><span class="val" id="arch">--</span></div>
-    <div class="metric"><span class="lbl">Uptime</span><span class="val" id="uptimeVal">--</span></div>
-    <div class="metric" id="batteryLine" style="display:none"><span class="lbl">Battery</span><span class="val" id="batteryVal">--</span></div>
-    <div class="metric"><span class="lbl">Tasks</span><span class="val" id="tasksCount">0</span></div>
-    <div class="metric"><span class="lbl">Load</span><span class="val" id="loadAvg">0.00 0.00 0.00</span></div>
-    <div class="metric" id="premiumLine"><span class="lbl">Premium</span><span class="val" id="premiumVal"><a href="#" onclick="showAuth()" style="color:#4a2070;text-decoration:none">disable</a></span></div>
-  </div>
-  <hr>
+<div class="ascii" id="asciiBlock"></div>
 
-  <!-- CPU per-core bars -->
-  <div class="section-title">cpu</div>
-  <div class="cpu-bar-container" id="cpuGrid"></div>
-  <div class="bar-line">
-    <span class="bar-label">total</span>
-    <div class="bar-track"><div class="bar-fill" id="cpuTotalBar" style="width:0%"></div></div>
-    <span class="bar-pct" id="cpuTotalPct">0%</span>
+<h1>ameni monitor — system dashboard</h1>
+<div class="sub" id="sysLine">Linux <span id="distro">Arch Linux</span> <span id="kernel">6.5.7</span>  |  <span id="arch">x86_64</span></div>
+
+<div class="grid">
+
+  <!-- CPU -->
+  <div class="card">
+    <div class="card-title">cpu</div>
+    <div class="metric"><span class="label">Usage</span><span class="value" id="cpuUsage">--</span></div>
+    <div class="bar-wrap"><div class="bar-fill" id="cpuBar" style="width:0%"></div></div>
+    <div class="metric"><span class="label">Load Avg</span><span class="value" id="cpuLoad">--</span></div>
+    <div class="metric"><span class="label">Cores</span><span class="value" id="cpuCores">8 cores</span></div>
+    <div class="metric"><span class="label">Freq</span><span class="value" id="cpuFreq">--</span></div>
+    <div class="metric"><span class="label">Temp</span><span class="value" id="cpuTemp">--</span></div>
   </div>
-  <div class="hline" style="font-size:9px">
-    <div class="metric"><span class="pr">freq</span> <span class="pc" id="cpuFreq">--</span></div>
-    <div class="metric"><span class="pr">temp</span> <span class="pc" id="cpuTemp">--</span></div>
+
+  <!-- Uptime -->
+  <div class="card">
+    <div class="card-title">uptime</div>
+    <div id="uptimeContent" style="font-size:16px;color:#c084fc">--</div>
   </div>
-  <hr>
+
+  <!-- Battery -->
+  <div class="card" id="batteryCard" style="display:none">
+    <div class="card-title">battery</div>
+    <div id="batteryContent" style="font-size:16px;color:#c084fc">--</div>
+  </div>
 
   <!-- Memory -->
-  <div class="section-title">memory</div>
-  <div class="bar-line">
-    <span class="bar-label">ram</span>
-    <div class="bar-track"><div class="bar-fill green" id="memBar" style="width:0%"></div></div>
-    <span class="bar-pct" id="memUsed">0%</span>
+  <div class="card">
+    <div class="card-title">memory</div>
+    <div class="metric"><span class="label">RAM Used</span><span class="value" id="memUsed">--</span></div>
+    <div class="bar-wrap"><div class="bar-fill" id="memBar" style="width:0%"></div></div>
+    <div class="metric"><span class="label">Available</span><span class="value" id="memAvail">--</span></div>
+    <div class="metric"><span class="label">Swap</span><span class="value" id="memSwap">--</span></div>
+    <div class="bar-wrap"><div class="bar-fill" id="swapBar" style="width:0%"></div></div>
   </div>
-  <div class="bar-line">
-    <span class="bar-label">swap</span>
-    <div class="bar-track"><div class="bar-fill yellow" id="swapBar" style="width:0%"></div></div>
-    <span class="bar-pct" id="memSwap">0%</span>
-  </div>
-  <div class="hline" style="font-size:9px">
-    <div class="metric"><span class="pr">avail</span> <span class="pc" id="memAvail">0.0 / 0.0 GB</span></div>
-  </div>
-  <hr>
 
-  <!-- Disk -->
-  <div class="section-title">disk</div>
-  <div id="diskContent" style="font-size:10px"></div>
-  <hr>
+  <!-- Disks -->
+  <div class="card">
+    <div class="card-title">disks</div>
+    <div id="diskContent"></div>
+  </div>
 
   <!-- Network -->
-  <div class="section-title">network</div>
-  <div id="netContent" style="font-size:10px"></div>
-  <hr>
-
-  <!-- Processes (top 5) -->
-  <div class="section-title">processes</div>
-  <div class="tasks-header">
-    <span class="pid">PID</span>
-    <span class="name">NAME</span>
-    <span class="cpu">CPU</span>
-    <span class="mem">MEM</span>
-  </div>
-  <div id="procContent"></div>
-  <hr>
-
-  <!-- Disk I/O (premium) -->
-  <div id="diskioSection" style="display:none">
-    <div class="section-title">disk i/o <span style="color:#a855f7;font-size:7px;letter-spacing:1px">PREMIUM</span></div>
-    <div id="diskIOContent" style="font-size:10px"></div>
-    <hr>
+  <div class="card">
+    <div class="card-title">network</div>
+    <div id="netContent"></div>
   </div>
 
-  <!-- History graph (premium) -->
-  <div id="historySection" style="display:none">
-    <div class="section-title">history <span style="color:#a855f7;font-size:7px;letter-spacing:1px">PREMIUM</span></div>
-    <canvas id="historyCanvas"></canvas>
-    <div style="display:flex;justify-content:space-between;font-size:7px;color:#2a1040">
-      <span id="timeStart">now</span>
-      <span>CPU %</span>
-      <span id="timeEnd">now</span>
-    </div>
-    <hr>
+  <!-- Processes -->
+  <div class="card">
+    <div class="card-title">processes</div>
+    <div id="procContent" style="font-size:14px"></div>
   </div>
 
-  <!-- Footer -->
-  <div class="hline">
-    <div class="metric"><span class="pr">ameni</span><span class="pc"> monitor</span><span class="cursor"></span></div>
-    <div class="metric" id="footerRight"><span class="pr">F1</span><span class="pc">Help</span> <span class="pr">F2</span><span class="pc">Setup</span></div>
+</div>
+
+<!-- History (premium) -->
+<div class="card premium-card" id="historyCard" style="margin-top:10px;display:none">
+  <div class="card-title">history (CPU last 30 min) <span class="premium-badge">PREMIUM</span></div>
+  <canvas id="historyCanvas" width="800" height="200" style="width:100%;height:100px;border-radius:4px;background:#12071e"></canvas>
+  <div style="display:flex;justify-content:space-between;font-size:8px;color:#4a2a5a;margin-top:4px">
+    <span id="timeStart">now</span><span>CPU % over time</span><span id="timeEnd">now</span>
   </div>
 </div>
 
-<!-- Auth overlay -->
-<div class="auth-overlay" id="authOverlay">
-  <div class="auth-box">
-    <div class="title">amenoke.ru login</div>
-    <input id="authLogin" type="text" placeholder="username or email">
-    <input id="authPass" type="password" placeholder="password">
-    <div style="display:flex;gap:6px;align-items:center">
-      <button onclick="doLogin()">Sign In</button>
-      <span style="font-size:9px;color:#2a1040"><a href="https://amenoke.ru" target="_blank" style="color:#4a2070;text-decoration:none">register</a></span>
-    </div>
-    <div class="error" id="authError"></div>
-    <div class="hint">or use offline key</div>
-    <div style="display:flex;gap:4px;margin-top:4px">
-      <input id="offlineKey" type="text" placeholder="paste license key" style="flex:1;margin-bottom:0">
-      <button onclick="doActivate()" style="white-space:nowrap">Activate</button>
-    </div>
-    <div id="authResult" style="font-size:10px;margin-top:4px;color:#7a4a8a"></div>
+<!-- Disk I/O (premium) -->
+<div class="card premium-card" id="diskIOCard" style="margin-top:10px;display:none">
+  <div class="card-title">disk i/o <span class="premium-badge">PREMIUM</span></div>
+  <div id="diskIOContent" style="font-size:14px"></div>
+</div>
+  <div style="display:flex;justify-content:space-between;font-size:8px;color:#7a4a8a;margin-top:4px">
+    <span id="timeStart">now</span><span>CPU % over time</span><span id="timeEnd">now</span>
   </div>
+</div>
+
+<!-- Premium activation -->
+<div class="card" style="margin-top:10px">
+  <div class="card-title">premium <span id="premiumBadge" class="premium-badge" style="display:none">ACTIVE</span></div>
+
+  <!-- Account status -->
+  <div id="accountStatus" style="font-size:14px;color:#9a7ab5;margin-bottom:8px">Checking...</div>
+
+  <!-- Login form -->
+  <div id="loginForm" style="display:none;flex-direction:column;gap:6px;margin-bottom:10px">
+    <input id="loginInput" type="text" placeholder="Username or Email" spellcheck="false"
+      style="background:#1a0a2e;border:1px solid #4a2070;border-radius:4px;padding:6px 8px;color:#c084fc;font-family:inherit;font-size:14px;outline:none">
+    <div style="display:flex;gap:6px">
+      <input id="passwordInput" type="password" placeholder="Password" spellcheck="false"
+        style="flex:1;background:#1a0a2e;border:1px solid #4a2070;border-radius:4px;padding:6px 8px;color:#c084fc;font-family:inherit;font-size:14px;outline:none">
+      <button id="loginBtn" onclick="amenokeLogin()"
+        style="background:linear-gradient(90deg,#a855f7,#c084fc);border:none;border-radius:4px;padding:6px 12px;color:#fff;font-family:inherit;font-size:14px;cursor:pointer">Sign In</button>
+    </div>
+    <div style="font-size:10px;color:#7a4a8a">
+      <a href="https://amenoke.ru" target="_blank" style="color:#a855f7;text-decoration:none">Register at amenoke.ru</a>
+    </div>
+    <div id="loginError" style="font-size:10px;color:#ef4444"></div>
+  </div>
+
+  <!-- Logged in info -->
+  <div id="loggedInInfo" style="display:none;font-size:14px;margin-bottom:8px">
+    <span id="loggedInUsername" style="color:#c084fc"></span>
+    <span id="loggedInPremium" style="color:#9a7ab5"></span>
+    <button onclick="amenokeLogout()" style="background:none;border:1px solid #4a2070;border-radius:4px;padding:2px 8px;color:#9a7ab5;font-size:10px;cursor:pointer;margin-left:6px">Logout</button>
+  </div>
+
+  <!-- Offline key activation -->
+  <div id="offlineSection" style="border-top:1px solid #1a0820;padding-top:8px;margin-top:6px">
+    <div style="font-size:9px;color:#7a4a8a;margin-bottom:4px">offline license key</div>
+    <div style="display:flex;gap:6px">
+      <input id="licenseInput" type="text" placeholder="Paste your license key" spellcheck="false"
+        style="flex:1;background:#1a0a2e;border:1px solid #4a2070;border-radius:4px;padding:6px 8px;color:#c084fc;font-family:inherit;font-size:14px;outline:none">
+      <button id="activateBtn" onclick="activateLicense()"
+        style="background:linear-gradient(90deg,#a855f7,#c084fc);border:none;border-radius:4px;padding:6px 12px;color:#fff;font-family:inherit;font-size:14px;cursor:pointer">Activate</button>
+    </div>
+    <div id="premiumResult" style="font-size:10px;margin-top:6px;color:#9a7ab5"></div>
+  </div>
+</div>
+
+<div class="footer" id="footer"><span class="pulse">●</span> ameni monitor</div>
+
 </div>
 
 <script>
+(function() {
+  var ascii = [
+    '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢲⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀',
+    '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀',
+    '⠀⠀⠀⠀⠀⠀⠀⠀⢀⠄⠂⢉⠤⠐⠋⠈⠡⡈⠉⠐⠠⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀',
+    '⠀⠀⠀⠀⢀⡀⢠⣤⠔⠁⢀⠀⠀⠀⠀⠀⠀⠀⠈⢢⠀⠀⠈⠱⡤⣤⠄⣀⠀⠀⠀⠀⠀',
+    '⠀⠀⠰⠁⠀⣰⣿⠃⠀⢠⠃⢸⠀⠀⠀⠀⠀⠀⠀⠀⠁⠀⠀⠀⠈⢞⣦⡀⠈⡇⠀⠀⠀',
+    '⠀⠀⠀⢇⣠⡿⠁⠀⢀⡃⠀⣈⠀⠀⠀⠀⢰⡀⠀⠀⠀⠀⢢⠰⠀⠀⢺⣧⢰⠀⠀⠀⠀',
+    '⠀⠀⠀⠈⣿⠁⡘⠀⡌⡇⠀⡿⠸⠀⠀⠀⠈⡕⡄⠀⠐⡀⠈⠀⢃⠀⠀⠾⠇⠀⠀⠀⠀',
+    '⠀⠀⠀⠀⠇⡇⠃⢠⠀⠶⡀⡇⢃⠡⡀⠀⠀⠡⠈⢂⡀⢁⠀⡁⠸⠀⡆⠘⡀⠀⠀⠀⠀',
+    '⠀⠀⠀⠸⠀⢸⠀⠘⡜⠀⣑⢴⣀⠑⠯⡂⠄⣀⣣⢀⣈⢺⡜⢣⠀⡆⡇⠀⢣⠀⠀⠀⠀',
+    '⠀⠀⠀⠇⠀⢸⠀⡗⣰⡿⡻⠿⡳⡅⠀⠀⠀⠀⠈⡵⠿⠿⡻⣷⡡⡇⡇⠀⢸⣇⠀⠀⠀',
+    '⠀⠀⢰⠀⠀⡆⡄⣧⡏⠸⢠⢲⢸⠁⠀⠀⠀⠀⠐⢙⢰⠂⢡⠘⣇⡇⠃⠀⠀⢹⡄⠀⠀',
+    '⠀⠀⠟⠀⠀⢰⢁⡇⠇⠰⣀⢁⡜⠀⠀⠀⠀⠀⠀⠘⣀⣁⠌⠀⠃⠰⠀⠀⠀⠈⠰⠀⠀',
+    '⠀⡘⠀⠀⠀⠀⢊⣤⠀⠀⠤⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠤⠄⠀⢸⠃⠀⠀⠀⠀⠀⠃⠀',
+    '⢠⠁⢀⠀⠀⠀⠈⢿⡀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⠀⠀⠀⢀⠏⠀⠀⠀⠀⠀⠀⠸⠀',
+    '⠘⠸⠘⡀⠀⠀⠀⠀⢣⠀⠀⠀⠀⠀⠀⠁⠀⠃⠀⠀⠀⠀⢀⠎⠀⠀⠀⠀⠀⢠⠀⠀⡇',
+    '⠀⠇⢆⢃⠀⠀⠀⠀⠀⡏⢲⢤⢀⡀⠀⠀⠀⠀⠀⢀⣠⠄⡚⠀⠀⠀⠀⠀⠀⣾⠀⠀⠀',
+    '⢰⠈⢌⢎⢆⠀⠀⠀⠀⠁⣌⠆⡰⡁⠉⠉⠀⠉⠁⡱⡘⡼⠇⠀⠀⠀⠀⢀⢬⠃⢠⠀⡆',
+    '⠀⢢⠀⠑⢵⣧⡀⠀⠀⡿⠳⠂⠉⠀⠀⠀⠀⠀⠀⠀⠁⢺⡀⠀⠀⢀⢠⣮⠃⢀⠆⡰⠀',
+    '⠀⠀⠑⠄⣀⠙⡭⠢⢀⡀⠀⠁⠄⣀⣀⠀⢀⣀⣀⣀⡠⠂⢃⡀⠔⠱⡞⢁⠄⣁⠔⠁⠀',
+    '⠀⠀⠀⠀⠀⢠⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠉⠁⠀⠀⠀⠀',
+    '⠀⠀⠀⠀⠀⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀'
+  ];
+  var el = document.getElementById('asciiBlock');
+  var html = '';
+  var colors = ['#c084fc','#c084fc','#d8b4fe','#e9d5ff','#a855f7','#9333ea'];
+  for(var i=0;i<ascii.length;i++){
+    html += '<div style="color:'+colors[i%6]+'">'+ascii[i]+'</div>';
+  }
+  el.innerHTML = html;
+})();
+
+function rnd(min,max){return Math.round((Math.random()*(max-min)+min)*10)/10}
+function rndI(min,max){return Math.floor(Math.random()*(max-min+1)+min)}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
+
 var hist = [];
+var t0 = Date.now();
 
 function barColor(p){
   if(p<60) return '#34d399';
@@ -200,113 +221,10 @@ function barColor(p){
 }
 
 function fmtB(b){
-  if(b>1073741824) return (b/1073741824).toFixed(1)+'G';
-  if(b>1048576) return (b/1048576).toFixed(1)+'M';
-  if(b>1024) return (b/1024).toFixed(1)+'K';
+  if(b>1073741824) return (b/1073741824).toFixed(1)+'GB';
+  if(b>1048576) return (b/1048576).toFixed(1)+'MB';
+  if(b>1024) return (b/1024).toFixed(1)+'KB';
   return b+'B';
-}
-
-function update(){
-  fetch('/api/monitor/all').then(function(r){return r.json()}).then(function(d){
-    var cpu = d.cpu || {};
-    var mem = d.memory || {};
-    
-    // CPU per-core bars
-    var cg = document.getElementById('cpuGrid');
-    var cores = cpu.cores || 1;
-    var freq = cpu.freq || [];
-    var chtml = '';
-    for(var i=0;i<Math.min(cores,16);i++){
-      var pct = Math.min(100, Math.round(Math.random()*80+10));
-      var bc = barColor(pct);
-      chtml += '<div class="cpu-block"><div class="meter"><div class="fill" style="height:'+pct+'%;background:'+bc+'"></div></div><span class="lbl">'+(freq[i]?Math.round(freq[i]/100)/10+'G':'')+'</span></div>';
-    }
-    cg.innerHTML = chtml;
-    
-    // CPU total
-    var cu = cpu.usage || 0;
-    document.getElementById('cpuTotalPct').textContent = cu+'%';
-    document.getElementById('cpuTotalBar').style.width = cu+'%';
-    document.getElementById('cpuTotalBar').style.background = 'linear-gradient(90deg,'+barColor(cu)+',#4ade80)';
-    document.getElementById('cpuFreq').textContent = (freq[0]?Math.round(freq[0])+'MHz':'--');
-    document.getElementById('cpuTemp').textContent = cpu.temp ? cpu.temp+'C' : '--';
-    
-    // Memory
-    var mp = mem.used_pct || 0;
-    document.getElementById('memUsed').textContent = mp+'%';
-    document.getElementById('memBar').style.width = mp+'%';
-    document.getElementById('memSwap').textContent = (mem.swap_used_pct||0)+'%';
-    document.getElementById('swapBar').style.width = (mem.swap_used_pct||0)+'%';
-    document.getElementById('memAvail').textContent = (mem.avail_gb||0).toFixed(1)+' / '+(mem.total_gb||0).toFixed(1)+' GB';
-    
-    // Uptime
-    var up = d.uptime || {};
-    var ut = '';
-    if(up.days > 0) ut += up.days + 'd ';
-    ut += up.hours + 'h ' + up.mins + 'm';
-    document.getElementById('uptimeVal').textContent = ut;
-    
-    // Battery
-    var bat = d.battery;
-    var bl = document.getElementById('batteryLine');
-    if(bat){
-      bl.style.display = 'flex';
-      var bc = bat.pct > 50 ? '#34d399' : (bat.pct > 20 ? '#fbbf24' : '#ef4444');
-      document.getElementById('batteryVal').innerHTML = '<span style="color:'+bc+'">'+bat.pct+'%</span>';
-    } else { bl.style.display = 'none'; }
-    
-    // Load
-    var la = cpu.load_avg || [];
-    document.getElementById('loadAvg').textContent = la.map(function(x){return x.toFixed(2)}).join(' ');
-    
-    // Tasks count
-    var procs = d.processes || [];
-    document.getElementById('tasksCount').textContent = procs.length + ' running';
-    
-    // Processes
-    var ph = '';
-    procs.forEach(function(p){
-      ph += '<div class="proc-row"><span class="pid">'+p.pid+'</span><span class="name">'+p.name+'</span><span class="cpu">--</span><span class="mem">'+p.mem+'M</span></div>';
-    });
-    document.getElementById('procContent').innerHTML = ph;
-    
-    // Disks
-    var disks = d.disk || [];
-    var dh = '';
-    disks.forEach(function(dd){
-      var bc = barColor(dd.used_pct||0);
-      dh += '<div class="bar-line"><span class="bar-label">'+dd.mount.substr(0,6)+'</span><div class="bar-track"><div class="bar-fill" style="width:'+dd.used_pct+'%;background:linear-gradient(90deg,'+bc+',#4ade80)"></div></div><span class="bar-pct">'+dd.used_pct+'%</span></div>';
-    });
-    document.getElementById('diskContent').innerHTML = dh;
-    
-    // Network
-    var nets = d.network || [];
-    var nh = '';
-    nets.forEach(function(n){
-      nh += '<div style="display:flex;justify-content:space-between;padding:1px 2px;font-size:10px"><span style="color:#c084fc">'+n.iface+'</span><span style="color:#9a7ab5">↓ '+fmtB(n.rx_bytes||0)+'  ↑ '+fmtB(n.tx_bytes||0)+'</span></div>';
-    });
-    document.getElementById('netContent').innerHTML = nh;
-    
-    // History
-    hist.push(cu);
-    if(hist.length>180) hist.shift();
-    drawHist();
-    
-    // Disk I/O (premium)
-    var dio = d.diskio;
-    if(dio && document.getElementById('diskioSection').style.display != 'none'){
-      var dih = '';
-      Object.keys(dio).forEach(function(k){
-        var v = dio[k];
-        dih += '<div style="display:flex;justify-content:space-between;padding:1px 2px;font-size:10px"><span style="color:#c084fc">'+k+'</span><span style="color:#9a7ab5">↓ '+fmtB(v.rbytes)+'  ↑ '+fmtB(v.wbytes)+'</span></div>';
-      });
-      document.getElementById('diskIOContent').innerHTML = dih;
-    }
-    
-    var dt = new Date();
-    document.getElementById('timeStart').textContent = dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    document.getElementById('timeEnd').textContent = dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  });
 }
 
 function drawHist(){
@@ -314,20 +232,20 @@ function drawHist(){
   if(!c) return;
   var ctx = c.getContext('2d');
   var w = c.width, h = c.height;
-  c.width = c.offsetWidth * 2; c.height = c.offsetHeight * 2;
-  ctx.scale(2,2); w = c.offsetWidth; h = c.offsetHeight;
   ctx.clearRect(0,0,w,h);
   if(hist.length<2) return;
   ctx.beginPath();
   ctx.moveTo(0, h);
   for(var i=0;i<hist.length;i++){
-    ctx.lineTo((i/(hist.length-1))*w, h - (hist[i]/100)*h);
+    var x = (i/(hist.length-1))*w;
+    var y = h - (hist[i]/100)*h;
+    ctx.lineTo(x, y);
   }
   ctx.lineTo(w, h);
   ctx.closePath();
   var grad = ctx.createLinearGradient(0,0,0,h);
-  grad.addColorStop(0,'rgba(168,85,247,0.3)');
-  grad.addColorStop(1,'rgba(168,85,247,0.01)');
+  grad.addColorStop(0,'rgba(168,85,247,0.4)');
+  grad.addColorStop(1,'rgba(168,85,247,0.02)');
   ctx.fillStyle = grad;
   ctx.fill();
   ctx.beginPath();
@@ -335,87 +253,199 @@ function drawHist(){
   for(var i=1;i<hist.length;i++){
     ctx.lineTo((i/(hist.length-1))*w, h - (hist[i]/100)*h);
   }
-  ctx.strokeStyle = '#a855f7';
-  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = '#c084fc';
+  ctx.lineWidth = 2;
   ctx.stroke();
 }
 
-// Auth functions
-function showAuth(){
-  document.getElementById('authOverlay').style.display = 'flex';
-}
-function hideAuth(){
-  document.getElementById('authOverlay').style.display = 'none';
-}
-document.getElementById('authOverlay').addEventListener('click', function(e){
-  if(e.target == this) hideAuth();
-});
-
 function checkPremium(){
   fetch('/api/premium').then(function(r){return r.json()}).then(function(d){
-    var pv = document.getElementById('premiumVal');
-    var histSec = document.getElementById('historySection');
-    var dioSec = document.getElementById('diskioSection');
+    var badge = document.getElementById('premiumBadge');
+    var loginForm = document.getElementById('loginForm');
+    var loggedInInfo = document.getElementById('loggedInInfo');
+    var offlineSection = document.getElementById('offlineSection');
+    var accountStatus = document.getElementById('accountStatus');
+
     if(d.premium){
-      pv.innerHTML = '<span style="color:#34d399">active</span>' + (d.username ? ' <span style="color:#4a2070">|</span> <span style="color:#c084fc">'+d.username+'</span>' : '');
-      histSec.style.display = 'block';
-      dioSec.style.display = 'block';
+      accountStatus.innerHTML = '<span style="color:#34d399">PREMIUM ACTIVE</span>';
+      badge.style.display = 'inline-block';
+      loginForm.style.display = 'none';
+      loggedInInfo.style.display = 'none';
+      offlineSection.style.display = 'none';
     } else if(d.username){
-      pv.innerHTML = '<a href="#" onclick="showAuth()" style="color:#4a2070;text-decoration:none">'+d.username+'</a>';
-      histSec.style.display = 'none';
-      dioSec.style.display = 'none';
+      loggedInInfo.style.display = 'block';
+      document.getElementById('loggedInUsername').textContent = d.username;
+      document.getElementById('loggedInPremium').textContent = '| not premium';
+      loginForm.style.display = 'none';
+      accountStatus.innerHTML = '<span style="color:#9a7ab5">Logged in as ' + d.username + '</span>';
+      badge.style.display = 'none';
+      offlineSection.style.display = 'block';
     } else {
-      pv.innerHTML = '<a href="#" onclick="showAuth()" style="color:#4a2070;text-decoration:none">off</a>';
-      histSec.style.display = 'none';
-      dioSec.style.display = 'none';
+      loginForm.style.display = 'flex';
+      loggedInInfo.style.display = 'none';
+      accountStatus.innerHTML = '<span style="color:#9a7ab5">Sign in with amenoke.ru</span>';
+      badge.style.display = 'none';
+      offlineSection.style.display = 'block';
     }
   });
 }
 
-function doLogin(){
-  var l = document.getElementById('authLogin').value.trim();
-  var p = document.getElementById('authPass').value.trim();
-  if(!l || !p){ document.getElementById('authError').textContent = 'enter login and password'; return; }
-  fetch('/api/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({login:l,password:p})})
+function amenokeLogin(){
+  var login = document.getElementById('loginInput').value.trim();
+  var password = document.getElementById('passwordInput').value.trim();
+  if(!login || !password){ document.getElementById('loginError').textContent = 'Enter login and password'; return; }
+  var btn = document.getElementById('loginBtn');
+  btn.textContent = 'Signing in...'; btn.disabled = true;
+  fetch('/api/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({login:login, password:password})})
     .then(function(r){return r.json()}).then(function(d){
       if(d.ok){
-        document.getElementById('authError').textContent = '';
-        hideAuth();
+        document.getElementById('loginError').textContent = '';
         checkPremium();
-      } else {
-        document.getElementById('authError').textContent = d.error || 'login failed';
+      }else{
+        document.getElementById('loginError').textContent = d.error || 'Login failed';
       }
+      btn.textContent = 'Sign In'; btn.disabled = false;
     });
 }
 
-function doActivate(){
-  var key = document.getElementById('offlineKey').value.trim();
-  if(!key){ document.getElementById('authResult').textContent = 'enter a key'; return; }
+function amenokeLogout(){
+  fetch('/api/logout', {method:'POST'}).then(function(r){return r.json()}).then(function(d){
+    checkPremium();
+  });
+}
+
+function activateLicense(){
+  var key = document.getElementById('licenseInput').value.trim();
+  if(!key){ document.getElementById('premiumResult').textContent = 'Enter a license key'; return; }
+  var btn = document.getElementById('activateBtn');
+  btn.textContent = 'Activating...'; btn.disabled = true;
   fetch('/api/activate', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({key:key})})
     .then(function(r){return r.json()}).then(function(d){
+      var pr = document.getElementById('premiumResult');
       if(d.ok && d.premium){
-        document.getElementById('authResult').innerHTML = '<span style="color:#34d399">activated for '+(d.email||'')+'</span>';
-        hideAuth();
+        pr.innerHTML = '<span style="color:#34d399">License activated for ' + (d.email||'') + '</span>';
         checkPremium();
       } else if(d.ok){
-        document.getElementById('authResult').innerHTML = '<span style="color:#ef4444">invalid key</span>';
+        pr.innerHTML = '<span style="color:#ef4444">Invalid license key</span>';
       } else {
-        document.getElementById('authResult').innerHTML = '<span style="color:#ef4444">'+(d.error||'failed')+'</span>';
+        pr.innerHTML = '<span style="color:#ef4444">' + (d.error||'Activation failed') + '</span>';
       }
+      btn.textContent = 'Activate'; btn.disabled = false;
     });
 }
 
-// System info
-fetch('/api/system').then(function(r){return r.json()}).then(function(d){
-  document.getElementById('distro').textContent = d.distro || d.os || '--';
-  document.getElementById('kernel').textContent = d.kernel || '';
-  document.getElementById('arch').textContent = d.arch || '';
-});
-
 checkPremium();
+
+function update(){
+  fetch('/api/monitor/all').then(function(r){return r.json()}).then(function(d){
+    var cpu = d.cpu || {};
+    document.getElementById('cpuUsage').textContent = (cpu.usage||0)+'%';
+    document.getElementById('cpuBar').style.width = (cpu.usage||0)+'%';
+    document.getElementById('cpuBar').style.background = 'linear-gradient(90deg,'+barColor(cpu.usage||0)+',#4ade80)';
+    document.getElementById('cpuLoad').textContent = (cpu.load_avg||[0,0,0]).join('  ');
+    document.getElementById('cpuCores').textContent = (cpu.cores||0)+' cores';
+    var freqText = (cpu.freq||[]).slice(0,4).map(function(f){return Math.round(f)+'MHz'}).join(' ');
+    document.getElementById('cpuFreq').textContent = freqText || '--';
+    document.getElementById('cpuTemp').textContent = (cpu.temp||0)+'°C';
+
+    var mem = d.memory || {};
+    document.getElementById('memUsed').textContent = (mem.used_pct||0)+'%';
+    document.getElementById('memBar').style.width = (mem.used_pct||0)+'%';
+    document.getElementById('memBar').style.background = 'linear-gradient(90deg,'+barColor(mem.used_pct||0)+',#4ade80)';
+    var totalGb = mem.total_gb || 0;
+    var availGb = mem.avail_gb || 0;
+    document.getElementById('memAvail').textContent = availGb.toFixed(1)+' / '+totalGb.toFixed(1)+' GB';
+    document.getElementById('memSwap').textContent = (mem.swap_used_pct||0)+'%';
+    document.getElementById('swapBar').style.width = (mem.swap_used_pct||0)+'%';
+    document.getElementById('swapBar').style.background = 'linear-gradient(90deg,'+barColor(mem.swap_used_pct||0)+',#4ade80)';
+
+    var disks = d.disk || [];
+    var dh = '';
+    disks.forEach(function(dd){
+      var bc = barColor(dd.used_pct||0);
+      dh += '<div class="disk-row"><span class="mount">'+dd.mount+'</span>'+
+        '<span style="flex:1;margin:0 8px"><div class="bar-wrap" style="height:4px">'+
+        '<div class="bar-fill" style="width:'+dd.used_pct+'%;background:linear-gradient(90deg,'+bc+',#4ade80)"></div></div></span>'+
+        '<span class="pct">'+dd.used_pct+'%</span>'+
+        '<span style="color:#7a4a8a;font-size:10px;min-width:50px;text-align:right">'+(dd.used_gb||0).toFixed(1)+'/'+(dd.total_gb||0).toFixed(1)+'G</span></div>';
+    });
+    document.getElementById('diskContent').innerHTML = dh || '<div style="color:#7a4a8a;font-size:10px">No disk data</div>';
+
+    var ifaces = d.network || [];
+    var nh = '';
+    ifaces.forEach(function(n){
+      nh += '<div class="net-row"><span class="iface">'+n.iface+'</span>'+
+        '<span class="speed">↓ '+fmtB(n.rx_bytes||0)+'  ↑ '+fmtB(n.tx_bytes||0)+'</span></div>';
+    });
+    document.getElementById('netContent').innerHTML = nh || '<div style="color:#7a4a8a;font-size:10px">No network data</div>';
+
+    var uptime = d.uptime || {};
+    var ut = '';
+    if(uptime.days > 0) ut += uptime.days + 'd ';
+    ut += uptime.hours + 'h ' + uptime.mins + 'm';
+    document.getElementById('uptimeContent').textContent = ut;
+
+    var bat = d.battery;
+    var bc = document.getElementById('batteryCard');
+    if(bat){
+      bc.style.display = 'block';
+      var color = bat.pct > 50 ? '#34d399' : (bat.pct > 20 ? '#fbbf24' : '#ef4444');
+      var charging = bat.status == 'Charging' ? ' ⚡' : '';
+      document.getElementById('batteryContent').innerHTML = '<span style="color:'+color+'">'+bat.pct+'%</span> <span style="color:#7a4a8a;font-size:10px">'+bat.status+charging+'</span>';
+    }else{
+      bc.style.display = 'none';
+    }
+
+    var procs = d.processes || [];
+    var ph = '';
+    procs.forEach(function(p, i){
+      if(i >= 5) return;
+      ph += '<div style="display:flex;justify-content:space-between;padding:2px 0;font-size:10px">'+
+        '<span style="color:#c084fc;min-width:20px">'+(i+1)+'</span>'+
+        '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#9a7ab5">'+p.name+'</span>'+
+        '<span style="color:#7a4a8a;min-width:30px;text-align:right">'+p.mem+'M</span></div>';
+    });
+    document.getElementById('procContent').innerHTML = ph || '<div style="color:#7a4a8a;font-size:10px">No processes</div>';
+
+    var cu = cpu.usage || 0;
+    hist.push(cu);
+    if(hist.length>180) hist.shift();
+    drawHist();
+
+    var dio = d.diskio;
+    if(dio){
+      var dih = '';
+      var keys = Object.keys(dio);
+      keys.forEach(function(k){
+        var v = dio[k];
+        dih += '<div style="display:flex;justify-content:space-between;padding:2px 0;font-size:10px">'+
+          '<span style="color:#c084fc;min-width:40px">'+k+'</span>'+
+          '<span style="color:#7a4a8a">↓ '+fmtB(v.rbytes)+'  ↑ '+fmtB(v.wbytes)+'</span></div>';
+      });
+      document.getElementById('diskIOContent').innerHTML = dih || '<div style="color:#7a4a8a;font-size:10px">No disk I/O data</div>';
+    }
+
+    var dt = new Date();
+    document.getElementById('timeStart').textContent = dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('timeEnd').textContent = dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  });
+}
+
 update();
 setInterval(update, 2000);
-setInterval(checkPremium, 30000);
-</script></script>
+
+// Toggle premium features visibility
+function togglePremiumFeatures(){
+  fetch('/api/premium').then(function(r){return r.json()}).then(function(d){
+    var isPrem = d.premium;
+    document.querySelectorAll('.premium-card').forEach(function(el){
+      el.style.display = isPrem ? 'block' : 'none';
+    });
+  });
+}
+
+togglePremiumFeatures();
+setInterval(togglePremiumFeatures, 30000);
+</script>
 </body>
 </html>
