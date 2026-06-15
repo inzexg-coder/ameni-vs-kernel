@@ -6,38 +6,38 @@
 <title>ameni monitor — live demo</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#08040e;font-family:monospace;min-height:100vh;color:#c0c0cc;overflow-x:hidden}
+  body{background:#0c0618;font-family:monospace;min-height:100vh;color:#e8e0f0;overflow-x:hidden}
   body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
     background:radial-gradient(ellipse at 20% 50%,#1a0a2e 0%,transparent 60%),
                radial-gradient(ellipse at 80% 20%,#2a1040 0%,transparent 50%);z-index:-1}
   .container{max-width:900px;margin:0 auto;padding:20px}
-  .ascii{font-size:7px;line-height:1.1;text-align:center;margin:5px 0 12px;white-space:pre;color:#a855f7;opacity:0.6}
+  .ascii{font-size:7px;line-height:1.1;text-align:center;margin:5px 0 12px;white-space:pre;color:#c084fc;opacity:0.6}
   h1{font-size:20px;font-weight:300;text-align:center;margin:0 0 4px;
-    background:linear-gradient(90deg,#a855f7,#e9d5ff,#a855f7);background-size:200% auto;
+    background:linear-gradient(90deg,#c084fc,#e9d5ff,#c084fc);background-size:200% auto;
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shim 4s linear infinite}
   @keyframes shim{0%{background-position:0% center}50%{background-position:200% center}100%{background-position:0% center}}
-  .sub{color:#6b4a7b;font-size:10px;text-align:center;margin-bottom:16px}
+  .sub{color:#9a7ab5;font-size:10px;text-align:center;margin-bottom:16px}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   @media(max-width:640px){.grid{grid-template-columns:1fr}}
-  .card{background:linear-gradient(135deg,#12071e,#1a0a2e);border:1px solid #2a1040;border-radius:8px;padding:14px 16px}
-  .card-title{color:#6b4a7b;font-size:9px;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+  .card{background:linear-gradient(135deg,#12071e,#1a0a2e);border:1px solid #4a2070;border-radius:8px;padding:14px 16px}
+  .card-title{color:#9a7ab5;font-size:9px;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
   .metric{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:12px}
-  .label{color:#6b4a7b;min-width:80px}
+  .label{color:#9a7ab5;min-width:80px}
   .value{color:#c084fc;font-weight:700}
-  .bar-wrap{width:100%;height:6px;background:#1a0820;border-radius:3px;overflow:hidden;margin:4px 0}
+  .bar-wrap{width:100%;height:6px;background:#2a1040;border-radius:3px;overflow:hidden;margin:4px 0}
   .bar-fill{height:100%;border-radius:3px;transition:width .6s ease}
-  .bar-green{background:linear-gradient(90deg,#22c55e,#4ade80)}
-  .bar-yellow{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+  .bar-green{background:linear-gradient(90deg,#34d399,#4ade80)}
+  .bar-yellow{background:linear-gradient(90deg,#fbbf24,#fbbf24)}
   .bar-red{background:linear-gradient(90deg,#ef4444,#dc2626)}
-  .bar-purple{background:linear-gradient(90deg,#7c3aed,#a855f7)}
+  .bar-purple{background:linear-gradient(90deg,#a855f7,#c084fc)}
   .disk-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:11px}
-  .disk-row .mount{color:#a855f7;min-width:60px}
+  .disk-row .mount{color:#c084fc;min-width:60px}
   .disk-row .pct{color:#c084fc;min-width:35px;text-align:right}
   .net-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px}
-  .net-row .iface{color:#a855f7;min-width:50px}
+  .net-row .iface{color:#c084fc;min-width:50px}
   .net-row .speed{color:#c084fc}
-  .footer{text-align:center;margin-top:16px;font-size:9px;color:#4a2a5a}
-  .premium-badge{display:inline-block;background:linear-gradient(90deg,#7c3aed,#a855f7);color:#fff;font-size:8px;padding:2px 6px;border-radius:3px;margin-left:6px}
+  .footer{text-align:center;margin-top:16px;font-size:9px;color:#7a4a8a}
+  .premium-badge{display:inline-block;background:linear-gradient(90deg,#a855f7,#c084fc);color:#fff;font-size:8px;padding:2px 6px;border-radius:3px;margin-left:6px}
   .pulse{animation:pulse 2s ease-in-out infinite}
   @keyframes pulse{0%{opacity:1}50%{opacity:.4}100%{opacity:1}}
   .blink{animation:blink 1s step-end infinite}
@@ -92,8 +92,8 @@
 <!-- History (premium) -->
 <div class="card" style="margin-top:10px">
   <div class="card-title">history (CPU last 30 min) <span class="premium-badge">PREMIUM</span></div>
-  <canvas id="historyCanvas" width="800" height="200" style="width:100%;height:120px;border-radius:4px;background:#0a0212"></canvas>
-  <div style="display:flex;justify-content:space-between;font-size:8px;color:#4a2a5a;margin-top:4px">
+  <canvas id="historyCanvas" width="800" height="200" style="width:100%;height:120px;border-radius:4px;background:#12071e"></canvas>
+  <div style="display:flex;justify-content:space-between;font-size:8px;color:#7a4a8a;margin-top:4px">
     <span id="timeStart">now</span><span>CPU % over time</span><span id="timeEnd">now</span>
   </div>
 </div>
@@ -103,20 +103,20 @@
   <div class="card-title">premium <span id="premiumBadge" class="premium-badge" style="display:none">ACTIVE</span></div>
 
   <!-- Account status -->
-  <div id="accountStatus" style="font-size:11px;color:#6b4a7b;margin-bottom:8px">Checking...</div>
+  <div id="accountStatus" style="font-size:11px;color:#9a7ab5;margin-bottom:8px">Checking...</div>
 
   <!-- Login form -->
   <div id="loginForm" style="display:none;flex-direction:column;gap:6px;margin-bottom:10px">
     <input id="loginInput" type="text" placeholder="Username or Email" spellcheck="false"
-      style="background:#12071e;border:1px solid #2a1040;border-radius:4px;padding:6px 8px;color:#c084fc;font-family:inherit;font-size:11px;outline:none">
+      style="background:#1a0a2e;border:1px solid #4a2070;border-radius:4px;padding:6px 8px;color:#c084fc;font-family:inherit;font-size:11px;outline:none">
     <div style="display:flex;gap:6px">
       <input id="passwordInput" type="password" placeholder="Password" spellcheck="false"
-        style="flex:1;background:#12071e;border:1px solid #2a1040;border-radius:4px;padding:6px 8px;color:#c084fc;font-family:inherit;font-size:11px;outline:none">
+        style="flex:1;background:#1a0a2e;border:1px solid #4a2070;border-radius:4px;padding:6px 8px;color:#c084fc;font-family:inherit;font-size:11px;outline:none">
       <button id="loginBtn" onclick="amenokeLogin()"
-        style="background:linear-gradient(90deg,#7c3aed,#a855f7);border:none;border-radius:4px;padding:6px 12px;color:#fff;font-family:inherit;font-size:11px;cursor:pointer">Sign In</button>
+        style="background:linear-gradient(90deg,#a855f7,#c084fc);border:none;border-radius:4px;padding:6px 12px;color:#fff;font-family:inherit;font-size:11px;cursor:pointer">Sign In</button>
     </div>
-    <div style="font-size:10px;color:#4a2a5a">
-      <a href="https://amenoke.ru" target="_blank" style="color:#7c3aed;text-decoration:none">Register at amenoke.ru</a>
+    <div style="font-size:10px;color:#7a4a8a">
+      <a href="https://amenoke.ru" target="_blank" style="color:#a855f7;text-decoration:none">Register at amenoke.ru</a>
     </div>
     <div id="loginError" style="font-size:10px;color:#ef4444"></div>
   </div>
@@ -124,20 +124,20 @@
   <!-- Logged in info -->
   <div id="loggedInInfo" style="display:none;font-size:11px;margin-bottom:8px">
     <span id="loggedInUsername" style="color:#c084fc"></span>
-    <span id="loggedInPremium" style="color:#6b4a7b"></span>
-    <button onclick="amenokeLogout()" style="background:none;border:1px solid #2a1040;border-radius:4px;padding:2px 8px;color:#6b4a7b;font-size:10px;cursor:pointer;margin-left:6px">Logout</button>
+    <span id="loggedInPremium" style="color:#9a7ab5"></span>
+    <button onclick="amenokeLogout()" style="background:none;border:1px solid #4a2070;border-radius:4px;padding:2px 8px;color:#9a7ab5;font-size:10px;cursor:pointer;margin-left:6px">Logout</button>
   </div>
 
   <!-- Offline key activation -->
   <div id="offlineSection" style="border-top:1px solid #1a0820;padding-top:8px;margin-top:6px">
-    <div style="font-size:9px;color:#4a2a5a;margin-bottom:4px">offline license key</div>
+    <div style="font-size:9px;color:#7a4a8a;margin-bottom:4px">offline license key</div>
     <div style="display:flex;gap:6px">
       <input id="licenseInput" type="text" placeholder="Paste your license key" spellcheck="false"
-        style="flex:1;background:#12071e;border:1px solid #2a1040;border-radius:4px;padding:6px 8px;color:#c084fc;font-family:inherit;font-size:11px;outline:none">
+        style="flex:1;background:#1a0a2e;border:1px solid #4a2070;border-radius:4px;padding:6px 8px;color:#c084fc;font-family:inherit;font-size:11px;outline:none">
       <button id="activateBtn" onclick="activateLicense()"
-        style="background:linear-gradient(90deg,#7c3aed,#a855f7);border:none;border-radius:4px;padding:6px 12px;color:#fff;font-family:inherit;font-size:11px;cursor:pointer">Activate</button>
+        style="background:linear-gradient(90deg,#a855f7,#c084fc);border:none;border-radius:4px;padding:6px 12px;color:#fff;font-family:inherit;font-size:11px;cursor:pointer">Activate</button>
     </div>
-    <div id="premiumResult" style="font-size:10px;margin-top:6px;color:#6b4a7b"></div>
+    <div id="premiumResult" style="font-size:10px;margin-top:6px;color:#9a7ab5"></div>
   </div>
 </div>
 
@@ -171,7 +171,7 @@
     '⠀⠀⠀⠀⠀⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀'
   ];
   var el = document.getElementById('asciiBlock');
-  var colors = ['#a855f7','#c084fc','#d8b4fe','#e9d5ff','#7c3aed','#9333ea'];
+  var colors = ['#c084fc','#c084fc','#d8b4fe','#e9d5ff','#a855f7','#9333ea'];
   ascii.forEach(function(l,i){
     var s = document.createElement('span');
     s.style.color = colors[i % 6];
@@ -190,8 +190,8 @@ var hist = [];
 var t0 = Date.now();
 
 function barColor(p){
-  if(p<60) return '#22c55e';
-  if(p<85) return '#f59e0b';
+  if(p<60) return '#34d399';
+  if(p<85) return '#fbbf24';
   return '#ef4444';
 }
 
@@ -228,13 +228,9 @@ function drawHist(){
   for(var i=1;i<hist.length;i++){
     ctx.lineTo((i/(hist.length-1))*w, h - (hist[i]/100)*h);
   }
-  ctx.strokeStyle = '#a855f7';
+  ctx.strokeStyle = '#c084fc';
   ctx.lineWidth = 2;
   ctx.stroke();
-}
-
-
-
 }
 
 function checkPremium(){
@@ -246,7 +242,7 @@ function checkPremium(){
     var accountStatus = document.getElementById('accountStatus');
 
     if(d.premium){
-      accountStatus.innerHTML = '<span style="color:#22c55e">PREMIUM ACTIVE</span>';
+      accountStatus.innerHTML = '<span style="color:#34d399">PREMIUM ACTIVE</span>';
       badge.style.display = 'inline-block';
       loginForm.style.display = 'none';
       loggedInInfo.style.display = 'none';
@@ -256,13 +252,13 @@ function checkPremium(){
       document.getElementById('loggedInUsername').textContent = d.username;
       document.getElementById('loggedInPremium').textContent = '| not premium';
       loginForm.style.display = 'none';
-      accountStatus.innerHTML = '<span style="color:#6b4a7b">Logged in as ' + d.username + '</span>';
+      accountStatus.innerHTML = '<span style="color:#9a7ab5">Logged in as ' + d.username + '</span>';
       badge.style.display = 'none';
       offlineSection.style.display = 'block';
     } else {
       loginForm.style.display = 'flex';
       loggedInInfo.style.display = 'none';
-      accountStatus.innerHTML = '<span style="color:#6b4a7b">Sign in with amenoke.ru</span>';
+      accountStatus.innerHTML = '<span style="color:#9a7ab5">Sign in with amenoke.ru</span>';
       badge.style.display = 'none';
       offlineSection.style.display = 'block';
     }
@@ -302,7 +298,7 @@ function activateLicense(){
     .then(function(r){return r.json()}).then(function(d){
       var pr = document.getElementById('premiumResult');
       if(d.ok && d.premium){
-        pr.innerHTML = '<span style="color:#22c55e">License activated for ' + (d.email||'') + '</span>';
+        pr.innerHTML = '<span style="color:#34d399">License activated for ' + (d.email||'') + '</span>';
         checkPremium();
       } else if(d.ok){
         pr.innerHTML = '<span style="color:#ef4444">Invalid license key</span>';
@@ -350,7 +346,7 @@ function update(){
       '<span style="flex:1;margin:0 8px"><div class="bar-wrap" style="height:4px">'+
       '<div class="bar-fill" style="width:'+d.p+'%;background:linear-gradient(90deg,'+bc+',#4ade80)"></div></div></span>'+
       '<span class="pct">'+d.p.toFixed(1)+'%</span>'+
-      '<span style="color:#6b4a7b;font-size:10px;min-width:50px;text-align:right">'+d.u.toFixed(1)+'/'+d.t+'G</span></div>';
+      '<span style="color:#9a7ab5;font-size:10px;min-width:50px;text-align:right">'+d.u.toFixed(1)+'/'+d.t+'G</span></div>';
   });
   document.getElementById('diskContent').innerHTML = dh;
 
