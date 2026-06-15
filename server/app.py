@@ -491,6 +491,11 @@ def get_local_ip():
     except:
         return "127.0.0.1"
 
+def _print_premium_async():
+    if _is_premium():
+        email = _license_data.get("email", "unknown") if _license_data else "unknown"
+        print(f"  \033[38;5;141mPremium:\033[0m enabled for {email}")
+
 def main():
     auto_open = "--no-browser" not in sys.argv and os.environ.get("AMENI_NO_BROWSER") != "1"
     ip = get_local_ip()
@@ -500,11 +505,9 @@ def main():
     print(f"  \033[38;5;92mLocal:\033[0m   http://127.0.0.1:{PORT}")
     print(f"  \033[38;5;92mNetwork:\033[0m http://{ip}:{PORT}")
     print(f"  \033[38;5;141mOpen:\033[0m    http://127.0.0.1:{PORT}")
-    if _is_premium():
-        email = _license_data.get("email", "unknown") if _license_data else "unknown"
-        print(f"  \033[38;5;141mPremium:\033[0m enabled for {email}")
     print("  \033[38;5;92m\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\033[0m")
     print("  \033[38;5;183mPress Ctrl+C to stop\033[0m\n")
+    threading.Thread(target=_print_premium_async, daemon=True).start()
     try:
         server = http.server.HTTPServer((HOST, PORT), Handler)
     except OSError:
