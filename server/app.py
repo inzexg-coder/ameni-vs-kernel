@@ -310,15 +310,19 @@ def read_network():
     if IS_WIN:
         net = []
         try:
-            import subprocess, json as _j
-            o = subprocess.run(["powershell","-NoProfile","-Command",
-                "Get-NetAdapterStatistics | Select-Object Name, ReceivedBytes, SentBytes | ConvertTo-Json"],
-                capture_output=True, text=True, timeout=10)
-            if o.stdout.strip():
-                data = _j.loads(o.stdout)
+            import json as _j
+            out, _ = _win_run(["powershell","-NoProfile","-Command",
+                "Get-NetAdapterStatistics | Select-Object Name, ReceivedBytes, SentBytes | ConvertTo-Json -Compress"])
+            if not out.strip():
+                out, _ = _win_run(["powershell","-NoProfile","-Command",
+                    "Get-CimInstance Win32_PerfFormattedData_Tcpip_NetworkInterface | Where-Object {$_.Name -ne '_Total'} | Select-Object Name, BytesReceivedPersec, BytesSentPersec | ConvertTo-Json -Compress"])
+            if out.strip():
+                data = _j.loads(out)
                 if not isinstance(data, list): data = [data]
                 for d in data:
-                    net.append({"iface": d["Name"], "rx_bytes": int(d["ReceivedBytes"]), "tx_bytes": int(d["SentBytes"])})
+                    rx = int(d.get("ReceivedBytes", d.get("BytesReceivedPersec", 0)))
+                    tx = int(d.get("SentBytes", d.get("BytesSentPersec", 0)))
+                    net.append({"iface": d.get("Name", "unknown"), "rx_bytes": rx, "tx_bytes": tx})
         except:
             pass
         return net
