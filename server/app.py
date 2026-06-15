@@ -504,8 +504,20 @@ def main():
         print(f"  \033[38;5;141mPremium:\033[0m enabled for {email}")
     print("  \033[38;5;92m\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\033[0m")
     print("  \033[38;5;183mPress Ctrl+C to stop\033[0m\n")
-    server = http.server.HTTPServer((HOST, PORT), Handler)
-    if auto_open:
+    try:
+        server = http.server.HTTPServer((HOST, PORT), Handler)
+    except OSError:
+        import subprocess as _sp
+        try:
+            _sp.run(["fuser", "-k", f"{PORT}/tcp"], capture_output=True, timeout=5)
+            time.sleep(1)
+        except:
+            pass
+        try:
+            server = http.server.HTTPServer((HOST, PORT), Handler)
+        except OSError:
+            print(f"  Port {PORT} in use. Kill it: fuser -k {PORT}/tcp")
+            return
         threading.Timer(1.5, lambda: webbrowser.open(f"http://127.0.0.1:{PORT}")).start()
     try:
         server.serve_forever()
