@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>ameni monitor — live demo</title>
+<title>ameni monitor</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:#0c0618;font-family:monospace;min-height:100vh;color:#e8e0f0;overflow-x:hidden}
@@ -11,7 +11,7 @@
     background:radial-gradient(ellipse at 20% 50%,#1a0a2e 0%,transparent 60%),
                radial-gradient(ellipse at 80% 20%,#2a1040 0%,transparent 50%);z-index:-1}
   .container{max-width:900px;margin:0 auto;padding:20px}
-  .ascii{font-size:7px;line-height:1.1;text-align:center;margin:5px 0 12px;white-space:pre;color:#c084fc;opacity:0.6}
+  .ascii{font-size:6px;line-height:1.0;text-align:center;margin:4px 0 10px;white-space:pre;color:#c084fc;opacity:0.7;letter-spacing:0}
   h1{font-size:20px;font-weight:300;text-align:center;margin:0 0 4px;
     background:linear-gradient(90deg,#c084fc,#e9d5ff,#c084fc);background-size:200% auto;
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shim 4s linear infinite}
@@ -67,7 +67,7 @@
 
   <!-- Memory -->
   <div class="card">
-    <div class="card-title">memory <span class="premium-badge">PREMIUM</span></div>
+    <div class="card-title">memory</div>
     <div class="metric"><span class="label">RAM Used</span><span class="value" id="memUsed">--</span></div>
     <div class="bar-wrap"><div class="bar-fill" id="memBar" style="width:0%"></div></div>
     <div class="metric"><span class="label">Available</span><span class="value" id="memAvail">--</span></div>
@@ -141,7 +141,7 @@
   </div>
 </div>
 
-<div class="footer" id="footer"><span class="pulse">●</span> live demo</div>
+<div class="footer" id="footer"><span class="pulse">●</span> ameni monitor</div>
 
 </div>
 
@@ -171,18 +171,15 @@
     '⠀⠀⠀⠀⠀⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀'
   ];
   var el = document.getElementById('asciiBlock');
+  var html = '';
   var colors = ['#c084fc','#c084fc','#d8b4fe','#e9d5ff','#a855f7','#9333ea'];
-  ascii.forEach(function(l,i){
-    var s = document.createElement('span');
-    s.style.color = colors[i % 6];
-    s.textContent = l;
-    el.appendChild(s);
-    el.appendChild(document.createTextNode('\
-'));
-  });
+  for(var i=0;i<ascii.length;i++){
+    html += '<div style="color:'+colors[i%6]+'">'+ascii[i]+'</div>';
+  }
+  el.innerHTML = html;
 })();
 
-function rnd(min,max){return Math.round((Math.random()*(max-min)+min)*10)/10}
+function rnd(function rnd(min,max){return Math.round((Math.random()*(max-min)+min)*10)/10}
 function rndI(min,max){return Math.floor(Math.random()*(max-min+1)+min)}
 function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
 
