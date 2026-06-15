@@ -122,11 +122,27 @@ IS_WIN = os.name == "nt"
 
 def _win_run(cmd, timeout=10):
     try:
+        import locale
         r = subprocess.run(cmd, capture_output=True, timeout=timeout)
-        return r.stdout.decode("utf-8", errors="replace"), r.stderr.decode("utf-8", errors="replace")
+        raw = r.stdout
+        if raw[:2] == b"\xff\xfe":
+            return raw.decode("utf-16-le", errors="replace"), r.stderr.decode("utf-16-le", errors="replace")
+        try:
+            return raw.decode("utf-8"), r.stderr.decode("utf-8")
+        except UnicodeDecodeError:
+            pass
+        try:
+            oem = "cp866"
+            return raw.decode(oem, errors="replace"), r.stderr.decode(oem, errors="replace")
+        except:
+            pass
+        try:
+            return raw.decode("cp1251", errors="replace"), r.stderr.decode("cp1251", errors="replace")
+        except:
+            pass
+        return raw.decode("utf-8", errors="replace"), r.stderr.decode("utf-8", errors="replace")
     except:
         return "", ""
-
 
 def cpu_stats():
     if IS_WIN:
