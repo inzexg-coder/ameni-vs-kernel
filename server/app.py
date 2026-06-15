@@ -418,6 +418,18 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 HTML_PAGE = open(os.path.join(os.path.dirname(__file__), "dashboard.html")).read()
 
 def read_uptime():
+    if IS_WIN:
+        try:
+            import ctypes
+            lib = ctypes.windll.kernel32
+            uptime_ms = lib.GetTickCount64()
+            total_sec = uptime_ms // 1000
+            days = int(total_sec // 86400)
+            hours = int((total_sec % 86400) // 3600)
+            mins = int((total_sec % 3600) // 60)
+            return {"days": days, "hours": hours, "mins": mins}
+        except:
+            return {"days": 0, "hours": 0, "mins": 0}
     try:
         with open("/proc/uptime") as f:
             up = float(f.read().split()[0])
@@ -429,6 +441,27 @@ def read_uptime():
         return {"days": 0, "hours": 0, "mins": 0}
 
 def read_processes():
+    if IS_WIN:
+        try:
+            import subprocess
+            r = subprocess.run(["wmic", "path", "Win32_Process", "get", "ProcessId,Name,WorkingSetSize", "/format:csv"],
+                               capture_output=True, text=True, timeout=5)
+            procs = []
+            for line in r.stdout.strip().split("\n")[1:]:
+                if not line.strip(): continue
+                parts = line.split(",")
+                if len(parts) >= 4:
+                    try:
+                        pid = int(parts[2])
+                        name = parts[1].strip()
+                        mem = int(parts[3]) // 1048576
+                        procs.append({"pid": pid, "name": name, "mem": mem})
+                    except:
+                        pass
+            procs.sort(key=lambda x: -x["mem"])
+            return procs[:5]
+        except:
+            return []
     procs = []
     try:
         for pid in os.listdir("/proc"):
@@ -447,6 +480,24 @@ def read_processes():
         return []
 
 def read_battery():
+    if IS_WIN:
+        try:
+            import subprocess, re
+            r = subprocess.run(["wmic", "path", "Win32_Battery", "get", "EstimatedChargeRemaining,Status,BatteryStatus",
+                               "/format:csv"], capture_output=True, text=True, timeout=5)
+            for line in r.stdout.strip().split("\n")[1:]:
+                if not line.strip(): continue
+                parts = line.split(",")
+                if len(parts) >= 3:
+                    try:
+                        pct = int(parts[1])
+                        st = "Charging" if "2" in parts[2] or "6" in parts[2] or "10" in parts[2] else "Discharging"
+                        return {"pct": pct, "status": st}
+                    except:
+                        pass
+        except:
+            pass
+        return None
     try:
         for bat in os.listdir("/sys/class/power_supply/"):
             if bat.startswith("BAT"):
@@ -460,6 +511,28 @@ def read_battery():
     return None
 
 def read_diskio():
+    if IS_WIN:
+        try:
+            import subprocess
+            r = subprocess.run(["wmic", "path", "Win32_PerfFormattedData_PerfDisk_LogicalDisk",
+                               "get", "Name,DiskReadBytesPersec,DiskWriteBytesPersec", "/format:csv"],
+                               capture_output=True, text=True, timeout=5)
+            disks = {}
+            for line in r.stdout.strip().split("\n")[1:]:
+                if not line.strip(): continue
+                parts = line.split(",")
+                if len(parts) >= 4:
+                    try:
+                        name = parts[1].strip().replace(":", "")
+                        rb = int(parts[2])
+                        wb = int(parts[3])
+                        if name and name != "_Total":
+                            disks[name] = {"rbytes": rb, "wbytes": wb}
+                    except:
+                        pass
+            return disks
+        except:
+            return {}
     disks = {}
     try:
         with open("/proc/diskstats") as f:
@@ -469,7 +542,7 @@ def read_diskio():
                     n = p[2]
                     if not any(n.startswith(x) for x in ["sd", "nvme", "vd", "mmc", "xvd"]):
                         continue
-                    if p[3] == "0": continue  # skip partitions
+                    if p[3] == "0": continue
                     rb = int(p[5]) * 512
                     wb = int(p[9]) * 512
                     disks[n] = {"rbytes": rb, "wbytes": wb}
@@ -518,7 +591,9 @@ def main():
         try:
             server = http.server.HTTPServer((HOST, PORT), Handler)
         except OSError:
-            print(f"  Port {PORT} in use. Kill it: fuser -k {PORT}/tcp")
+            cmd = "netstat -ano | findstr :" + str(PORT) if IS_WIN else f"fuser -k {PORT}/tcp"
+            hint = "netstat -ano | findstr :"+str(PORT) if IS_WIN else f"fuser -k {PORT}/tcp"
+            print(f"  Port {PORT} in use. Kill it: {hint}")
             return
     if auto_open:
         threading.Timer(1.5, lambda: webbrowser.open(f"http://127.0.0.1:{PORT}")).start()
