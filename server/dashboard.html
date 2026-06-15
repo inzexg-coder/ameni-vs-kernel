@@ -6,239 +6,198 @@
 <title>ameni monitor</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
-
   body{background:#f8f6fc;font-family:system-ui,-apple-system,sans-serif;min-height:100vh;
-    color:#2a1a3e;overflow-x:hidden;padding:24px}
+    color:#2a1a3e;overflow-x:auto;padding:24px}
   body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
-    background:radial-gradient(ellipse at 50% 20%,rgba(168,85,247,0.08) 0%,transparent 60%);
-    z-index:-1}
-
-  .container{max-width:960px;margin:0 auto}
-
+    background:radial-gradient(ellipse at 50% 20%,rgba(168,85,247,0.08) 0%,transparent 60%);z-index:-1}
+  .container{max-width:1100px;margin:0 auto;padding:0 20px}
   .ascii{font-family:monospace;font-size:9px;line-height:1.15;text-align:center;margin:8px 0 20px;
     white-space:pre;opacity:0.85;letter-spacing:0.5px}
-
   h1{font-size:30px;font-weight:700;text-align:center;margin:0 0 4px;letter-spacing:0;
     background:linear-gradient(135deg,#7c3aed,#a855f7,#c084fc);
     -webkit-background-clip:text;-webkit-text-fill-color:transparent}
-
   .sub{font-size:13px;text-align:center;margin:0 0 24px;color:#a888c8}
   .sub span{color:#7c3aed;font-weight:600}
-
-  .graph{display:flex;flex-direction:column;align-items:center;gap:0;position:relative}
-
-  .graph-row{display:flex;justify-content:center;gap:28px;position:relative;width:100%}
-
-  .graph-node{flex:1;max-width:440px;min-width:340px;position:relative}
-
-  .connector-h{display:none}
-  .graph-row.two .graph-node:first-child::after{content:'';position:absolute;top:50%;right:-16px;
-    width:16px;height:2px;background:linear-gradient(90deg,#d8c4e8,#c8b0e0);transform:translateY(-50%)}
-  .graph-row.two .graph-node:last-child::before{content:'';position:absolute;top:50%;left:-16px;
-    width:16px;height:2px;background:linear-gradient(90deg,#c8b0e0,#d8c4e8);transform:translateY(-50%)}
-
-  .v-connector{width:3px;height:32px;background:linear-gradient(to bottom,#d8c4e8,#e8dff0);margin:0 auto;position:relative}
-  .v-connector::before{content:'';display:block;width:7px;height:7px;background:#d0b8e0;
-    border-radius:50%;position:absolute;top:-3px;left:-2px}
-  .v-connector::after{content:'';display:block;width:5px;height:5px;background:#d8c4e8;
-    border-radius:50%;position:absolute;bottom:-2px;left:-1px}
-
-  .card{background:#ffffff;border:1px solid #e0d0ea;border-radius:14px;padding:22px 24px;
-    box-shadow:0 2px 8px rgba(124,58,237,0.06),0 8px 28px rgba(124,58,237,0.08);
-    position:relative;transition:all 0.15s ease}
+  .canvas-wrap{position:relative;min-height:900px;width:100%}
+  .node{position:absolute;z-index:2;transition:all 0.15s ease}
+  .node:hover{z-index:10}
+  .node-cpu{top:0;left:50%;transform:translateX(-50%);width:400px}
+  .node-memory{top:10px;left:3%;width:350px}
+  .node-uptime{top:0;right:3%;width:280px}
+  .node-battery{top:110px;right:3%;width:280px}
+  .node-disk{top:210px;left:6%;width:430px}
+  .node-network{top:220px;right:6%;width:330px}
+  .node-processes{top:380px;left:3%;width:350px}
+  .node-history{top:390px;right:8%;width:380px}
+  .node-diskio{top:540px;left:15%;width:360px}
+  .node-auth{top:680px;left:50%;transform:translateX(-50%);width:520px}
+  .card{background:#fff;border:1px solid #e0d0ea;border-radius:14px;padding:20px 22px;
+    box-shadow:0 2px 8px rgba(124,58,237,0.06),0 8px 28px rgba(124,58,237,0.08);position:relative}
   .card:hover{box-shadow:0 4px 16px rgba(124,58,237,0.1),0 12px 40px rgba(124,58,237,0.12);
     transform:translateY(-2px);border-color:#d0b8e0}
-
   .card::after{content:'';position:absolute;top:14px;right:18px;width:10px;height:10px;
-    border-radius:50%;background:linear-gradient(135deg,#7c3aed,#c084fc);opacity:0.35}
-
-  .card-title{color:#7c3aed;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;
-    margin-bottom:10px;font-weight:700}
-
+    border-radius:50%;background:linear-gradient(135deg,#7c3aed,#c084fc);opacity:0.3}
+  .card-title{color:#7c3aed;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;margin-bottom:10px;font-weight:700}
   .metric{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:15px}
   .label{color:#9a7ab5;font-size:13px}
   .value{color:#2a1a3e;font-weight:600;font-size:16px}
-
   .bar-wrap{width:100%;height:12px;background:#f0e8f8;border-radius:6px;overflow:hidden;margin:6px 0}
-  .bar-fill{height:100%;border-radius:6px;transition:width .4s ease;
-    background:linear-gradient(90deg,#a855f7,#c084fc)}
-
-  .disk-row,.net-row,.proc-row{display:flex;justify-content:space-between;align-items:center;
-    padding:5px 0;font-size:14px;border-bottom:1px solid #f2ecf8}
+  .bar-fill{height:100%;border-radius:6px;transition:width .4s ease;background:linear-gradient(90deg,#a855f7,#c084fc)}
+  .disk-row,.net-row,.proc-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:14px;border-bottom:1px solid #f2ecf8}
   .disk-row:last-child,.net-row:last-child,.proc-row:last-child{border-bottom:none}
   .disk-row .mount,.net-row .iface{color:#7c3aed;min-width:60px;font-weight:600}
   .disk-row .pct{color:#9a7ab5;min-width:40px;text-align:right}
   .proc-row .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#4a3060;font-size:13px}
   .proc-row .mem{color:#7c3aed;min-width:35px;text-align:right;font-weight:600}
-
   .big-text{font-size:36px;font-weight:700;text-align:center;padding:10px 0;
-    background:linear-gradient(135deg,#7c3aed,#c084fc);
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent}
-
+    background:linear-gradient(135deg,#7c3aed,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
   .footer{text-align:center;margin-top:12px;font-size:10px;color:#c8b0d8}
-
   .premium-badge{display:inline-block;background:linear-gradient(135deg,#7c3aed,#c084fc);
     color:#fff;font-size:9px;padding:2px 8px;border-radius:4px;margin-left:6px;font-weight:700}
-
-  .premium-node{display:none;margin-top:0}
-
-  .auth-card{background:#ffffff;border:1px solid #e0d0ea;border-radius:14px;padding:18px 22px;
-    box-shadow:0 2px 8px rgba(124,58,237,0.06)}
+  .premium-node{display:none}
+  .auth-card{background:#fff;border:1px solid #e0d0ea;border-radius:14px;padding:18px 22px;box-shadow:0 2px 8px rgba(124,58,237,0.06)}
   .auth-card .title{color:#7c3aed;font-size:11px;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;font-weight:700}
-  .auth-card input{background:#f8f6fc;border:1px solid #e0d0ea;border-radius:8px;padding:10px 14px;
-    color:#2a1a3e;font-family:inherit;font-size:14px;outline:none;margin-bottom:6px;width:260px}
+  .auth-card input{background:#f8f6fc;border:1px solid #e0d0ea;border-radius:8px;padding:10px 14px;color:#2a1a3e;font-family:inherit;font-size:14px;outline:none;margin-bottom:6px;width:260px}
   .auth-card input:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,0.12)}
-  .auth-card button{background:linear-gradient(135deg,#7c3aed,#c084fc);border:none;border-radius:8px;
-    padding:10px 20px;color:#fff;font-family:inherit;font-size:13px;cursor:pointer;font-weight:600;margin-left:4px}
+  .auth-card button{background:linear-gradient(135deg,#7c3aed,#c084fc);border:none;border-radius:8px;padding:10px 20px;color:#fff;font-family:inherit;font-size:13px;cursor:pointer;font-weight:600;margin-left:4px}
   .auth-card button:hover{box-shadow:0 3px 10px rgba(124,58,237,0.25)}
   .auth-card .hint{font-size:10px;color:#c8b0d8;margin-top:6px}
   .auth-card .hint a{color:#9a7ab5;text-decoration:none}
   .auth-card .error{font-size:11px;color:#e53e3e;margin-top:4px}
-
   canvas{border-radius:8px;background:#f8f6fc;width:100%;height:70px;border:1px solid #f0e8f8}
-
-  .full-node{width:100%}
-
   .pulse{animation:pulse 2s ease-in-out infinite}
   @keyframes pulse{0%{opacity:1}50%{opacity:0.4}100%{opacity:1}}
+  .connectors{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none}
+  .connectors path{stroke:#d0c0e0;stroke-width:1.5;fill:none;stroke-dasharray:3,3;opacity:0.5}
+  @media(max-width:900px){
+    .node{position:static;transform:none!important;width:100%!important;margin-bottom:16px}
+    .canvas-wrap{min-height:auto}
+    .connectors{display:none}
+  }
 </style>
 </head>
 <body>
 <div class="container">
-
 <div class="ascii" id="asciiBlock"></div>
-
 <h1>ameni monitor</h1>
 <div class="sub"><span id="distro">--</span> <span id="kernel">--</span> <span id="arch">--</span></div>
 
-<div class="graph">
+<div class="canvas-wrap">
+<svg class="connectors" id="connectors">
+  <path d="M200,100 Q550,50 700,80"/>
+  <path d="M200,100 L180,280"/>
+  <path d="M700,80 L760,290"/>
+  <path d="M180,280 Q300,350 500,380"/>
+  <path d="M760,290 Q620,350 420,380"/>
+  <path d="M500,380 L220,530"/>
+  <path d="M420,380 L680,530"/>
+  <path d="M220,530 L420,700"/>
+  <path d="M680,530 L560,700"/>
+</svg>
 
-  <div class="graph-row two">
-    <div class="graph-node">
-      <div class="card">
-        <div class="card-title">cpu</div>
-        <div class="metric"><span class="label">Usage</span><span class="value" id="cpuUsage">--</span></div>
-        <div class="bar-wrap"><div class="bar-fill" id="cpuBar" style="width:0%"></div></div>
-        <div class="metric"><span class="label">Load</span><span class="value" id="cpuLoad">--</span></div>
-        <div class="metric"><span class="label">Cores</span><span class="value" id="cpuCores">--</span></div>
-        <div class="metric"><span class="label">Freq</span><span class="value" id="cpuFreq">--</span></div>
-        <div class="metric"><span class="label">Temp</span><span class="value" id="cpuTemp">--</span></div>
-      </div>
-    </div>
-    <div class="graph-node">
-      <div class="card">
-        <div class="card-title">memory</div>
-        <div class="metric"><span class="label">RAM</span><span class="value" id="memUsed">--</span></div>
-        <div class="bar-wrap"><div class="bar-fill" id="memBar" style="width:0%"></div></div>
-        <div class="metric"><span class="label">Avail</span><span class="value" id="memAvail">--</span></div>
-        <div class="metric"><span class="label">Swap</span><span class="value" id="memSwap">--</span></div>
-        <div class="bar-wrap"><div class="bar-fill" id="swapBar" style="width:0%"></div></div>
-      </div>
+<div class="node node-cpu">
+  <div class="card">
+    <div class="card-title">cpu</div>
+    <div class="metric"><span class="label">Usage</span><span class="value" id="cpuUsage">--</span></div>
+    <div class="bar-wrap"><div class="bar-fill" id="cpuBar" style="width:0%"></div></div>
+    <div class="metric"><span class="label">Load</span><span class="value" id="cpuLoad">--</span></div>
+    <div class="metric"><span class="label">Cores</span><span class="value" id="cpuCores">--</span></div>
+    <div class="metric"><span class="label">Freq</span><span class="value" id="cpuFreq">--</span></div>
+    <div class="metric"><span class="label">Temp</span><span class="value" id="cpuTemp">--</span></div>
+  </div>
+</div>
+
+<div class="node node-memory">
+  <div class="card">
+    <div class="card-title">memory</div>
+    <div class="metric"><span class="label">RAM</span><span class="value" id="memUsed">--</span></div>
+    <div class="bar-wrap"><div class="bar-fill" id="memBar" style="width:0%"></div></div>
+    <div class="metric"><span class="label">Avail</span><span class="value" id="memAvail">--</span></div>
+    <div class="metric"><span class="label">Swap</span><span class="value" id="memSwap">--</span></div>
+    <div class="bar-wrap"><div class="bar-fill" id="swapBar" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div class="node node-uptime">
+  <div class="card">
+    <div class="card-title">uptime</div>
+    <div id="uptimeContent" class="big-text">--</div>
+  </div>
+</div>
+
+<div class="node node-battery" id="batteryCard" style="display:none">
+  <div class="card">
+    <div class="card-title">battery</div>
+    <div id="batteryContent" class="big-text">--</div>
+  </div>
+</div>
+
+<div class="node node-disk">
+  <div class="card">
+    <div class="card-title">disk</div>
+    <div id="diskContent"></div>
+  </div>
+</div>
+
+<div class="node node-network">
+  <div class="card">
+    <div class="card-title">network</div>
+    <div id="netContent"></div>
+  </div>
+</div>
+
+<div class="node node-processes">
+  <div class="card">
+    <div class="card-title">processes</div>
+    <div id="procContent"></div>
+  </div>
+</div>
+
+<div class="node node-history premium-node" id="historyNode">
+  <div class="card">
+    <div class="card-title">history <span class="premium-badge">PREMIUM</span></div>
+    <canvas id="historyCanvas"></canvas>
+    <div style="display:flex;justify-content:space-between;font-size:9px;color:#b8a0c8;margin-top:3px">
+      <span id="timeStart">now</span><span>CPU %</span><span id="timeEnd">now</span>
     </div>
   </div>
+</div>
 
-  <div class="v-connector"></div>
+<div class="node node-diskio premium-node" id="diskIONode">
+  <div class="card">
+    <div class="card-title">disk i/o <span class="premium-badge">PREMIUM</span></div>
+    <div id="diskIOContent"></div>
+  </div>
+</div>
 
-  <div class="graph-row two">
-    <div class="graph-node">
-      <div class="card">
-        <div class="card-title">uptime</div>
-        <div id="uptimeContent" class="big-text">--</div>
+<div class="node node-auth">
+  <div class="auth-card">
+    <div class="title">premium <span id="premiumBadge" class="premium-badge" style="display:none">ACTIVE</span></div>
+    <div id="premiumStatus" style="font-size:13px;color:#9a7ab5;margin-bottom:10px">Checking...</div>
+    <div id="loginForm" style="display:none;margin-bottom:8px">
+      <div><input id="loginInput" type="text" placeholder="username or email"></div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input id="passwordInput" type="password" placeholder="password">
+        <button id="loginBtn" onclick="amenokeLogin()">Sign In</button>
       </div>
+      <div class="hint"><a href="https://amenoke.ru" target="_blank">amenoke.ru</a> — register</div>
+      <div id="loginError" class="error"></div>
     </div>
-    <div class="graph-node" id="batteryCard" style="display:none">
-      <div class="card">
-        <div class="card-title">battery</div>
-        <div id="batteryContent" class="big-text">--</div>
+    <div id="loggedInInfo" style="display:none;font-size:13px;margin-bottom:8px">
+      <span id="loggedInUsername" style="color:#7c3aed;font-weight:600"></span>
+      <span id="loggedInPremium" style="color:#9a7ab5"></span>
+      <button onclick="amenokeLogout()" style="background:none;border:1px solid #e0d0ea;border-radius:6px;padding:6px 12px;color:#9a7ab5;font-size:12px;cursor:pointer;margin-left:6px">logout</button>
+    </div>
+    <div id="offlineSection" style="border-top:1px solid #f0e8f8;padding-top:10px;margin-top:6px">
+      <div style="font-size:10px;color:#c8b0d8;margin-bottom:6px">offline key</div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input id="licenseInput" type="text" placeholder="paste license key" style="width:280px">
+        <button id="activateBtn" onclick="activateLicense()">Activate</button>
       </div>
+      <div id="premiumResult" style="font-size:11px;margin-top:6px;color:#9a7ab5"></div>
     </div>
   </div>
-
-  <div class="v-connector"></div>
-
-  <div class="graph-row">
-    <div class="graph-node full-node">
-      <div class="card">
-        <div class="card-title">disk</div>
-        <div id="diskContent"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="v-connector"></div>
-
-  <div class="graph-row two">
-    <div class="graph-node">
-      <div class="card">
-        <div class="card-title">network</div>
-        <div id="netContent"></div>
-      </div>
-    </div>
-    <div class="graph-node">
-      <div class="card">
-        <div class="card-title">processes</div>
-        <div id="procContent"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="v-connector" id="historyConnector" style="opacity:0.3"></div>
-
-  <div class="graph-row premium-node" id="historyNode">
-    <div class="graph-node full-node">
-      <div class="card">
-        <div class="card-title">history <span class="premium-badge">PREMIUM</span></div>
-        <canvas id="historyCanvas"></canvas>
-        <div style="display:flex;justify-content:space-between;font-size:9px;color:#b8a0c8;margin-top:3px">
-          <span id="timeStart">now</span><span>CPU %</span><span id="timeEnd">now</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="v-connector premium-node" id="diskIOConnector" style="display:none"></div>
-
-  <div class="graph-row premium-node" id="diskIONode" style="display:none">
-    <div class="graph-node full-node">
-      <div class="card">
-        <div class="card-title">disk i/o <span class="premium-badge">PREMIUM</span></div>
-        <div id="diskIOContent"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="v-connector" style="opacity:0.3"></div>
-
-  <div class="graph-row">
-    <div class="graph-node full-node">
-      <div class="auth-card">
-        <div class="title">premium <span id="premiumBadge" class="premium-badge" style="display:none">ACTIVE</span></div>
-        <div id="premiumStatus" style="font-size:13px;color:#9a7ab5;margin-bottom:10px">Checking...</div>
-        <div id="loginForm" style="display:none;margin-bottom:8px">
-          <div><input id="loginInput" type="text" placeholder="username or email"></div>
-          <div style="display:flex;gap:6px;align-items:center">
-            <input id="passwordInput" type="password" placeholder="password">
-            <button id="loginBtn" onclick="amenokeLogin()">Sign In</button>
-          </div>
-          <div class="hint"><a href="https://amenoke.ru" target="_blank">amenoke.ru</a> — register</div>
-          <div id="loginError" class="error"></div>
-        </div>
-        <div id="loggedInInfo" style="display:none;font-size:13px;margin-bottom:8px">
-          <span id="loggedInUsername" style="color:#7c3aed;font-weight:600"></span>
-          <span id="loggedInPremium" style="color:#9a7ab5"></span>
-          <button onclick="amenokeLogout()" style="background:none;border:1px solid #e0d0ea;border-radius:6px;padding:6px 12px;color:#9a7ab5;font-size:12px;cursor:pointer;margin-left:6px">logout</button>
-        </div>
-        <div id="offlineSection" style="border-top:1px solid #f0e8f8;padding-top:10px;margin-top:6px">
-          <div style="font-size:10px;color:#c8b0d8;margin-bottom:6px">offline key</div>
-          <div style="display:flex;gap:6px;align-items:center">
-            <input id="licenseInput" type="text" placeholder="paste license key" style="width:280px">
-            <button id="activateBtn" onclick="activateLicense()">Activate</button>
-          </div>
-          <div id="premiumResult" style="font-size:11px;margin-top:6px;color:#9a7ab5"></div>
-        </div>
-      </div>
-    </div>
-  </div>
+</div>
 
 </div>
 
@@ -246,8 +205,8 @@
 </div>
 
 <script>
-(function() {
-  var art = [
+(function(){
+  var art=[
     '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢲⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀',
     '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀',
     '⠀⠀⠀⠀⠀⠀⠀⠀⢀⠄⠂⢉⠤⠐⠋⠈⠡⡈⠉⠐⠠⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀',
@@ -270,246 +229,170 @@
     '⠀⠀⠀⠀⠀⢠⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠉⠁⠀⠀⠀⠀',
     '⠀⠀⠀⠀⠀⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀'
   ];
-  var el = document.getElementById('asciiBlock');
-  var html = '';
-  var colors = ['#a855f7','#7c3aed','#c084fc','#9333ea','#d8b4fe','#7c3aed'];
+  var el=document.getElementById('asciiBlock');
+  var h='';
+  var cl=['#a855f7','#7c3aed','#c084fc','#9333ea','#d8b4fe','#7c3aed'];
   for(var i=0;i<art.length;i++){
-    html += '<div style="color:'+colors[i%6]+';text-shadow:0 0 2px rgba(124,58,237,0.15)">'+art[i]+'</div>';
-  }
-  el.innerHTML = html;
+    h+='<div style="color:'+cl[i%6]+';text-shadow:0 0 2px rgba(124,58,237,0.15)">'+art[i]+'</div>';}
+  el.innerHTML=h;
 })();
 
-function rnd(min,max){return Math.round((Math.random()*(max-min)+min)*10)/10}
-function rndI(min,max){return Math.floor(Math.random()*(max-min+1)+min)}
-
-var hist = [];
-
-function barColor(p){
-  if(p<60) return '#34d399';
-  if(p<85) return '#fbbf24';
-  return '#ef4444';
-}
-
+function barColor(p){if(p<60)return'#34d399';if(p<85)return'#fbbf24';return'#ef4444';}
 function fmtB(b){
-  if(b>1073741824) return (b/1073741824).toFixed(1)+'GB';
-  if(b>1048576) return (b/1048576).toFixed(1)+'MB';
-  if(b>1024) return (b/1024).toFixed(1)+'KB';
-  return b+'B';
-}
+  if(b>1073741824)return(b/1073741824).toFixed(1)+'GB';
+  if(b>1048576)return(b/1048576).toFixed(1)+'MB';
+  if(b>1024)return(b/1024).toFixed(1)+'KB';
+  return b+'B';}
+
+var hist=[];
 
 function drawHist(){
-  var c = document.getElementById('historyCanvas');
-  if(!c) return;
-  var ctx = c.getContext('2d');
-  var w = c.width, h = c.height;
-  ctx.clearRect(0,0,w,h);
-  if(hist.length<2) return;
-  ctx.beginPath();
-  ctx.moveTo(0, h);
-  for(var i=0;i<hist.length;i++){
-    ctx.lineTo((i/(hist.length-1))*w, h-(hist[i]/100)*h);
-  }
-  ctx.lineTo(w, h);
-  ctx.closePath();
-  var grad = ctx.createLinearGradient(0,0,0,h);
-  grad.addColorStop(0,'rgba(168,85,247,0.35)');
-  grad.addColorStop(1,'rgba(168,85,247,0.02)');
-  ctx.fillStyle = grad;
-  ctx.fill();
+  var c=document.getElementById('historyCanvas');if(!c)return;
+  var ctx=c.getContext('2d');var w=c.width,h=c.height;
+  ctx.clearRect(0,0,w,h);if(hist.length<2)return;
+  ctx.beginPath();ctx.moveTo(0,h);
+  for(var i=0;i<hist.length;i++)ctx.lineTo((i/(hist.length-1))*w,h-(hist[i]/100)*h);
+  ctx.lineTo(w,h);ctx.closePath();
+  var g=ctx.createLinearGradient(0,0,0,h);
+  g.addColorStop(0,'rgba(168,85,247,0.35)');g.addColorStop(1,'rgba(168,85,247,0.02)');
+  ctx.fillStyle=g;ctx.fill();
   ctx.beginPath();
   for(var i=0;i<hist.length;i++){
-    var x = (i/(hist.length-1))*w;
-    var y = h-(hist[i]/100)*h;
-    if(i===0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-  }
-  ctx.strokeStyle = '#c084fc';
-  ctx.lineWidth = 2.5;
-  ctx.stroke();
-}
+    var x=(i/(hist.length-1))*w,y=h-(hist[i]/100)*h;
+    if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+  ctx.strokeStyle='#c084fc';ctx.lineWidth=2.5;ctx.stroke();}
 
 function checkPremium(){
   fetch('/api/premium').then(function(r){return r.json()}).then(function(d){
-    var badge = document.getElementById('premiumBadge');
-    var loginForm = document.getElementById('loginForm');
-    var loggedInInfo = document.getElementById('loggedInInfo');
-    var offlineSection = document.getElementById('offlineSection');
-    var status = document.getElementById('premiumStatus');
-
+    document.getElementById('premiumBadge').style.display=d.premium?'inline-block':'none';
+    var s=document.getElementById('premiumStatus');
+    var lf=document.getElementById('loginForm');
+    var li=document.getElementById('loggedInInfo');
+    var os=document.getElementById('offlineSection');
     if(d.premium){
-      status.innerHTML = '<span style="color:#34d399;font-weight:600">PREMIUM ACTIVE</span>';
-      badge.style.display = 'inline-block';
-      loginForm.style.display = 'none';
-      loggedInInfo.style.display = 'none';
-      offlineSection.style.display = 'none';
-    } else if(d.username){
-      loggedInInfo.style.display = 'block';
-      document.getElementById('loggedInUsername').textContent = d.username;
-      document.getElementById('loggedInPremium').textContent = '| not premium';
-      loginForm.style.display = 'none';
-      status.innerHTML = '<span style="color:#9a7ab5">Logged in as ' + d.username + '</span>';
-      badge.style.display = 'none';
-      offlineSection.style.display = 'block';
-    } else {
-      loginForm.style.display = 'block';
-      loggedInInfo.style.display = 'none';
-      status.innerHTML = '<span style="color:#9a7ab5">Sign in via amenoke.ru</span>';
-      badge.style.display = 'none';
-      offlineSection.style.display = 'block';
-    }
-  });
-}
+      s.innerHTML='<span style="color:#34d399;font-weight:600">PREMIUM ACTIVE</span>';
+      lf.style.display='none';li.style.display='none';os.style.display='none';}
+    else if(d.username){
+      li.style.display='block';document.getElementById('loggedInUsername').textContent=d.username;
+      document.getElementById('loggedInPremium').textContent='| not premium';
+      lf.style.display='none';s.innerHTML='<span style="color:#9a7ab5">Logged in as '+d.username+'</span>';
+      document.getElementById('premiumBadge').style.display='none';os.style.display='block';}
+    else{
+      lf.style.display='block';li.style.display='none';
+      s.innerHTML='<span style="color:#9a7ab5">Sign in via amenoke.ru</span>';
+      document.getElementById('premiumBadge').style.display='none';os.style.display='block';}});}
 
 function amenokeLogin(){
-  var login = document.getElementById('loginInput').value.trim();
-  var password = document.getElementById('passwordInput').value.trim();
-  if(!login || !password){ document.getElementById('loginError').textContent = 'Enter login and password'; return; }
-  var btn = document.getElementById('loginBtn');
-  btn.textContent = 'Signing in...'; btn.disabled = true;
-  fetch('/api/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({login:login, password:password})})
+  var l=document.getElementById('loginInput').value.trim();
+  var p=document.getElementById('passwordInput').value.trim();
+  if(!l||!p){document.getElementById('loginError').textContent='Enter login and password';return;}
+  var b=document.getElementById('loginBtn');b.textContent='Signing in...';b.disabled=true;
+  fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({login:l,password:p})})
     .then(function(r){return r.json()}).then(function(d){
-      if(d.ok){
-        document.getElementById('loginError').textContent = '';
-        checkPremium();
-      }else{
-        document.getElementById('loginError').textContent = d.error || 'Login failed';
-      }
-      btn.textContent = 'Sign In'; btn.disabled = false;
-    });
-}
+      if(d.ok){document.getElementById('loginError').textContent='';checkPremium();}
+      else{document.getElementById('loginError').textContent=d.error||'Login failed';}
+      b.textContent='Sign In';b.disabled=false;});}
 
 function amenokeLogout(){
-  fetch('/api/logout', {method:'POST'}).then(function(r){return r.json()}).then(function(d){
-    checkPremium();
-  });
-}
+  fetch('/api/logout',{method:'POST'}).then(function(r){return r.json()}).then(function(d){checkPremium();});}
 
 function activateLicense(){
-  var key = document.getElementById('licenseInput').value.trim();
-  if(!key){ document.getElementById('premiumResult').textContent = 'Enter a license key'; return; }
-  var btn = document.getElementById('activateBtn');
-  btn.textContent = 'Activating...'; btn.disabled = true;
-  fetch('/api/activate', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({key:key})})
+  var k=document.getElementById('licenseInput').value.trim();
+  if(!k){document.getElementById('premiumResult').textContent='Enter a license key';return;}
+  var b=document.getElementById('activateBtn');b.textContent='Activating...';b.disabled=true;
+  fetch('/api/activate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:k})})
     .then(function(r){return r.json()}).then(function(d){
-      var pr = document.getElementById('premiumResult');
-      if(d.ok && d.premium){
-        pr.innerHTML = '<span style="color:#34d399">License activated for ' + (d.email||'') + '</span>';
-        checkPremium();
-      } else if(d.ok){
-        pr.innerHTML = '<span style="color:#ef4444">Invalid license key</span>';
-      } else {
-        pr.innerHTML = '<span style="color:#ef4444">' + (d.error||'Activation failed') + '</span>';
-      }
-      btn.textContent = 'Activate'; btn.disabled = false;
-    });
-}
+      var pr=document.getElementById('premiumResult');
+      if(d.ok&&d.premium){pr.innerHTML='<span style="color:#34d399">License activated</span>';checkPremium();}
+      else if(d.ok){pr.innerHTML='<span style="color:#ef4444">Invalid license key</span>';}
+      else{pr.innerHTML='<span style="color:#ef4444">'+(d.error||'Activation failed')+'</span>';}
+      b.textContent='Activate';b.disabled=false;});}
 
 checkPremium();
 
 function update(){
   fetch('/api/monitor/all').then(function(r){return r.json()}).then(function(d){
-    var cpu = d.cpu || {};
-    document.getElementById('cpuUsage').textContent = (cpu.usage||0)+'%';
-    document.getElementById('cpuBar').style.width = (cpu.usage||0)+'%';
-    document.getElementById('cpuBar').style.background = 'linear-gradient(90deg,'+barColor(cpu.usage||0)+',#34d399)';
-    document.getElementById('cpuLoad').textContent = (cpu.load_avg||[0,0,0]).join('  ');
-    document.getElementById('cpuCores').textContent = (cpu.cores||0)+' cores';
-    var freq = (cpu.freq||[]).slice(0,4).map(function(f){return Math.round(f)+'MHz'}).join(' ');
-    document.getElementById('cpuFreq').textContent = freq || '--';
-    document.getElementById('cpuTemp').textContent = (cpu.temp||0)+'°C';
+    var c=d.cpu||{};
+    document.getElementById('cpuUsage').textContent=(c.usage||0)+'%';
+    document.getElementById('cpuBar').style.width=(c.usage||0)+'%';
+    document.getElementById('cpuBar').style.background='linear-gradient(90deg,'+barColor(c.usage||0)+',#34d399)';
+    document.getElementById('cpuLoad').textContent=(c.load_avg||[0,0,0]).join('  ');
+    document.getElementById('cpuCores').textContent=(c.cores||0)+' cores';
+    var f=(c.freq||[]).slice(0,4).map(function(f){return Math.round(f)+'MHz'}).join(' ');
+    document.getElementById('cpuFreq').textContent=f||'--';
+    document.getElementById('cpuTemp').textContent=(c.temp||0)+'°C';
 
-    var mem = d.memory || {};
-    document.getElementById('memUsed').textContent = (mem.used_pct||0)+'%';
-    document.getElementById('memBar').style.width = (mem.used_pct||0)+'%';
-    document.getElementById('memBar').style.background = 'linear-gradient(90deg,'+barColor(mem.used_pct||0)+',#34d399)';
-    var tg = mem.total_gb||0, ag = mem.avail_gb||0;
-    document.getElementById('memAvail').textContent = ag.toFixed(1)+' / '+tg.toFixed(1)+' GB';
-    document.getElementById('memSwap').textContent = (mem.swap_used_pct||0)+'%';
-    document.getElementById('swapBar').style.width = (mem.swap_used_pct||0)+'%';
-    document.getElementById('swapBar').style.background = 'linear-gradient(90deg,'+barColor(mem.swap_used_pct||0)+',#34d399)';
+    var m=d.memory||{};
+    document.getElementById('memUsed').textContent=(m.used_pct||0)+'%';
+    document.getElementById('memBar').style.width=(m.used_pct||0)+'%';
+    document.getElementById('memBar').style.background='linear-gradient(90deg,'+barColor(m.used_pct||0)+',#34d399)';
+    document.getElementById('memAvail').textContent=(m.avail_gb||0).toFixed(1)+' / '+(m.total_gb||0).toFixed(1)+' GB';
+    document.getElementById('memSwap').textContent=(m.swap_used_pct||0)+'%';
+    document.getElementById('swapBar').style.width=(m.swap_used_pct||0)+'%';
+    document.getElementById('swapBar').style.background='linear-gradient(90deg,'+barColor(m.swap_used_pct||0)+',#34d399)';
 
-    var disks = d.disk || [];
-    var dh = '';
-    disks.forEach(function(dd){
-      var bc = barColor(dd.used_pct||0);
-      dh += '<div class="disk-row"><span class="mount">'+dd.mount+'</span>'+
-        '<span style="flex:1;margin:0 10px"><div class="bar-wrap" style="height:6px">'+
-        '<div class="bar-fill" style="width:'+dd.used_pct+'%;background:linear-gradient(90deg,'+bc+',#34d399)"></div></div></span>'+
+    var ds=d.disk||[];var dh='';
+    ds.forEach(function(dd){
+      var bc=barColor(dd.used_pct||0);
+      dh+='<div class="disk-row"><span class="mount">'+dd.mount+'</span>'+
+        '<span style="flex:1;margin:0 10px"><div class="bar-wrap" style="height:6px"><div class="bar-fill" style="width:'+dd.used_pct+'%;background:linear-gradient(90deg,'+bc+',#34d399)"></div></div></span>'+
         '<span class="pct">'+dd.used_pct+'%</span>'+
-        '<span style="color:#7a4a8a;font-size:11px;min-width:60px;text-align:right">'+(dd.used_gb||0).toFixed(1)+'/'+(dd.total_gb||0).toFixed(1)+'G</span></div>';
-    });
-    document.getElementById('diskContent').innerHTML = dh || '<div style="color:#9a7ab5;font-size:12px">No disk data</div>';
+        '<span style="color:#7a4a8a;font-size:11px;min-width:60px;text-align:right">'+(dd.used_gb||0).toFixed(1)+'/'+(dd.total_gb||0).toFixed(1)+'G</span></div>';});
+    document.getElementById('diskContent').innerHTML=dh||'<div style="color:#9a7ab5;font-size:12px">No disk data</div>';
 
-    var net = d.network || [];
-    var nh = '';
-    net.forEach(function(n){
-      nh += '<div class="net-row"><span class="iface">'+n.iface+'</span>'+
-        '<span class="speed">↓ '+fmtB(n.rx_bytes||0)+'  ↑ '+fmtB(n.tx_bytes||0)+'</span></div>';
-    });
-    document.getElementById('netContent').innerHTML = nh || '<div style="color:#9a7ab5;font-size:12px">No network data</div>';
+    var n=d.network||[];var nh='';
+    n.forEach(function(nn){
+      nh+='<div class="net-row"><span class="iface">'+nn.iface+'</span>'+
+        '<span class="speed">&darr; '+fmtB(nn.rx_bytes||0)+'  &uarr; '+fmtB(nn.tx_bytes||0)+'</span></div>';});
+    document.getElementById('netContent').innerHTML=nh||'<div style="color:#9a7ab5;font-size:12px">No network data</div>';
 
-    var up = d.uptime || {};
-    var ut = '';
-    if(up.days>0) ut += up.days+'d ';
-    ut += up.hours+'h '+up.mins+'m';
-    document.getElementById('uptimeContent').textContent = ut;
+    var up=d.uptime||{};var ut='';
+    if(up.days>0)ut+=up.days+'d ';
+    ut+=up.hours+'h '+up.mins+'m';
+    document.getElementById('uptimeContent').textContent=ut;
 
-    var bat = d.battery;
-    var bc = document.getElementById('batteryCard');
+    var bat=d.battery;
+    var bc=document.getElementById('batteryCard');
     if(bat){
-      bc.style.display = 'block';
-      var color = bat.pct>50?'#34d399':(bat.pct>20?'#fbbf24':'#ef4444');
-      var ch = bat.status=='Charging'?' ⚡':'';
-      document.getElementById('batteryContent').innerHTML = '<span style="color:'+color+'">'+bat.pct+'%</span> <span style="color:#9a7ab5;font-size:12px">'+bat.status+ch+'</span>';
-    }else{
-      bc.style.display = 'none';
-    }
+      bc.style.display='block';
+      var col=bat.pct>50?'#34d399':(bat.pct>20?'#fbbf24':'#ef4444');
+      document.getElementById('batteryContent').innerHTML='<span style="color:'+col+'">'+bat.pct+'%</span> <span style="color:#9a7ab5;font-size:12px">'+bat.status+'</span>';}
+    else{bc.style.display='none';}
 
-    var procs = d.processes || [];
-    var ph = '';
-    procs.forEach(function(p,i){
-      if(i>=5) return;
-      ph += '<div class="proc-row"><span style="color:#c084fc;min-width:22px;font-size:12px">'+(i+1)+'</span>'+
-        '<span class="name">'+p.name+'</span>'+
-        '<span class="mem">'+p.mem+'M</span></div>';
-    });
-    document.getElementById('procContent').innerHTML = ph || '<div style="color:#9a7ab5;font-size:12px">No processes</div>';
+    var ps=d.processes||[];var ph='';
+    ps.forEach(function(p,i){
+      if(i>=5)return;
+      ph+='<div class="proc-row"><span style="color:#c084fc;min-width:22px;font-size:12px">'+(i+1)+'</span>'+
+        '<span class="name">'+p.name+'</span><span class="mem">'+p.mem+'M</span></div>';});
+    document.getElementById('procContent').innerHTML=ph||'<div style="color:#9a7ab5;font-size:12px">No processes</div>';
 
-    var cu = cpu.usage || 0;
-    hist.push(cu);
-    if(hist.length>180) hist.shift();
+    var cu=c.usage||0;hist.push(cu);
+    if(hist.length>180)hist.shift();
     drawHist();
 
-    var dio = d.diskio;
+    var dio=d.diskio;
     if(dio){
-      var dih = '';
+      var dih='';
       Object.keys(dio).forEach(function(k){
-        var v = dio[k];
-        dih += '<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px">'+
+        var v=dio[k];
+        dih+='<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px">'+
           '<span style="color:#c084fc;min-width:50px">'+k+'</span>'+
-          '<span style="color:#7a4a8a">↓ '+fmtB(v.rbytes)+'  ↑ '+fmtB(v.wbytes)+'</span></div>';
-      });
-      document.getElementById('diskIOContent').innerHTML = dih || '<div style="color:#9a7ab5;font-size:12px">No disk I/O</div>';
-    }
+          '<span style="color:#7a4a8a">&darr; '+fmtB(v.rbytes)+'  &uarr; '+fmtB(v.wbytes)+'</span></div>';});
+      document.getElementById('diskIOContent').innerHTML=dih||'<div style="color:#9a7ab5;font-size:12px">No disk I/O</div>';}
 
-    var dt = new Date();
-    document.getElementById('timeStart').textContent = dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    document.getElementById('timeEnd').textContent = dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  });
-}
+    var dt=new Date();
+    document.getElementById('timeStart').textContent=dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('timeEnd').textContent=dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});});}
 
 update();
-setInterval(update, 2000);
+setInterval(update,2000);
 
 function togglePremium(){
   fetch('/api/premium').then(function(r){return r.json()}).then(function(d){
-    var p = d.premium;
     document.querySelectorAll('.premium-node').forEach(function(el){
-      el.style.display = p?'block':'none';
-    });
-  });
-}
+      el.style.display=d.premium?'block':'none';});});}
 togglePremium();
-setInterval(togglePremium, 30000);
+setInterval(togglePremium,30000);
 </script>
 </body>
 </html>
