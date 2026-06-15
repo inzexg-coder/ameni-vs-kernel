@@ -65,6 +65,18 @@
     <div class="metric"><span class="label">Temp</span><span class="value" id="cpuTemp">--</span></div>
   </div>
 
+  <!-- Uptime -->
+  <div class="card">
+    <div class="card-title">uptime</div>
+    <div id="uptimeContent" style="font-size:12px;color:#c084fc">--</div>
+  </div>
+
+  <!-- Battery -->
+  <div class="card" id="batteryCard" style="display:none">
+    <div class="card-title">battery</div>
+    <div id="batteryContent" style="font-size:12px;color:#c084fc">--</div>
+  </div>
+
   <!-- Memory -->
   <div class="card">
     <div class="card-title">memory</div>
@@ -87,12 +99,28 @@
     <div id="netContent"></div>
   </div>
 
+  <!-- Processes -->
+  <div class="card">
+    <div class="card-title">processes</div>
+    <div id="procContent" style="font-size:11px"></div>
+  </div>
+
 </div>
 
 <!-- History (premium) -->
 <div class="card premium-card" id="historyCard" style="margin-top:10px;display:none">
   <div class="card-title">history (CPU last 30 min) <span class="premium-badge">PREMIUM</span></div>
   <canvas id="historyCanvas" width="800" height="200" style="width:100%;height:120px;border-radius:4px;background:#12071e"></canvas>
+  <div style="display:flex;justify-content:space-between;font-size:8px;color:#4a2a5a;margin-top:4px">
+    <span id="timeStart">now</span><span>CPU % over time</span><span id="timeEnd">now</span>
+  </div>
+</div>
+
+<!-- Disk I/O (premium) -->
+<div class="card premium-card" id="diskIOCard" style="margin-top:10px;display:none">
+  <div class="card-title">disk i/o <span class="premium-badge">PREMIUM</span></div>
+  <div id="diskIOContent" style="font-size:11px"></div>
+</div>
   <div style="display:flex;justify-content:space-between;font-size:8px;color:#7a4a8a;margin-top:4px">
     <span id="timeStart">now</span><span>CPU % over time</span><span id="timeEnd">now</span>
   </div>
@@ -351,10 +379,51 @@ function update(){
     });
     document.getElementById('netContent').innerHTML = nh || '<div style="color:#7a4a8a;font-size:10px">No network data</div>';
 
+    var uptime = d.uptime || {};
+    var ut = '';
+    if(uptime.days > 0) ut += uptime.days + 'd ';
+    ut += uptime.hours + 'h ' + uptime.mins + 'm';
+    document.getElementById('uptimeContent').textContent = ut;
+
+    var bat = d.battery;
+    var bc = document.getElementById('batteryCard');
+    if(bat){
+      bc.style.display = 'block';
+      var color = bat.pct > 50 ? '#34d399' : (bat.pct > 20 ? '#fbbf24' : '#ef4444');
+      var charging = bat.status == 'Charging' ? ' ⚡' : '';
+      document.getElementById('batteryContent').innerHTML = '<span style="color:'+color+'">'+bat.pct+'%</span> <span style="color:#7a4a8a;font-size:10px">'+bat.status+charging+'</span>';
+    }else{
+      bc.style.display = 'none';
+    }
+
+    var procs = d.processes || [];
+    var ph = '';
+    procs.forEach(function(p, i){
+      if(i >= 5) return;
+      ph += '<div style="display:flex;justify-content:space-between;padding:2px 0;font-size:10px">'+
+        '<span style="color:#c084fc;min-width:20px">'+(i+1)+'</span>'+
+        '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#9a7ab5">'+p.name+'</span>'+
+        '<span style="color:#7a4a8a;min-width:30px;text-align:right">'+p.mem+'M</span></div>';
+    });
+    document.getElementById('procContent').innerHTML = ph || '<div style="color:#7a4a8a;font-size:10px">No processes</div>';
+
     var cu = cpu.usage || 0;
     hist.push(cu);
     if(hist.length>180) hist.shift();
     drawHist();
+
+    var dio = d.diskio;
+    if(dio){
+      var dih = '';
+      var keys = Object.keys(dio);
+      keys.forEach(function(k){
+        var v = dio[k];
+        dih += '<div style="display:flex;justify-content:space-between;padding:2px 0;font-size:10px">'+
+          '<span style="color:#c084fc;min-width:40px">'+k+'</span>'+
+          '<span style="color:#7a4a8a">↓ '+fmtB(v.rbytes)+'  ↑ '+fmtB(v.wbytes)+'</span></div>';
+      });
+      document.getElementById('diskIOContent').innerHTML = dih || '<div style="color:#7a4a8a;font-size:10px">No disk I/O data</div>';
+    }
 
     var dt = new Date();
     document.getElementById('timeStart').textContent = dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
@@ -372,11 +441,6 @@ function togglePremiumFeatures(){
     document.querySelectorAll('.premium-card').forEach(function(el){
       el.style.display = isPrem ? 'block' : 'none';
     });
-    if(isPrem){
-      document.getElementById('historyCard').style.display = 'block';
-    }else{
-      document.getElementById('historyCard').style.display = 'none';
-    }
   });
 }
 

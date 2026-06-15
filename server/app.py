@@ -315,8 +315,12 @@ def read_all():
     mem = cpu.pop("_mem", None) if IS_WIN else None
     if mem is None:
         mem = read_memory()
-    data = {"cpu": cpu, "memory": mem, "disk": read_disk(), "network": read_network(), "time": time.time()}
-    if _is_premium(): history.append(data)
+    data = {"cpu": cpu, "memory": mem, "disk": read_disk(), "network": read_network(),
+            "uptime": read_uptime(), "processes": read_processes(), "battery": read_battery(),
+            "time": time.time()}
+    if _is_premium():
+        data["diskio"] = read_diskio()
+        history.append(data)
     return data
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -348,6 +352,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             elif sub == "memory": self.send_json(read_memory())
             elif sub == "disk": self.send_json(read_disk())
             elif sub == "network": self.send_json(read_network())
+            elif sub == "uptime": self.send_json(read_uptime())
+            elif sub == "processes": self.send_json(read_processes())
+            elif sub == "battery": self.send_json(read_battery())
+            elif sub == "diskio":
+                if _is_premium(): self.send_json(read_diskio())
+                else: self.send_json({"error": "premium required", "premium": False}, 402)
             elif sub == "history":
                 if _is_premium(): self.send_json(list(history))
                 else: self.send_json({"error": "premium required", "premium": False}, 402)
@@ -408,6 +418,67 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if "/api/" in str(args[0]): print(f"  {args[0]}")
 
 HTML_PAGE = open(os.path.join(os.path.dirname(__file__), "dashboard.html")).read()
+
+def read_uptime():
+    try:
+        with open("/proc/uptime") as f:
+            up = float(f.read().split()[0])
+            days = int(up // 86400)
+            hours = int((up % 86400) // 3600)
+            mins = int((up % 3600) // 60)
+            return {"days": days, "hours": hours, "mins": mins}
+    except:
+        return {"days": 0, "hours": 0, "mins": 0}
+
+def read_processes():
+    procs = []
+    try:
+        for pid in os.listdir("/proc"):
+            if not pid.isdigit(): continue
+            try:
+                with open(f"/proc/{pid}/stat") as f:
+                    p = f.read().split()
+                    n = p[1].strip("()")
+                    mem = int(p[23]) * 4096 // 1024 // 1024
+                    procs.append({"pid": int(pid), "name": n, "mem": mem})
+            except:
+                pass
+        procs.sort(key=lambda x: -x["mem"])
+        return procs[:5]
+    except:
+        return []
+
+def read_battery():
+    try:
+        for bat in os.listdir("/sys/class/power_supply/"):
+            if bat.startswith("BAT"):
+                with open(f"/sys/class/power_supply/{bat}/capacity") as f:
+                    pct = int(f.read().strip())
+                with open(f"/sys/class/power_supply/{bat}/status") as f:
+                    st = f.read().strip()
+                return {"pct": pct, "status": st}
+    except:
+        pass
+    return None
+
+def read_diskio():
+    disks = {}
+    try:
+        with open("/proc/diskstats") as f:
+            for line in f:
+                p = line.split()
+                if len(p) >= 14:
+                    n = p[2]
+                    if not any(n.startswith(x) for x in ["sd", "nvme", "vd", "mmc", "xvd"]):
+                        continue
+                    if p[3] == "0": continue  # skip partitions
+                    rb = int(p[5]) * 512
+                    wb = int(p[9]) * 512
+                    disks[n] = {"rbytes": rb, "wbytes": wb}
+    except:
+        pass
+    return disks
+
 
 
 def get_local_ip():
