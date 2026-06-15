@@ -4,8 +4,12 @@ import http.server, threading, json, os, socket, webbrowser, sys, time, collecti
 
 PORT = 3000
 HOST = "0.0.0.0"
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
-from cryptography.exceptions import InvalidSignature
+try:
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+    from cryptography.exceptions import InvalidSignature
+    _HAS_CRYPTOGRAPHY = True
+except ImportError:
+    _HAS_CRYPTOGRAPHY = False
 import json as _json, base64, urllib.request as _urllib, urllib.error as _urlerr
 
 _PUBLIC_KEY_B64 = "t71Kad65MvKZOlex8i/Is8FBzEDV/YNZkvHzoVYI9bM="
@@ -29,6 +33,8 @@ def _get_machine_id():
 
 def _check_license():
     global _license_data
+    if not _HAS_CRYPTOGRAPHY:
+        return False
     key_path = os.path.expanduser("~/.ameni/license.key")
     if not os.path.exists(key_path):
         return False
