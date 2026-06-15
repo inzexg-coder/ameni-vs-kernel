@@ -108,11 +108,9 @@ def _amenoke_check():
         return None
 
 def _is_premium():
-    # 1. Check amenoke.ru (online)
     online = _amenoke_check()
     if online is True:
         return True
-    # 2. Fallback to Ed25519 key (offline)
     return _check_license()
 IS_WIN = os.name == "nt"
 

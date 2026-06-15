@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>ameni monitor</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:#f8f6fc;font-family:system-ui,-apple-system,sans-serif;min-height:100vh;
@@ -97,56 +98,56 @@
   canvas{border-radius:10px;background:#f8f6fc;width:100%;height:200px;border:1px solid #ede4f4}
   .canvas-label{display:flex;justify-content:space-between;font-size:10px;color:#b8a0c8;margin-top:4px}
 
-  /* 🌟 Animations */
+  
 
-  /* CPU: pulsing glow ring */
+  
   @keyframes cpuPulse{0%{box-shadow:0 0 0 0 rgba(168,85,247,0)}50%{box-shadow:0 0 0 4px rgba(168,85,247,0.1)}100%{box-shadow:0 0 0 0 rgba(168,85,247,0)}}
   .g-cpu .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
     background:linear-gradient(90deg,#7c3aed,#a855f7,#c084fc);opacity:0.6}
   .g-cpu .card{animation:cpuPulse 2.5s ease-in-out infinite}
 
-  /* Memory: gentle fill pulse on bars */
+  
   @keyframes memShimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
   .g-memory .bar-fill{background-size:200% 100%;animation:memShimmer 4s ease-in-out infinite}
 
-  /* Uptime: blinking colon animation */
+  
   @keyframes blink{0%{opacity:1}50%{opacity:0.2}100%{opacity:1}}
   .g-uptime .big-text::after{content:':';animation:blink 1.5s steps(1) infinite;margin-left:0}
   .g-uptime .card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;
     background:linear-gradient(180deg,#7c3aed,transparent);opacity:0.15}
 
-  /* Battery: level wave when charging */
+  
   @keyframes batCharge{0%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-4px) scaleY(1.05)}100%{transform:translateY(0) scaleY(1)}}
   @keyframes batGlow{0%{opacity:0.4}50%{opacity:0.8}100%{opacity:0.4}}
-  .g-battery .card::before{content:'⚡';position:absolute;top:12px;right:40px;font-size:18px;
+  .g-battery .card::before{content:'';position:absolute;top:12px;right:40px;font-size:18px;
     opacity:0;transition:opacity 0.5s}
   .g-battery.charging .card::before{opacity:0.6;animation:batGlow 1.5s ease-in-out infinite}
 
-  /* Disk: scanning line sweep */
+  
   @keyframes diskScan{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
   .g-disk .card::before{content:'';position:absolute;top:0;left:0;width:60px;height:100%;
     background:linear-gradient(90deg,transparent,rgba(168,85,247,0.06),transparent);
     animation:diskScan 3s ease-in-out infinite;pointer-events:none}
 
-  /* Network: signal wave dots */
+  
   @keyframes netWave{0%{transform:scaleY(0.3);opacity:0.5}50%{transform:scaleY(1);opacity:1}100%{transform:scaleY(0.3);opacity:0.5}}
   .g-network .card::before{content:'';position:absolute;bottom:14px;right:20px;display:flex;gap:3px}
   .g-network .card{position:relative}
   .g-network .card::before{content:'▁ ▂ ▃ ▄ ▅';position:absolute;bottom:16px;right:20px;
     font-size:8px;letter-spacing:2px;color:#c084fc;opacity:0.3;animation:netWave 3s ease-in-out infinite}
 
-  /* Processes: cursor blink */
+  
   @keyframes typeCur{0%{opacity:1}50%{opacity:0}100%{opacity:1}}
   .g-processes .card::after{content:'_';position:absolute;bottom:20px;right:24px;
     font-size:18px;color:#a855f7;opacity:0.4;animation:typeCur 1s steps(1) infinite}
 
-  /* History: subtle glow at bottom */
+  
   @keyframes histGlow{0%{opacity:0.2}50%{opacity:0.5}100%{opacity:0.2}}
   .g-history .card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
     background:linear-gradient(90deg,#7c3aed,#c084fc,#7c3aed);
     animation:histGlow 2.5s ease-in-out infinite;opacity:0.4}
 
-  /* Premium glow border */
+  
   @keyframes premGlow{0%{border-image:linear-gradient(135deg,#a855f7,#c084fc,#7c3aed) 1}
     50%{border-image:linear-gradient(135deg,#c084fc,#a855f7,#7c3aed) 1}
     100%{border-image:linear-gradient(135deg,#a855f7,#c084fc,#7c3aed) 1}}
@@ -193,7 +194,7 @@
 
   <div class="g-cpu">
     <div class="card">
-      <div class="card-title">cpu</div>
+      <div class="card-title"><i class="fas fa-microchip" style="margin-right:6px;opacity:0.6"></i>cpu</div>
       <div class="metric"><span class="label">Usage</span><span class="value" id="cpuUsage">--</span></div>
       <div class="bar-wrap"><div class="bar-fill" id="cpuBar" style="width:0%"></div></div>
       <div class="metric"><span class="label">Load</span><span class="value" id="cpuLoad">--</span></div>
@@ -205,7 +206,7 @@
 
   <div class="g-memory">
     <div class="card">
-      <div class="card-title">memory</div>
+      <div class="card-title"><i class="fas fa-memory" style="margin-right:6px;opacity:0.6"></i>memory</div>
       <div class="metric"><span class="label">RAM</span><span class="value" id="memUsed">--</span></div>
       <div class="bar-wrap"><div class="bar-fill" id="memBar" style="width:0%"></div></div>
       <div class="metric"><span class="label">Avail</span><span class="value" id="memAvail">--</span></div>
@@ -216,35 +217,35 @@
 
   <div class="g-uptime">
     <div class="card">
-      <div class="card-title">uptime</div>
+      <div class="card-title"><i class="fas fa-clock" style="margin-right:6px;opacity:0.6"></i>uptime</div>
       <div id="uptimeContent" class="big-text">--</div>
     </div>
   </div>
 
   <div class="g-battery" id="batteryCard">
     <div class="card">
-      <div class="card-title">battery</div>
+      <div class="card-title"><i class="fas fa-battery-three-quarters" style="margin-right:6px;opacity:0.6"></i>battery</div>
       <div id="batteryContent" class="big-text">--</div>
     </div>
   </div>
 
   <div class="g-disk">
     <div class="card">
-      <div class="card-title">disk</div>
+      <div class="card-title"><i class="fas fa-hard-drive" style="margin-right:6px;opacity:0.6"></i>disk</div>
       <div id="diskContent"></div>
     </div>
   </div>
 
   <div class="g-network">
     <div class="card">
-      <div class="card-title">network</div>
+      <div class="card-title"><i class="fas fa-network-wired" style="margin-right:6px;opacity:0.6"></i>network</div>
       <div id="netContent"></div>
     </div>
   </div>
 
   <div class="g-processes">
     <div class="card">
-      <div class="card-title">processes</div>
+      <div class="card-title"><i class="fas fa-microchip" style="margin-right:6px;opacity:0.6"></i>processes</div>
       <div id="procContent"></div>
     </div>
   </div>
@@ -256,7 +257,7 @@
   <div class="g-history premium-node" id="historyNode">
     <div class="premium-card">
       <div class="card">
-        <div class="card-title">history <span class="premium-badge">PREMIUM</span></div>
+        <div class="card-title"><i class="fas fa-chart-line" style="margin-right:6px;opacity:0.6"></i>history <span class="premium-badge">PREMIUM</span></div>
         <canvas id="historyCanvas"></canvas>
         <div class="canvas-label"><span id="timeStart">now</span><span>CPU %</span><span id="timeEnd">now</span></div>
       </div>
@@ -266,7 +267,7 @@
   <div class="g-diskio premium-node" id="diskIONode">
     <div class="premium-card">
       <div class="card">
-        <div class="card-title">disk i/o <span class="premium-badge">PREMIUM</span></div>
+        <div class="card-title"><i class="fas fa-circle-notch" style="margin-right:6px;opacity:0.6"></i>disk i/o <span class="premium-badge">PREMIUM</span></div>
         <div id="diskIOContent"></div>
       </div>
     </div>
@@ -463,14 +464,14 @@ function update(){
     var up=d.uptime||{};var ut='';
     if(up.days>0)ut+=up.days+'d ';
     ut+=up.hours+'h '+up.mins+'m';
-    document.getElementById('uptimeContent').textContent=ut;
+    document.getElementById('uptimeContent').innerHTML='<i class="fas fa-clock" style="font-size:24px;margin-right:8px;opacity:0.6"></i> '+ut;
 
     var bat=d.battery;
     var bc=document.getElementById('batteryCard');
     if(bat){
       bc.style.display='block';
       bc.classList.toggle('charging', bat.status=='Charging');
-      document.getElementById('batteryContent').innerHTML='<span style="color:'+barColor(bat.pct)+'">'+bat.pct+'%</span> <span style="color:#9a7ab5;font-size:12px">'+bat.status+'</span>';}
+      document.getElementById('batteryContent').innerHTML='<span style="color:'+barColor(bat.pct)+'">'+bat.pct+'%</span> <span style="color:#9a7ab5;font-size:12px"><i class="fas fa-bolt" style="margin-right:4px"></i>'+bat.status+'</span>';}
     else{bc.style.display='none';bc.classList.remove('charging');}
 
     var ps=d.processes||[];var ph='';
