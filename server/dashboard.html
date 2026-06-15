@@ -7,83 +7,105 @@
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:#f8f6fc;font-family:system-ui,-apple-system,sans-serif;min-height:100vh;
-    color:#2a1a3e;overflow-x:auto;padding:20px}
+    color:#2a1a3e;overflow-x:auto;padding:24px}
   body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
-    background:radial-gradient(ellipse at 50% 20%,rgba(168,85,247,0.08) 0%,transparent 60%);z-index:-1}
-  .container{max-width:1200px;margin:0 auto;padding:0 16px}
-  .ascii{font-family:monospace;font-size:9px;line-height:1.15;text-align:center;margin:6px 0 18px;
-    white-space:pre;opacity:0.85;letter-spacing:0.5px}
-  h1{font-size:30px;font-weight:700;text-align:center;margin:0 0 4px;letter-spacing:0;
+    background:radial-gradient(ellipse at 50% 20%,rgba(168,85,247,0.1) 0%,transparent 60%);z-index:-1}
+  .container{max-width:1300px;margin:0 auto;padding:0 16px}
+  .ascii{font-family:monospace;font-size:10px;line-height:1.2;text-align:center;margin:6px 0 20px;
+    white-space:pre;opacity:0.9;letter-spacing:0.5px}
+  h1{font-size:34px;font-weight:700;text-align:center;margin:0 0 6px;letter-spacing:0;
     background:linear-gradient(135deg,#7c3aed,#a855f7,#c084fc);
     -webkit-background-clip:text;-webkit-text-fill-color:transparent}
-  .sub{font-size:13px;text-align:center;margin:0 0 20px;color:#a888c8}
+  .sub{font-size:14px;text-align:center;margin:0 0 24px;color:#a888c8}
   .sub span{color:#7c3aed;font-weight:600}
 
-  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;position:relative;z-index:2}
+  .section-label{font-size:13px;text-transform:uppercase;letter-spacing:3px;color:#c0a8d8;
+    text-align:center;margin:24px 0 16px;grid-column:1/13;font-weight:700}
+
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:20px;position:relative;z-index:2}
   .grid>div{position:relative;z-index:2}
 
-  .g-cpu{grid-column:4/10;grid-row:1}
+  .g-cpu{grid-column:3/11;grid-row:1}
   .g-memory{grid-column:1/6;grid-row:2}
-  .g-uptime{grid-column:8/13;grid-row:2}
-  .g-battery{grid-column:8/13;grid-row:3}
-  .g-disk{grid-column:2/8;grid-row:3}
+  .g-uptime{grid-column:7/13;grid-row:2}
+  .g-battery{grid-column:7/13;grid-row:3}
+  .g-disk{grid-column:1/7;grid-row:3}
   .g-network{grid-column:8/12;grid-row:4}
   .g-processes{grid-column:1/6;grid-row:4}
-  .g-history{grid-column:8/13;grid-row:5}
-  .g-diskio{grid-column:3/9;grid-row:6}
-  .g-auth{grid-column:4/10;grid-row:7}
 
-  .card{background:#fff;border:1px solid #e0d0ea;border-radius:14px;padding:18px 20px;
-    box-shadow:0 2px 8px rgba(124,58,237,0.06),0 8px 28px rgba(124,58,237,0.08);position:relative}
-  .card:hover{box-shadow:0 4px 16px rgba(124,58,237,0.1),0 12px 40px rgba(124,58,237,0.12);
+  .g-premium-label{grid-column:1/13;grid-row:5;text-align:center;margin:8px 0 0}
+  .g-history{grid-column:2/12;grid-row:6}
+  .g-diskio{grid-column:3/11;grid-row:7}
+  .g-auth{grid-column:4/10;grid-row:8}
+
+  .card{background:#fff;border:1px solid #e0d0ea;border-radius:16px;padding:24px 28px;
+    box-shadow:0 3px 12px rgba(124,58,237,0.07),0 10px 32px rgba(124,58,237,0.09);position:relative}
+  .card:hover{box-shadow:0 6px 20px rgba(124,58,237,0.12),0 14px 48px rgba(124,58,237,0.13);
     transform:translateY(-2px);border-color:#d0b8e0}
-  .card::after{content:'';position:absolute;top:14px;right:18px;width:10px;height:10px;
-    border-radius:50%;background:linear-gradient(135deg,#7c3aed,#c084fc);opacity:0.3}
-  .card-title{color:#7c3aed;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;margin-bottom:10px;font-weight:700}
+  .card::after{content:'';position:absolute;top:16px;right:20px;width:12px;height:12px;
+    border-radius:50%;background:linear-gradient(135deg,#7c3aed,#c084fc);opacity:0.25}
+  .card-title{color:#7c3aed;font-size:14px;text-transform:uppercase;letter-spacing:3px;margin-bottom:14px;font-weight:700}
 
-  /* Premium card with highlighted border */
-  .premium-card{border:2px solid;border-image:linear-gradient(135deg,#a855f7,#c084fc,#7c3aed) 1;border-radius:14px;position:relative}
-  .premium-card::before{content:'';position:absolute;inset:-3px;border-radius:16px;
-    background:linear-gradient(135deg,#a855f7,#c084fc,#7c3aed);z-index:-1}
-  .premium-card .card{box-shadow:0 2px 12px rgba(168,85,247,0.15)}
+  .premium-card{border:2px solid;border-image:linear-gradient(135deg,#a855f7,#c084fc,#7c3aed) 1;
+    border-radius:16px}
+  .premium-card .card{box-shadow:0 3px 16px rgba(168,85,247,0.18)}
   .premium-node{display:none}
 
-  .metric{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:15px}
-  .label{color:#9a7ab5;font-size:13px}
-  .value{color:#2a1a3e;font-weight:600;font-size:16px}
-  .bar-wrap{width:100%;height:12px;background:#f0e8f8;border-radius:6px;overflow:hidden;margin:5px 0}
-  .bar-fill{height:100%;border-radius:6px;transition:width .4s ease;background:linear-gradient(90deg,#a855f7,#c084fc)}
-  .disk-row,.net-row,.proc-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:14px;border-bottom:1px solid #f2ecf8}
+  .metric{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:17px}
+  .label{color:#9a7ab5;font-size:14px}
+  .value{color:#2a1a3e;font-weight:600;font-size:18px}
+  .bar-wrap{width:100%;height:14px;background:#f0e8f8;border-radius:7px;overflow:hidden;margin:6px 0}
+  .bar-fill{height:100%;border-radius:7px;transition:width .4s ease;background:linear-gradient(90deg,#a855f7,#c084fc)}
+
+  .disk-row,.net-row,.proc-row{display:flex;justify-content:space-between;align-items:center;
+    padding:6px 0;font-size:15px;border-bottom:1px solid #f2ecf8}
   .disk-row:last-child,.net-row:last-child,.proc-row:last-child{border-bottom:none}
-  .disk-row .mount,.net-row .iface{color:#7c3aed;min-width:60px;font-weight:600}
-  .disk-row .pct{color:#9a7ab5;min-width:40px;text-align:right}
-  .proc-row .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#4a3060;font-size:13px}
-  .proc-row .mem{color:#7c3aed;min-width:35px;text-align:right;font-weight:600}
-  .big-text{font-size:34px;font-weight:700;text-align:center;padding:8px 0;
+  .disk-row .mount,.net-row .iface{color:#7c3aed;min-width:70px;font-weight:600;font-size:14px}
+  .disk-row .pct{color:#9a7ab5;min-width:45px;text-align:right}
+  .proc-row .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#4a3060;font-size:14px}
+  .proc-row .mem{color:#7c3aed;min-width:40px;text-align:right;font-weight:600;font-size:14px}
+
+  .big-text{font-size:42px;font-weight:700;text-align:center;padding:10px 0;
     background:linear-gradient(135deg,#7c3aed,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-  .footer{text-align:center;margin-top:16px;font-size:10px;color:#c8b0d8}
+
+  .footer{text-align:center;margin-top:20px;font-size:11px;color:#c8b0d8;letter-spacing:1px}
+
   .premium-badge{display:inline-block;background:linear-gradient(135deg,#7c3aed,#c084fc);
-    color:#fff;font-size:9px;padding:2px 8px;border-radius:4px;margin-left:6px;font-weight:700}
-  .auth-card{background:#fff;border:1px solid #e0d0ea;border-radius:14px;padding:18px 22px;box-shadow:0 2px 8px rgba(124,58,237,0.06)}
-  .auth-card .title{color:#7c3aed;font-size:11px;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;font-weight:700}
-  .auth-card input{background:#f8f6fc;border:1px solid #e0d0ea;border-radius:8px;padding:10px 14px;color:#2a1a3e;font-family:inherit;font-size:14px;outline:none;margin-bottom:6px;width:260px}
+    color:#fff;font-size:10px;padding:3px 10px;border-radius:5px;margin-left:8px;font-weight:700;letter-spacing:0.5px}
+
+  /* Premium section label */
+  .prem-label{font-size:12px;text-transform:uppercase;letter-spacing:4px;color:#c084fc;font-weight:700;
+    text-align:center;padding:8px 0;position:relative}
+  .prem-label::before,.prem-label::after{content:'';display:inline-block;width:60px;height:1px;
+    background:linear-gradient(90deg,transparent,#c084fc);vertical-align:middle;margin:0 12px}
+  .prem-label::after{background:linear-gradient(90deg,#c084fc,transparent)}
+
+  .auth-card{background:#fff;border:1px solid #e0d0ea;border-radius:16px;padding:20px 24px;
+    box-shadow:0 2px 8px rgba(124,58,237,0.06)}
+  .auth-card .title{color:#7c3aed;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;margin-bottom:12px;font-weight:700}
+  .auth-card input{background:#f8f6fc;border:1px solid #e0d0ea;border-radius:8px;padding:12px 16px;
+    color:#2a1a3e;font-family:inherit;font-size:15px;outline:none;margin-bottom:8px;width:280px}
   .auth-card input:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,0.12)}
-  .auth-card button{background:linear-gradient(135deg,#7c3aed,#c084fc);border:none;border-radius:8px;padding:10px 20px;color:#fff;font-family:inherit;font-size:13px;cursor:pointer;font-weight:600;margin-left:4px}
-  .auth-card button:hover{box-shadow:0 3px 10px rgba(124,58,237,0.25)}
-  .auth-card .hint{font-size:10px;color:#c8b0d8;margin-top:6px}
+  .auth-card button{background:linear-gradient(135deg,#7c3aed,#c084fc);border:none;border-radius:8px;
+    padding:12px 24px;color:#fff;font-family:inherit;font-size:14px;cursor:pointer;font-weight:600;margin-left:6px}
+  .auth-card button:hover{box-shadow:0 3px 12px rgba(124,58,237,0.3)}
+  .auth-card .hint{font-size:11px;color:#c8b0d8;margin-top:6px}
   .auth-card .hint a{color:#9a7ab5;text-decoration:none}
   .auth-card .error{font-size:11px;color:#e53e3e;margin-top:4px}
-  canvas{border-radius:8px;background:#f8f6fc;width:100%;height:70px;border:1px solid #f0e8f8}
+
+  /* History canvas extra large */
+  canvas{border-radius:10px;background:#f8f6fc;width:100%;height:200px;border:1px solid #f0e8f8}
+  .canvas-label{display:flex;justify-content:space-between;font-size:10px;color:#b8a0c8;margin-top:4px}
+
   .pulse{animation:pulse 2s ease-in-out infinite}
   @keyframes pulse{0%{opacity:1}50%{opacity:0.4}100%{opacity:1}}
 
-  /* SVG connectors as background */
-  .bg-lines{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;opacity:0.25}
+  .bg-lines{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;opacity:0.2}
   .bg-lines path{stroke:#a855f7;stroke-width:1.5;fill:none}
-  .bg-lines circle{fill:#c084fc;opacity:0.3}
+  .bg-lines circle{fill:#c084fc;opacity:0.25}
 
   @media(max-width:900px){
-    .grid{display:flex;flex-direction:column;gap:12px}
+    .grid{display:flex;flex-direction:column;gap:14px}
     .grid>div{grid-column:auto!important;grid-row:auto!important}
     .bg-lines{display:none}
   }
@@ -92,20 +114,20 @@
 <body>
 
 <svg class="bg-lines" viewBox="0 0 1200 1200" preserveAspectRatio="none">
-  <path d="M0,200 Q600,100 1200,200"/>
-  <path d="M0,350 Q600,450 1200,350"/>
-  <path d="M0,500 Q600,400 1200,500"/>
-  <path d="M0,650 Q600,750 1200,650"/>
-  <path d="M0,800 Q600,700 1200,800"/>
+  <path d="M0,200 Q600,80 1200,200"/>
+  <path d="M0,400 Q600,500 1200,400"/>
+  <path d="M0,600 Q600,500 1200,600"/>
+  <path d="M0,800 Q600,900 1200,800"/>
+  <path d="M0,1000 Q600,900 1200,1000"/>
   <path d="M400,0 Q300,600 400,1200"/>
   <path d="M800,0 Q900,600 800,1200"/>
-  <circle cx="300" cy="300" r="4"/>
-  <circle cx="900" cy="300" r="4"/>
-  <circle cx="200" cy="500" r="3"/>
-  <circle cx="1000" cy="500" r="3"/>
-  <circle cx="500" cy="400" r="5"/>
-  <circle cx="700" cy="400" r="4"/>
-  <circle cx="600" cy="600" r="6"/>
+  <circle cx="300" cy="250" r="5"/>
+  <circle cx="900" cy="350" r="4"/>
+  <circle cx="200" cy="550" r="4"/>
+  <circle cx="1000" cy="550" r="3"/>
+  <circle cx="500" cy="450" r="6"/>
+  <circle cx="700" cy="650" r="5"/>
+  <circle cx="600" cy="850" r="7"/>
 </svg>
 
 <div class="container">
@@ -173,14 +195,17 @@
     </div>
   </div>
 
+  <!-- Premium section label -->
+  <div class="g-premium-label">
+    <div class="prem-label">premium features</div>
+  </div>
+
   <div class="g-history premium-node" id="historyNode">
     <div class="premium-card">
       <div class="card">
         <div class="card-title">history <span class="premium-badge">PREMIUM</span></div>
         <canvas id="historyCanvas"></canvas>
-        <div style="display:flex;justify-content:space-between;font-size:9px;color:#b8a0c8;margin-top:3px">
-          <span id="timeStart">now</span><span>CPU %</span><span id="timeEnd">now</span>
-        </div>
+        <div class="canvas-label"><span id="timeStart">now</span><span>CPU %</span><span id="timeEnd">now</span></div>
       </div>
     </div>
   </div>
@@ -197,28 +222,28 @@
   <div class="g-auth">
     <div class="auth-card">
       <div class="title">premium <span id="premiumBadge" class="premium-badge" style="display:none">ACTIVE</span></div>
-      <div id="premiumStatus" style="font-size:13px;color:#9a7ab5;margin-bottom:10px">Checking...</div>
+      <div id="premiumStatus" style="font-size:14px;color:#9a7ab5;margin-bottom:10px">Checking...</div>
       <div id="loginForm" style="display:none;margin-bottom:8px">
         <div><input id="loginInput" type="text" placeholder="username or email"></div>
-        <div style="display:flex;gap:6px;align-items:center">
+        <div style="display:flex;gap:8px;align-items:center">
           <input id="passwordInput" type="password" placeholder="password">
           <button id="loginBtn" onclick="amenokeLogin()">Sign In</button>
         </div>
         <div class="hint"><a href="https://amenoke.ru" target="_blank">amenoke.ru</a> — register</div>
         <div id="loginError" class="error"></div>
       </div>
-      <div id="loggedInInfo" style="display:none;font-size:13px;margin-bottom:8px">
+      <div id="loggedInInfo" style="display:none;font-size:14px;margin-bottom:8px">
         <span id="loggedInUsername" style="color:#7c3aed;font-weight:600"></span>
         <span id="loggedInPremium" style="color:#9a7ab5"></span>
-        <button onclick="amenokeLogout()" style="background:none;border:1px solid #e0d0ea;border-radius:6px;padding:6px 12px;color:#9a7ab5;font-size:12px;cursor:pointer;margin-left:6px">logout</button>
+        <button onclick="amenokeLogout()" style="background:none;border:1px solid #e0d0ea;border-radius:6px;padding:6px 14px;color:#9a7ab5;font-size:13px;cursor:pointer;margin-left:6px">logout</button>
       </div>
       <div id="offlineSection" style="border-top:1px solid #f0e8f8;padding-top:10px;margin-top:6px">
-        <div style="font-size:10px;color:#c8b0d8;margin-bottom:6px">offline key</div>
-        <div style="display:flex;gap:6px;align-items:center">
-          <input id="licenseInput" type="text" placeholder="paste license key" style="width:280px">
+        <div style="font-size:11px;color:#c8b0d8;margin-bottom:6px">offline key</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="licenseInput" type="text" placeholder="paste license key" style="width:300px">
           <button id="activateBtn" onclick="activateLicense()">Activate</button>
         </div>
-        <div id="premiumResult" style="font-size:11px;margin-top:6px;color:#9a7ab5"></div>
+        <div id="premiumResult" style="font-size:12px;margin-top:6px;color:#9a7ab5"></div>
       </div>
     </div>
   </div>
@@ -229,6 +254,7 @@
 </div>
 
 <script>
+
 
 (function(){
   var art=[
@@ -418,6 +444,7 @@ function togglePremium(){
       el.style.display=d.premium?'block':'none';});});}
 togglePremium();
 setInterval(togglePremium,30000);
+
 
 </script>
 </body>
