@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>ameni monitor — banner 2480x1754</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+
+  body{
+    width:1240px;height:877px;overflow:hidden;
+    font-family:'Inter',system-ui,sans-serif;
+    background:#f8f6fc;position:relative;
+  }
+
+  body::before{
+    content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+    background:
+      radial-gradient(ellipse at 15% 10%,rgba(168,85,247,0.06) 0%,transparent 50%),
+      radial-gradient(ellipse at 85% 90%,rgba(192,132,252,0.04) 0%,transparent 50%);
+    z-index:0;
+  }
+
+  /* bg lines */
+  .bg-lines{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0.15}
+  .bg-lines path{stroke:#a855f7;stroke-width:2;fill:none}
+  .bg-lines circle{fill:#c084fc;opacity:0.2}
+
+  .banner{
+    position:relative;z-index:1;
+    width:1140px;height:777px;margin:50px;
+    display:flex;flex-direction:column;
+    background:#ffffff;
+    border:1px solid #e0d0ea;
+    border-radius:32px;
+    padding:32px 40px;
+    box-shadow:0 8px 48px rgba(124,58,237,0.06),0 24px 80px rgba(124,58,237,0.08);
+    overflow:hidden;
+  }
+
+  .banner::after{
+    content:'';position:absolute;top:16px;right:20px;
+    width:12px;height:12px;border-radius:50%;
+    background:linear-gradient(135deg,#7c3aed,#c084fc);opacity:0.2;
+  }
+
+  /* top row */
+  .top{
+    display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;
+  }
+
+  .logo{
+    display:flex;align-items:center;gap:10px;
+  }
+
+  .logo-box{
+    width:36px;height:36px;border-radius:10px;
+    background:linear-gradient(135deg,#7c3aed,#c084fc);
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;color:#fff;
+    box-shadow:0 4px 12px rgba(124,58,237,0.2);
+  }
+
+  .logo-text{
+    font-size:18px;font-weight:700;color:#5b21b6;letter-spacing:-0.3px;
+  }
+  .logo-text span{color:#7c3aed;}
+
+  .pill{
+    display:flex;align-items:center;gap:8px;
+    background:linear-gradient(135deg,#f0e6f8,#f8f0fc);
+    border:1px solid #e0d0ea;border-radius:20px;
+    padding:8px 18px;font-size:18px;color:#7c3aed;font-weight:600;
+  }
+  .pill i{color:#fbbf24;font-size:12px;}
+
+  /* center */
+  .center{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:8px;
+  }
+
+  .ascii{
+    font-family:monospace;font-size:14px;line-height:1.2;text-align:center;white-space:pre;
+    color:#a855f7;opacity:0.4;margin-bottom:6px;letter-spacing:1px;
+  }
+
+  .main-title{
+    font-size:44px;font-weight:900;letter-spacing:-3px;line-height:1;
+    background:linear-gradient(135deg,#7c3aed,#a855f7,#c084fc);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  }
+
+  .tagline{
+    font-size:16px;color:#a888c8;font-weight:500;letter-spacing:2px;
+  }
+  .tagline span{color:#7c3aed;font-weight:700;}
+  .tagline i{margin:0 12px;color:#d8c8e8;font-size:12px;}
+
+  /* node cards row */
+  .cards{
+    display:flex;gap:12px;margin-top:8px;
+  }
+
+  .node{
+    flex:1;background:#fff;border:1px solid #e0d0ea;
+    border-radius:10px;padding:12px 16px;
+    box-shadow:0 2px 8px rgba(124,58,237,0.04),0 8px 24px rgba(124,58,237,0.05);
+    position:relative;
+  }
+  .node::after{
+    content:'';position:absolute;top:12px;right:14px;
+    width:8px;height:8px;border-radius:50%;
+    background:linear-gradient(135deg,#7c3aed,#c084fc);opacity:0.25;
+  }
+
+  .node-title{
+    font-size:12px;text-transform:uppercase;letter-spacing:2.5px;
+    color:#5b21b6;font-weight:700;margin-bottom:10px;
+  }
+  .node-title i{color:#a855f7;margin-right:8px;font-size:11px;}
+
+  .node-val{
+    font-size:18px;font-weight:700;
+    background:linear-gradient(135deg,#6d28d9,#a855f7);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    margin-bottom:3px;
+  }
+
+  .node-bar{
+    height:6px;background:#ede4f4;border-radius:3px;overflow:hidden;margin-bottom:3px;
+  }
+  .node-bar-fill{
+    height:100%;border-radius:3px;
+    background:linear-gradient(90deg,#a855f7,#c084fc);
+  }
+
+  .node-sub{
+    font-size:11px;color:#a78bba;display:flex;justify-content:space-between;
+  }
+
+  /* connectors */
+  .connectors{
+    display:flex;align-items:center;justify-content:center;gap:0;padding:0 20px;
+    position:relative;height:2px;margin:4px 0;
+  }
+  .connectors .dot{
+    width:4px;height:4px;border-radius:50%;background:#d0b8e0;margin:0 3px;
+  }
+  .connectors .line{
+    flex:1;height:1px;background:linear-gradient(90deg,#e0d0ea,#d0b8e0,#e0d0ea);
+  }
+
+  /* bottom row */
+  .bottom{
+    display:flex;justify-content:space-between;align-items:center;margin-top:10px;
+    padding-top:12px;border-top:1px solid #f0e6f8;
+  }
+
+  .cmd{
+    display:flex;align-items:center;gap:8px;
+    background:#f8f6fc;border:1px solid #e0d0ea;
+    border-radius:10px;padding:10px 18px;
+    font-family:monospace;font-size:14px;color:#6d28d9;
+  }
+  .cmd i{color:#a78bba;font-size:12px;}
+
+  .badge-group{display:flex;gap:12px;}
+  .badge-item{
+    display:flex;align-items:center;gap:6px;
+    font-size:12px;color:#a78bba;
+  }
+  .badge-item i{color:#7c3aed;font-size:12px;}
+
+  .cta{
+    display:inline-flex;align-items:center;gap:8px;
+    background:linear-gradient(135deg,#7c3aed,#c084fc);
+    border:none;border-radius:10px;padding:8px 18px;
+    font-family:inherit;font-size:12px;font-weight:700;color:#fff;
+    text-decoration:none;
+    box-shadow:0 4px 20px rgba(124,58,237,0.2);
+  }
+  .cta i{font-size:12px;}
+</style>
+</head>
+<body>
+
+<svg class="bg-lines" viewBox="0 0 1240 877">
+  <path d="M0,300 Q1240,150 2480,300"/>
+  <path d="M0,600 Q1240,750 2480,600"/>
+  <path d="M0,900 Q1240,800 2480,900"/>
+  <path d="M0,1200 Q1240,1350 2480,1200"/>
+  <path d="M0,1500 Q1240,1400 2480,1500"/>
+  <path d="M600,0 Q500,877 600,1754"/>
+  <path d="M1880,0 Q1980,877 1880,1754"/>
+  <circle cx="400" cy="400" r="3"/>
+  <circle cx="2000" cy="500" r="2.5"/>
+  <circle cx="1200" cy="300" r="3.5"/>
+  <circle cx="800" cy="1000" r="2"/>
+  <circle cx="1800" cy="1200" r="2.5"/>
+  <circle cx="400" cy="1400" r="3"/>
+  <circle cx="2100" cy="300" r="2"/>
+  <circle cx="1200" cy="1500" r="2.5"/>
+  <circle cx="300" cy="800" r="2"/>
+  <circle cx="2200" cy="1000" r="2.5"/>
+</svg>
+
+<div class="banner">
+
+  <div class="top">
+    <div class="logo">
+      <div class="logo-box"><i class="fas fa-chart-simple"></i></div>
+      <div class="logo-text">ameni <span>monitor</span></div>
+    </div>
+    <div class="pill"><i class="fas fa-crown"></i> premium ready</div>
+  </div>
+
+  <div class="center">
+    <div class="ascii">
+      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢲⢄⠀⠀⠀⠀⠀⠀⠀⠀
+      ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡆⠀⠀⠀⠀⠀⠀⠀⠀
+      ⠀⠀⠀⠀⢀⠄⠂⢉⠤⠐⠋⠈⠡⡈⠉⠐⠠⡀⠀
+      ⠀⢀⡀⢠⣤⠔⠁⢀⠀⠀⠀⠀⠀⠀⠈⢢⠀⠈⠱
+      ⠀⠰⠁⠀⣰⣿⠃⢠⠃⢸⠀⠀⠀⠀⠀⠀⠁⠀⠀
+      ⠀⠀⢇⣠⡿⠁⢀⡃⣈⠀⠀⢰⡀⠀⠀⢢⠰⠀⠀
+      ⠀⠀⠈⣿⠁⡘⡌⡇⡿⠸⠀⠈⡕⡄⠐⡀⠈⠀⢃
+      ⠀⠀⠀⠇⡇⠃⢠⠶⡀⡇⢃⠡⡀⠡⠈⢂⡀⢁⠀
+      ⠀⠀⠸⠀⢸⠘⡜⣑⢴⣀⠑⠯⡂⠄⣀⣣⢀⣈⢺
+      ⠀⠀⠇⠀⢸⡗⣰⡿⡻⠿⡳⡅⠀⠀⠈⡵⠿⠿⡻
+      ⠀⢰⠀⠀⡆⡄⣧⡏⠸⢠⢲⢸⠁⠀⠀⠐⢙⢰⠂
+      ⠀⠟⠀⠀⢰⢁⡇⠇⠰⣀⢁⡜⠀⠀⠀⠀⠘⣀⣁
+      ⠀⡘⠀⠀⠀⢊⣤⠀⠤⠄⠀⠀⠀⠀⠀⠀⠀⠀⠤
+      ⢠⠁⢀⠀⠀⠈⢿⡀⠀⠀⢀⡀⠀⠀⠀⠀⢀⠏⠀
+      ⠘⠸⠘⡀⠀⠀⢣⠀⠀⠁⠀⠃⠀⠀⢀⠎⠀⠀⢠
+    </div>
+    <div class="main-title">ameni monitor</div>
+    <div class="tagline">
+      <span>real-time</span> system dashboard
+      <i class="fas fa-circle"></i>
+      zero config
+      <i class="fas fa-circle"></i>
+      one command
+    </div>
+  </div>
+
+  <div class="connectors">
+    <span class="line"></span><span class="dot"></span><span class="line"></span>
+  </div>
+
+  <div class="cards">
+    <div class="node">
+      <div class="node-title"><i class="fas fa-microchip"></i> cpu &amp; memory</div>
+      <div class="node-val">34.2%</div>
+      <div class="node-bar"><div class="node-bar-fill" style="width:34%"></div></div>
+      <div class="node-sub"><span>load: 1.2 0.8 0.5</span><span>48°C</span></div>
+    </div>
+    <div class="node">
+      <div class="node-title"><i class="fas fa-hard-drive"></i> disk &amp; network</div>
+      <div class="node-val">37.8%</div>
+      <div class="node-bar"><div class="node-bar-fill" style="width:38%"></div></div>
+      <div class="node-sub"><span>84.2 / 222.9 GB</span><span>↓↑ 1.2 MB/s</span></div>
+    </div>
+    <div class="node">
+      <div class="node-title"><i class="fas fa-clock"></i> uptime &amp; battery</div>
+      <div class="node-val">1d 5h</div>
+      <div class="node-bar"><div class="node-bar-fill" style="width:67%"></div></div>
+      <div class="node-sub"><span>battery: 67%</span><span>charging</span></div>
+    </div>
+    <div class="node" style="border:2px solid;border-image:linear-gradient(135deg,#a855f7,#c084fc,#7c3aed) 1">
+      <div class="node-title"><i class="fas fa-chart-line"></i> history <span style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#c084fc);color:#fff;font-size:10px;padding:2px 8px;border-radius:3px;margin-left:8px;font-weight:700;letter-spacing:0.5px">PREMIUM</span></div>
+      <div class="node-val">graph</div>
+      <div class="node-bar"><div class="node-bar-fill" style="width:55%"></div></div>
+      <div class="node-sub"><span>6 min history</span><span>disk i/o</span></div>
+    </div>
+  </div>
+
+  <div class="connectors">
+    <span class="line"></span><span class="dot"></span><span class="dot"></span><span class="line"></span>
+  </div>
+
+  <div class="bottom">
+    <div class="cmd"><i class="fas fa-chevron-right"></i> curl -sL bit.ly/ameni | bash</div>
+    <div class="badge-group">
+      <div class="badge-item"><i class="fas fa-check-circle"></i> linux</div>
+      <div class="badge-item"><i class="fas fa-check-circle"></i> windows</div>
+      <div class="badge-item"><i class="fas fa-check-circle"></i> mit license</div>
+    </div>
+    <a class="cta" href="#"><i class="fab fa-github"></i> github</a>
+  </div>
+
+</div>
+
+</body>
+</html>

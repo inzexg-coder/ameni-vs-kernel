@@ -449,25 +449,27 @@ def read_uptime():
 def read_processes():
     if IS_WIN:
         try:
-            import subprocess
-            r = subprocess.run(["wmic", "path", "Win32_Process", "get", "ProcessId,Name,WorkingSetSize", "/format:csv"],
-                               capture_output=True, text=True, timeout=5)
-            procs = []
-            for line in r.stdout.strip().split("\n")[1:]:
-                if not line.strip(): continue
-                parts = line.split(",")
-                if len(parts) >= 4:
+            import subprocess, json
+            ps_cmd = "Get-CimInstance Win32_Process | Sort-Object WorkingSetSize -Descending | Select-Object -First 5 ProcessId,Name,WorkingSetSize | ConvertTo-Json -Compress"
+            r = subprocess.run(["powershell", "-NoProfile", "-Command", ps_cmd],
+                               capture_output=True, text=True, timeout=10)
+            out = r.stdout.strip()
+            if out and out != "null":
+                data = json.loads(out)
+                if not isinstance(data, list): data = [data]
+                procs = []
+                for item in data:
                     try:
-                        pid = int(parts[2])
-                        name = parts[1].strip()
-                        mem = int(parts[3]) // 1048576
+                        pid = int(item.get("ProcessId", 0))
+                        name = item.get("Name", "")
+                        mem = int(item.get("WorkingSetSize", 0)) // 1048576
                         procs.append({"pid": pid, "name": name, "mem": mem})
                     except:
                         pass
-            procs.sort(key=lambda x: -x["mem"])
-            return procs[:5]
+                return procs[:5]
         except:
-            return []
+            pass
+        return []
     procs = []
     try:
         for pid in os.listdir("/proc"):
@@ -488,19 +490,37 @@ def read_processes():
 def read_battery():
     if IS_WIN:
         try:
-            import subprocess, re
-            r = subprocess.run(["wmic", "path", "Win32_Battery", "get", "EstimatedChargeRemaining,Status,BatteryStatus",
-                               "/format:csv"], capture_output=True, text=True, timeout=5)
-            for line in r.stdout.strip().split("\n")[1:]:
-                if not line.strip(): continue
-                parts = line.split(",")
-                if len(parts) >= 3:
-                    try:
-                        pct = int(parts[1])
-                        st = "Charging" if "2" in parts[2] or "6" in parts[2] or "10" in parts[2] else "Discharging"
-                        return {"pct": pct, "status": st}
-                    except:
-                        pass
+            import subprocess, json
+            ps_cmd = "Get-CimInstance Win32_Battery | Select-Object EstimatedChargeRemaining, BatteryStatus | ConvertTo-Json -Compress"
+            r = subprocess.run(["powershell", "-NoProfile", "-Command", ps_cmd],
+                               capture_output=True, text=True, timeout=5)
+            out = r.stdout.strip()
+            if not out or out == "null":
+                # fallback to wmic
+                r2 = subprocess.run(["wmic", "path", "Win32_Battery", "get", "EstimatedChargeRemaining,BatteryStatus",
+                                    "/format:csv"], capture_output=True, text=True, timeout=5)
+                for line in r2.stdout.strip().split("\n")[1:]:
+                    if not line.strip(): continue
+                    parts = [p.strip() for p in line.split(",") if p.strip()]
+                    if len(parts) >= 3:
+                        try:
+                            pct = int(parts[1])
+                            bs = int(parts[2]) if parts[2].isdigit() else 0
+                            st = "Charging" if bs in (2,6,7,8,9,10,11) else "Discharging"
+                            if bs == 3: st = "Fully Charged"
+                            return {"pct": pct, "status": st}
+                        except:
+                            pass
+            else:
+                data = json.loads(out)
+                if isinstance(data, list):
+                    data = data[0] if data else None
+                if data:
+                    pct = data.get("EstimatedChargeRemaining", 0)
+                    bs = data.get("BatteryStatus", 0)
+                    st = "Charging" if bs in (2,6,7,8,9,10,11) else "Discharging"
+                    if bs == 3: st = "Fully Charged"
+                    return {"pct": pct, "status": st}
         except:
             pass
         return None
@@ -519,24 +539,24 @@ def read_battery():
 def read_diskio():
     if IS_WIN:
         try:
-            import subprocess
-            r = subprocess.run(["wmic", "path", "Win32_PerfFormattedData_PerfDisk_LogicalDisk",
-                               "get", "Name,DiskReadBytesPersec,DiskWriteBytesPersec", "/format:csv"],
-                               capture_output=True, text=True, timeout=5)
-            disks = {}
-            for line in r.stdout.strip().split("\n")[1:]:
-                if not line.strip(): continue
-                parts = line.split(",")
-                if len(parts) >= 4:
+            import subprocess, json
+            ps_cmd = "Get-CimInstance Win32_PerfFormattedData_PerfDisk_LogicalDisk | Select-Object Name,DiskReadBytesPersec,DiskWriteBytesPersec | ConvertTo-Json -Compress"
+            r = subprocess.run(["powershell", "-NoProfile", "-Command", ps_cmd],
+                               capture_output=True, text=True, timeout=10)
+            out = r.stdout.strip()
+            if out and out != "null":
+                data = json.loads(out)
+                if not isinstance(data, list): data = [data]
+                disks = {}
+                for item in data:
                     try:
-                        name = parts[1].strip().replace(":", "")
-                        rb = int(parts[2])
-                        wb = int(parts[3])
+                        name = item.get("Name", "").replace(":", "").strip()
                         if name and name != "_Total":
-                            disks[name] = {"rbytes": rb, "wbytes": wb}
+                            disks[name] = {"rbytes": int(item.get("DiskReadBytesPersec", 0)),
+                                           "wbytes": int(item.get("DiskWriteBytesPersec", 0))}
                     except:
                         pass
-            return disks
+                return disks
         except:
             return {}
     disks = {}
