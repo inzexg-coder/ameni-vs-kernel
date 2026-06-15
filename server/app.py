@@ -457,7 +457,7 @@ def read_processes():
     if IS_WIN:
         try:
             import subprocess, json
-            ps_cmd = "Get-CimInstance Win32_Process | Sort-Object WorkingSetSize -Descending | Select-Object -First 5 ProcessId,Name,WorkingSetSize | ConvertTo-Json -Compress"
+            ps_cmd = "$oe=[Console]::OutputEncoding=[Text.Encoding]::UTF8;$OutputEncoding=[Text.Encoding]::UTF8;Get-CimInstance Win32_Process | Sort-Object WorkingSetSize -Descending | Select-Object -First 5 ProcessId,Name,WorkingSetSize | ConvertTo-Json -Compress"
             out, _ = _win_run(["powershell", "-NoProfile", "-Command", ps_cmd], timeout=10)
             out = out.strip()
             if out and out != "null":
@@ -497,7 +497,7 @@ def read_battery():
     if IS_WIN:
         try:
             import subprocess, json
-            ps_cmd = "Get-CimInstance Win32_Battery | Select-Object EstimatedChargeRemaining, BatteryStatus | ConvertTo-Json -Compress"
+            ps_cmd = "$oe=[Console]::OutputEncoding=[Text.Encoding]::UTF8;$OutputEncoding=[Text.Encoding]::UTF8;Get-CimInstance Win32_Battery | Select-Object EstimatedChargeRemaining, BatteryStatus | ConvertTo-Json -Compress"
             out, _ = _win_run(["powershell", "-NoProfile", "-Command", ps_cmd])
             out = out.strip()
             if not out or out == "null":
@@ -544,7 +544,7 @@ def read_diskio():
     if IS_WIN:
         try:
             import subprocess, json
-            ps_cmd = "Get-CimInstance Win32_PerfFormattedData_PerfDisk_LogicalDisk | Select-Object Name,DiskReadBytesPersec,DiskWriteBytesPersec | ConvertTo-Json -Compress"
+            ps_cmd = "$oe=[Console]::OutputEncoding=[Text.Encoding]::UTF8;$OutputEncoding=[Text.Encoding]::UTF8;Get-CimInstance Win32_PerfFormattedData_PerfDisk_LogicalDisk | Select-Object Name,DiskReadBytesPersec,DiskWriteBytesPersec | ConvertTo-Json -Compress"
             out, _ = _win_run(["powershell", "-NoProfile", "-Command", ps_cmd], timeout=10)
             out = out.strip()
             if out and out != "null":
