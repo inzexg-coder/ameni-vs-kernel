@@ -288,7 +288,12 @@
   el.innerHTML=h;
 })();
 
-function barColor(p){if(p<60)return'#34d399';if(p<85)return'#fbbf24';return'#ef4444';}
+function barColor(p){
+  if(p<50) return '#34d399';
+  if(p<70) return '#fbbf24';
+  if(p<85) return '#fb923c';
+  return '#ef4444';
+}
 function fmtB(b){
   if(b>1073741824)return(b/1073741824).toFixed(1)+'GB';
   if(b>1048576)return(b/1048576).toFixed(1)+'MB';
@@ -365,6 +370,7 @@ function update(){
   fetch('/api/monitor/all').then(function(r){return r.json()}).then(function(d){
     var c=d.cpu||{};
     document.getElementById('cpuUsage').textContent=(c.usage||0)+'%';
+    document.getElementById('cpuUsage').style.color=barColor(c.usage||0);
     document.getElementById('cpuBar').style.width=(c.usage||0)+'%';
     document.getElementById('cpuBar').style.background='linear-gradient(90deg,'+barColor(c.usage||0)+',#34d399)';
     document.getElementById('cpuLoad').textContent=(c.load_avg||[0,0,0]).join('  ');
@@ -372,13 +378,16 @@ function update(){
     var f=(c.freq||[]).slice(0,4).map(function(f){return Math.round(f)+'MHz'}).join(' ');
     document.getElementById('cpuFreq').textContent=f||'--';
     document.getElementById('cpuTemp').textContent=(c.temp||0)+'°C';
+    document.getElementById('cpuTemp').style.color=barColor(c.temp||0);
 
     var m=d.memory||{};
     document.getElementById('memUsed').textContent=(m.used_pct||0)+'%';
+    document.getElementById('memUsed').style.color=barColor(m.used_pct||0);
     document.getElementById('memBar').style.width=(m.used_pct||0)+'%';
     document.getElementById('memBar').style.background='linear-gradient(90deg,'+barColor(m.used_pct||0)+',#34d399)';
     document.getElementById('memAvail').textContent=(m.avail_gb||0).toFixed(1)+' / '+(m.total_gb||0).toFixed(1)+' GB';
     document.getElementById('memSwap').textContent=(m.swap_used_pct||0)+'%';
+    document.getElementById('memSwap').style.color=barColor(m.swap_used_pct||0);
     document.getElementById('swapBar').style.width=(m.swap_used_pct||0)+'%';
     document.getElementById('swapBar').style.background='linear-gradient(90deg,'+barColor(m.swap_used_pct||0)+',#34d399)';
 
@@ -387,7 +396,7 @@ function update(){
       var bc=barColor(dd.used_pct||0);
       dh+='<div class="disk-row"><span class="mount">'+dd.mount+'</span>'+
         '<span style="flex:1;margin:0 10px"><div class="bar-wrap" style="height:6px"><div class="bar-fill" style="width:'+dd.used_pct+'%;background:linear-gradient(90deg,'+bc+',#34d399)"></div></div></span>'+
-        '<span class="pct">'+dd.used_pct+'%</span>'+
+        '<span class="pct" style="color:'+barColor(dd.used_pct||0)+'">'+dd.used_pct+'%</span>'+
         '<span style="color:#7a4a8a;font-size:11px;min-width:60px;text-align:right">'+(dd.used_gb||0).toFixed(1)+'/'+(dd.total_gb||0).toFixed(1)+'G</span></div>';});
     document.getElementById('diskContent').innerHTML=dh||'<div style="color:#9a7ab5;font-size:12px">No disk data</div>';
 
@@ -406,8 +415,8 @@ function update(){
     var bc=document.getElementById('batteryCard');
     if(bat){
       bc.style.display='block';
-      var col=bat.pct>50?'#34d399':(bat.pct>20?'#fbbf24':'#ef4444');
-      document.getElementById('batteryContent').innerHTML='<span style="color:'+col+'">'+bat.pct+'%</span> <span style="color:#9a7ab5;font-size:12px">'+bat.status+'</span>';}
+      
+      document.getElementById('batteryContent').innerHTML='<span style="color:'+barColor(bat.pct)+'">'+bat.pct+'%</span> <span style="color:#9a7ab5;font-size:12px">'+bat.status+'</span>';}
     else{bc.style.display='none';}
 
     var ps=d.processes||[];var ph='';
