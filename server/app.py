@@ -4,7 +4,116 @@ import http.server, threading, json, os, socket, webbrowser, sys, time, collecti
 
 PORT = 3000
 HOST = "0.0.0.0"
-PREMIUM = os.environ.get("AMENI_PREMIUM") == "1" or os.path.exists(os.path.expanduser("~/.ameni/premium.key"))
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+from cryptography.exceptions import InvalidSignature
+import json as _json, base64, urllib.request as _urllib, urllib.error as _urlerr
+
+_PUBLIC_KEY_B64 = "t71Kad65MvKZOlex8i/Is8FBzEDV/YNZkvHzoVYI9bM="
+AMENOKE_API = "https://amenoke.ru/amenodes/api"
+_license_data = None
+_amenoke_user = None
+
+def _get_machine_id():
+    try:
+        with open("/etc/machine-id") as f:
+            return f.read().strip()
+    except:
+        try:
+            import subprocess
+            if os.name == "nt":
+                r = subprocess.run(["wmic", "csproduct", "get", "uuid"], capture_output=True, text=True, timeout=5)
+                return r.stdout.strip().split("\n")[-1].strip()
+        except:
+            pass
+    return "unknown"
+
+def _check_license():
+    global _license_data
+    key_path = os.path.expanduser("~/.ameni/license.key")
+    if not os.path.exists(key_path):
+        return False
+    try:
+        with open(key_path) as f:
+            raw = f.read().strip()
+        parts = raw.split(".")
+        if len(parts) != 2:
+            return False
+        data_b64, sig_b64 = parts
+        payload_bytes = base64.urlsafe_b64decode(data_b64 + "==")
+        sig_bytes = base64.urlsafe_b64decode(sig_b64 + "==")
+        pub_bytes = base64.b64decode(_PUBLIC_KEY_B64)
+        pub_key = Ed25519PublicKey.from_public_bytes(pub_bytes)
+        try:
+            pub_key.verify(sig_bytes, payload_bytes)
+        except InvalidSignature:
+            return False
+        payload = _json.loads(payload_bytes)
+        from datetime import datetime, timezone
+        exp = datetime.fromisoformat(payload["exp"])
+        if exp < datetime.now(timezone.utc):
+            return False
+        mid = _get_machine_id()
+        if payload.get("machine_id") and payload["machine_id"] != mid:
+            return False
+        _license_data = payload
+        return True
+    except:
+        return False
+
+def _amenoke_login(login, password):
+    global _amenoke_user
+    try:
+        data = _json.dumps({"login": login, "password": password}).encode()
+        req = _urllib.Request(AMENOKE_API + "/login.php", data=data,
+                              headers={"Content-Type": "application/json"})
+        resp = _urllib.urlopen(req, timeout=5)
+        result = _json.loads(resp.read())
+        token = result.get("token", "")
+        token_path = os.path.expanduser("~/.ameni/token")
+        os.makedirs(os.path.dirname(token_path), exist_ok=True)
+        with open(token_path, "w") as f:
+            f.write(token + "\n")
+        _amenoke_user = result.get("user", {})
+        return True
+    except Exception as e:
+        _amenoke_user = None
+        return False
+
+def _amenoke_logout():
+    global _amenoke_user
+    token_path = os.path.expanduser("~/.ameni/token")
+    if os.path.exists(token_path):
+        os.remove(token_path)
+    _amenoke_user = None
+
+def _amenoke_check():
+    global _amenoke_user
+    token_path = os.path.expanduser("~/.ameni/token")
+    if not os.path.exists(token_path):
+        return None
+    try:
+        with open(token_path) as f:
+            token = f.read().strip()
+        if not token:
+            return None
+        req = _urllib.Request(AMENOKE_API + "/premium_check.php",
+                              headers={"Authorization": "Bearer " + token})
+        resp = _urllib.urlopen(req, timeout=5)
+        result = _json.loads(resp.read())
+        if result.get("success") and result.get("premium"):
+            _amenoke_user = {"username": result.get("username", "")}
+            return True
+        return False
+    except:
+        return None
+
+def _is_premium():
+    # 1. Check amenoke.ru (online)
+    online = _amenoke_check()
+    if online is True:
+        return True
+    # 2. Fallback to Ed25519 key (offline)
+    return _check_license()
 IS_WIN = os.name == "nt"
 
 
@@ -207,7 +316,7 @@ def read_all():
     if mem is None:
         mem = read_memory()
     data = {"cpu": cpu, "memory": mem, "disk": read_disk(), "network": read_network(), "time": time.time()}
-    if PREMIUM: history.append(data)
+    if _is_premium(): history.append(data)
     return data
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -240,17 +349,66 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             elif sub == "disk": self.send_json(read_disk())
             elif sub == "network": self.send_json(read_network())
             elif sub == "history":
-                if PREMIUM: self.send_json(list(history))
+                if _is_premium(): self.send_json(list(history))
                 else: self.send_json({"error": "premium required", "premium": False}, 402)
             else: self.send_json({"error": "unknown"}, 404)
         elif self.path == "/api/premium":
-            self.send_json({"premium": PREMIUM})
+            resp = {"premium": _is_premium()}
+            if _amenoke_user:
+                resp["username"] = _amenoke_user.get("username", "")
+            self.send_json(resp)
         else:
             super().do_GET()
+    def do_POST(self):
+        if self.path == "/api/activate":
+            length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(length).decode("utf-8") if length else "{}"
+            try:
+                data = _json.loads(body)
+                key = data.get("key", "").strip()
+            except:
+                key = ""
+            if not key:
+                self.send_json({"ok": False, "error": "empty key"}, 400)
+                return
+            key_dir = os.path.expanduser("~/.ameni")
+            os.makedirs(key_dir, exist_ok=True)
+            with open(os.path.join(key_dir, "license.key"), "w") as f:
+                f.write(key + "\n")
+            prem = _is_premium()
+            resp = {"ok": True, "premium": prem}
+            if prem and _license_data:
+                resp["email"] = _license_data.get("email", "")
+                resp["exp"] = _license_data.get("exp", "")
+            self.send_json(resp)
+        elif self.path == "/api/login":
+            length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(length).decode("utf-8") if length else "{}"
+            try:
+                data = _json.loads(body)
+                login = data.get("login", "")
+                password = data.get("password", "")
+            except:
+                login = password = ""
+            if not login or not password:
+                self.send_json({"ok": False, "error": "login and password required"}, 400)
+                return
+            ok = _amenoke_login(login, password)
+            if ok:
+                self.send_json({"ok": True, "user": _amenoke_user, "premium": _is_premium()})
+            else:
+                self.send_json({"ok": False, "error": "invalid credentials"}, 401)
+        elif self.path == "/api/logout":
+            _amenoke_logout()
+            self.send_json({"ok": True})
+        else:
+            self.send_json({"error": "not found"}, 404)
+
     def log_message(self, format, *args):
         if "/api/" in str(args[0]): print(f"  {args[0]}")
 
-HTML_PAGE = r'<!DOCTYPE html>\n<html lang="ru">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width,initial-scale=1.0">\n<title>ameni monitor — live demo</title>\n<style>\n  @import url(\'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&display=swap\');\n  *{margin:0;padding:0;box-sizing:border-box}\n  body{background:#08040e;font-family:\'JetBrains Mono\',monospace;min-height:100vh;color:#c0c0cc;overflow-x:hidden}\n  body::before{content:\'\';position:fixed;top:0;left:0;right:0;bottom:0;\n    background:radial-gradient(ellipse at 20% 50%,#1a0a2e 0%,transparent 60%),\n               radial-gradient(ellipse at 80% 20%,#2a1040 0%,transparent 50%);z-index:-1}\n  .container{max-width:900px;margin:0 auto;padding:20px}\n  .ascii{font-size:7px;line-height:1.1;text-align:center;margin:5px 0 12px;white-space:pre;color:#a855f7;opacity:0.6}\n  h1{font-size:20px;font-weight:300;text-align:center;margin:0 0 4px;\n    background:linear-gradient(90deg,#a855f7,#e9d5ff,#a855f7);background-size:200% auto;\n    -webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shim 4s linear infinite}\n  @keyframes shim{0%{background-position:0% center}50%{background-position:200% center}100%{background-position:0% center}}\n  .sub{color:#6b4a7b;font-size:10px;text-align:center;margin-bottom:16px}\n  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}\n  @media(max-width:640px){.grid{grid-template-columns:1fr}}\n  .card{background:linear-gradient(135deg,#12071e,#1a0a2e);border:1px solid #2a1040;border-radius:8px;padding:14px 16px}\n  .card-title{color:#6b4a7b;font-size:9px;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}\n  .metric{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:12px}\n  .label{color:#6b4a7b;min-width:80px}\n  .value{color:#c084fc;font-weight:700}\n  .bar-wrap{width:100%;height:6px;background:#1a0820;border-radius:3px;overflow:hidden;margin:4px 0}\n  .bar-fill{height:100%;border-radius:3px;transition:width .6s ease}\n  .bar-green{background:linear-gradient(90deg,#22c55e,#4ade80)}\n  .bar-yellow{background:linear-gradient(90deg,#f59e0b,#fbbf24)}\n  .bar-red{background:linear-gradient(90deg,#ef4444,#dc2626)}\n  .bar-purple{background:linear-gradient(90deg,#7c3aed,#a855f7)}\n  .disk-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:11px}\n  .disk-row .mount{color:#a855f7;min-width:60px}\n  .disk-row .pct{color:#c084fc;min-width:35px;text-align:right}\n  .net-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px}\n  .net-row .iface{color:#a855f7;min-width:50px}\n  .net-row .speed{color:#c084fc}\n  .footer{text-align:center;margin-top:16px;font-size:9px;color:#4a2a5a}\n  .premium-badge{display:inline-block;background:linear-gradient(90deg,#7c3aed,#a855f7);color:#fff;font-size:8px;padding:2px 6px;border-radius:3px;margin-left:6px}\n  .pulse{animation:pulse 2s ease-in-out infinite}\n  @keyframes pulse{0%{opacity:1}50%{opacity:.4}100%{opacity:1}}\n  .blink{animation:blink 1s step-end infinite}\n  @keyframes blink{0%{opacity:1}50%{opacity:0}}\n</style>\n</head>\n<body>\n<div class="container">\n\n<div class="ascii" id="asciiBlock"></div>\n\n<h1>ameni monitor — system dashboard</h1>\n<div class="sub" id="sysLine">Linux <span id="distro">Arch Linux</span> <span id="kernel">6.5.7</span>  |  <span id="arch">x86_64</span></div>\n\n<div class="grid">\n\n  <!-- CPU -->\n  <div class="card">\n    <div class="card-title">cpu</div>\n    <div class="metric"><span class="label">Usage</span><span class="value" id="cpuUsage">--</span></div>\n    <div class="bar-wrap"><div class="bar-fill" id="cpuBar" style="width:0%"></div></div>\n    <div class="metric"><span class="label">Load Avg</span><span class="value" id="cpuLoad">--</span></div>\n    <div class="metric"><span class="label">Cores</span><span class="value" id="cpuCores">8 cores</span></div>\n    <div class="metric"><span class="label">Freq</span><span class="value" id="cpuFreq">--</span></div>\n    <div class="metric"><span class="label">Temp</span><span class="value" id="cpuTemp">--</span></div>\n  </div>\n\n  <!-- Memory -->\n  <div class="card">\n    <div class="card-title">memory <span class="premium-badge">PREMIUM</span></div>\n    <div class="metric"><span class="label">RAM Used</span><span class="value" id="memUsed">--</span></div>\n    <div class="bar-wrap"><div class="bar-fill" id="memBar" style="width:0%"></div></div>\n    <div class="metric"><span class="label">Available</span><span class="value" id="memAvail">--</span></div>\n    <div class="metric"><span class="label">Swap</span><span class="value" id="memSwap">--</span></div>\n    <div class="bar-wrap"><div class="bar-fill" id="swapBar" style="width:0%"></div></div>\n  </div>\n\n  <!-- Disks -->\n  <div class="card">\n    <div class="card-title">disks</div>\n    <div id="diskContent"></div>\n  </div>\n\n  <!-- Network -->\n  <div class="card">\n    <div class="card-title">network</div>\n    <div id="netContent"></div>\n  </div>\n\n</div>\n\n<!-- History (premium) -->\n<div class="card" style="margin-top:10px">\n  <div class="card-title">history (CPU last 30 min) <span class="premium-badge">PREMIUM</span></div>\n  <canvas id="historyCanvas" width="800" height="200" style="width:100%;height:120px;border-radius:4px;background:#0a0212"></canvas>\n  <div style="display:flex;justify-content:space-between;font-size:8px;color:#4a2a5a;margin-top:4px">\n    <span id="timeStart">now</span><span>CPU % over time</span><span id="timeEnd">now</span>\n  </div>\n</div>\n\n<div class="footer" id="footer"><span class="pulse">●</span> live demo &mdash; обновление каждые 2 сек</div>\n\n</div>\n\n<script>\n(function() {\n  var ascii = [\n    \'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢲⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\',\n    \'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\',\n    \'⠀⠀⠀⠀⠀⠀⠀⠀⢀⠄⠂⢉⠤⠐⠋⠈⠡⡈⠉⠐⠠⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\',\n    \'⠀⠀⠀⠀⢀⡀⢠⣤⠔⠁⢀⠀⠀⠀⠀⠀⠀⠀⠈⢢⠀⠀⠈⠱⡤⣤⠄⣀⠀⠀⠀⠀⠀\',\n    \'⠀⠀⠰⠁⠀⣰⣿⠃⠀⢠⠃⢸⠀⠀⠀⠀⠀⠀⠀⠀⠁⠀⠀⠀⠈⢞⣦⡀⠈⡇⠀⠀⠀\',\n    \'⠀⠀⠀⢇⣠⡿⠁⠀⢀⡃⠀⣈⠀⠀⠀⠀⢰⡀⠀⠀⠀⠀⢢⠰⠀⠀⢺⣧⢰⠀⠀⠀⠀\',\n    \'⠀⠀⠀⠈⣿⠁⡘⠀⡌⡇⠀⡿⠸⠀⠀⠀⠈⡕⡄⠀⠐⡀⠈⠀⢃⠀⠀⠾⠇⠀⠀⠀⠀\',\n    \'⠀⠀⠀⠀⠇⡇⠃⢠⠀⠶⡀⡇⢃⠡⡀⠀⠀⠡⠈⢂⡀⢁⠀⡁⠸⠀⡆⠘⡀⠀⠀⠀⠀\',\n    \'⠀⠀⠀⠸⠀⢸⠀⠘⡜⠀⣑⢴⣀⠑⠯⡂⠄⣀⣣⢀⣈⢺⡜⢣⠀⡆⡇⠀⢣⠀⠀⠀⠀\',\n    \'⠀⠀⠀⠇⠀⢸⠀⡗⣰⡿⡻⠿⡳⡅⠀⠀⠀⠀⠈⡵⠿⠿⡻⣷⡡⡇⡇⠀⢸⣇⠀⠀⠀\',\n    \'⠀⠀⢰⠀⠀⡆⡄⣧⡏⠸⢠⢲⢸⠁⠀⠀⠀⠀⠐⢙⢰⠂⢡⠘⣇⡇⠃⠀⠀⢹⡄⠀⠀\',\n    \'⠀⠀⠟⠀⠀⢰⢁⡇⠇⠰⣀⢁⡜⠀⠀⠀⠀⠀⠀⠘⣀⣁⠌⠀⠃⠰⠀⠀⠀⠈⠰⠀⠀\',\n    \'⠀⡘⠀⠀⠀⠀⢊⣤⠀⠀⠤⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠤⠄⠀⢸⠃⠀⠀⠀⠀⠀⠃⠀\',\n    \'⢠⠁⢀⠀⠀⠀⠈⢿⡀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⠀⠀⠀⢀⠏⠀⠀⠀⠀⠀⠀⠸⠀\',\n    \'⠘⠸⠘⡀⠀⠀⠀⠀⢣⠀⠀⠀⠀⠀⠀⠁⠀⠃⠀⠀⠀⠀⢀⠎⠀⠀⠀⠀⠀⢠⠀⠀⡇\',\n    \'⠀⠇⢆⢃⠀⠀⠀⠀⠀⡏⢲⢤⢀⡀⠀⠀⠀⠀⠀⢀⣠⠄⡚⠀⠀⠀⠀⠀⠀⣾⠀⠀⠀\',\n    \'⢰⠈⢌⢎⢆⠀⠀⠀⠀⠁⣌⠆⡰⡁⠉⠉⠀⠉⠁⡱⡘⡼⠇⠀⠀⠀⠀⢀⢬⠃⢠⠀⡆\',\n    \'⠀⢢⠀⠑⢵⣧⡀⠀⠀⡿⠳⠂⠉⠀⠀⠀⠀⠀⠀⠀⠁⢺⡀⠀⠀⢀⢠⣮⠃⢀⠆⡰⠀\',\n    \'⠀⠀⠑⠄⣀⠙⡭⠢⢀⡀⠀⠁⠄⣀⣀⠀⢀⣀⣀⣀⡠⠂⢃⡀⠔⠱⡞⢁⠄⣁⠔⠁⠀\',\n    \'⠀⠀⠀⠀⠀⢠⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠉⠁⠀⠀⠀⠀\',\n    \'⠀⠀⠀⠀⠀⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀\'\n  ];\n  var el = document.getElementById(\'asciiBlock\');\n  var colors = [\'#a855f7\',\'#c084fc\',\'#d8b4fe\',\'#e9d5ff\',\'#7c3aed\',\'#9333ea\'];\n  ascii.forEach(function(l,i){\n    var s = document.createElement(\'span\');\n    s.style.color = colors[i % 6];\n    s.textContent = l;\n    el.appendChild(s);\n    el.appendChild(document.createTextNode(\'\\n\'));\n  });\n})();\n\nfunction rnd(min,max){return Math.round((Math.random()*(max-min)+min)*10)/10}\nfunction rndI(min,max){return Math.floor(Math.random()*(max-min+1)+min)}\nfunction pick(arr){return arr[Math.floor(Math.random()*arr.length)]}\n\nvar hist = [];\nvar t0 = Date.now();\n\nfunction barColor(p){\n  if(p<60) return \'#22c55e\';\n  if(p<85) return \'#f59e0b\';\n  return \'#ef4444\';\n}\n\nfunction fmtB(b){\n  if(b>1073741824) return (b/1073741824).toFixed(1)+\'GB\';\n  if(b>1048576) return (b/1048576).toFixed(1)+\'MB\';\n  if(b>1024) return (b/1024).toFixed(1)+\'KB\';\n  return b+\'B\';\n}\n\nfunction drawHist(){\n  var c = document.getElementById(\'historyCanvas\');\n  if(!c) return;\n  var ctx = c.getContext(\'2d\');\n  var w = c.width, h = c.height;\n  ctx.clearRect(0,0,w,h);\n  if(hist.length<2) return;\n  ctx.beginPath();\n  ctx.moveTo(0, h);\n  for(var i=0;i<hist.length;i++){\n    var x = (i/(hist.length-1))*w;\n    var y = h - (hist[i]/100)*h;\n    ctx.lineTo(x, y);\n  }\n  ctx.lineTo(w, h);\n  ctx.closePath();\n  var grad = ctx.createLinearGradient(0,0,0,h);\n  grad.addColorStop(0,\'rgba(168,85,247,0.4)\');\n  grad.addColorStop(1,\'rgba(168,85,247,0.02)\');\n  ctx.fillStyle = grad;\n  ctx.fill();\n  ctx.beginPath();\n  ctx.moveTo(0, h - (hist[0]/100)*h);\n  for(var i=1;i<hist.length;i++){\n    ctx.lineTo((i/(hist.length-1))*w, h - (hist[i]/100)*h);\n  }\n  ctx.strokeStyle = \'#a855f7\';\n  ctx.lineWidth = 2;\n  ctx.stroke();\n}\n\nfunction update(){\n  var cu = rnd(10,95);\n  document.getElementById(\'cpuUsage\').textContent = cu+\'%\';\n  document.getElementById(\'cpuBar\').style.width = cu+\'%\';\n  document.getElementById(\'cpuBar\').style.background = \'linear-gradient(90deg,\'+barColor(cu)+\',#4ade80)\';\n  document.getElementById(\'cpuLoad\').textContent = rnd(0,3)+\'  \'+rnd(0,2)+\'  \'+rnd(0,1);\n  var freqs = [];\n  for(var i=0;i<8;i++) freqs.push(rndI(400,3200));\n  document.getElementById(\'cpuFreq\').textContent = freqs.slice(0,4).map(function(f){return f+\'MHz\'}).join(\' \');\n  document.getElementById(\'cpuTemp\').textContent = rnd(35,85)+\'\\u00b0C\';\n\n  var mp = rnd(40,92);\n  var mt = rnd(6,32);\n  var ma = mt*(1-mp/100);\n  document.getElementById(\'memUsed\').textContent = mp+\'%\';\n  document.getElementById(\'memBar\').style.width = mp+\'%\';\n  document.getElementById(\'memBar\').style.background = \'linear-gradient(90deg,\'+barColor(mp)+\',#4ade80)\';\n  document.getElementById(\'memAvail\').textContent = ma.toFixed(1)+\' / \'+mt+\' GB\';\n  var sp = rnd(0,90);\n  document.getElementById(\'memSwap\').textContent = sp+\'%\';\n  document.getElementById(\'swapBar\').style.width = sp+\'%\';\n  document.getElementById(\'swapBar\').style.background = \'linear-gradient(90deg,\'+barColor(sp)+\',#4ade80)\';\n\n  var disks = [\n    {m:\'/\', p:rnd(20,95), u:rnd(10,200), t:240},\n    {m:\'/home\', p:rnd(20,95), u:rnd(50,400), t:500},\n    {m:\'/mnt/data\', p:rnd(20,95), u:rnd(100,900), t:1000}\n  ];\n  var dh = \'\';\n  disks.forEach(function(d){\n    var bc = barColor(d.p);\n    dh += \'<div class="disk-row"><span class="mount">\'+d.m+\'</span>\'+\n      \'<span style="flex:1;margin:0 8px"><div class="bar-wrap" style="height:4px">\'+\n      \'<div class="bar-fill" style="width:\'+d.p+\'%;background:linear-gradient(90deg,\'+bc+\',#4ade80)"></div></div></span>\'+\n      \'<span class="pct">\'+d.p.toFixed(1)+\'%</span>\'+\n      \'<span style="color:#6b4a7b;font-size:10px;min-width:50px;text-align:right">\'+d.u.toFixed(1)+\'/\'+d.t+\'G</span></div>\';\n  });\n  document.getElementById(\'diskContent\').innerHTML = dh;\n\n  var ifaces = [\n    {n:\'wlan0\', r:rndI(100,5000000), t:rndI(50,1000000)},\n    {n:\'eth0\', r:rndI(0,1000), t:rndI(0,500)}\n  ];\n  var nh = \'\';\n  ifaces.forEach(function(n){\n    nh += \'<div class="net-row"><span class="iface">\'+n.n+\'</span>\'+\n      \'<span class="speed">\\u2193 \'+fmtB(n.r)+\'  \\u2191 \'+fmtB(n.t)+\'</span></div>\';\n  });\n  document.getElementById(\'netContent\').innerHTML = nh;\n\n  hist.push(cu);\n  if(hist.length>180) hist.shift();\n  drawHist();\n\n  var d = new Date();\n  document.getElementById(\'timeStart\').textContent = d.toLocaleTimeString([],{hour:\'2-digit\',minute:\'2-digit\'});\n  document.getElementById(\'timeEnd\').textContent = d.toLocaleTimeString([],{hour:\'2-digit\',minute:\'2-digit\'});\n}\n\nupdate();\nsetInterval(update, 2000);\n</script>\n</body>\n</html>\n'
+HTML_PAGE = open(os.path.join(os.path.dirname(__file__), "dashboard.html")).read()
+
 
 def get_local_ip():
     try:
@@ -270,7 +428,9 @@ def main():
     print("  \033[38;5;147mServer started\033[0m")
     print(f"  \033[38;5;92mLocal:\033[0m   http://127.0.0.1:{PORT}")
     print(f"  \033[38;5;92mNetwork:\033[0m http://{ip}:{PORT}")
-    if PREMIUM: print("  \033[38;5;141mPremium:\033[0m enabled")
+    if _is_premium():
+        email = _license_data.get("email", "unknown") if _license_data else "unknown"
+        print(f"  \033[38;5;141mPremium:\033[0m enabled for {email}")
     print("  \033[38;5;92m\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\033[0m")
     print("  \033[38;5;183mPress Ctrl+C to stop\033[0m\n")
     server = http.server.HTTPServer((HOST, PORT), Handler)

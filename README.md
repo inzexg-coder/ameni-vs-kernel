@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/Ameni_Monitor-System_Dashboard-%23a855f7?labelColor=222" alt="Ameni Monitor">
   <img src="https://img.shields.io/badge/platform-linux+windows-%234CAF50?labelColor=222" alt="Linux+Windows">
   <img src="https://img.shields.io/badge/license-MIT-lightgrey?labelColor=222" alt="MIT">
-  <img src="https://img.shields.io/badge/dependencies-0-brightgreen?labelColor=222" alt="Zero dependencies">
+  <img src="https://img.shields.io/badge/dependencies-cryptography-7c3aed?labelColor=222" alt="cryptography">
 </p>
 
 <h1 align="center">Ameni Monitor — панель мониторинга</h1>
@@ -24,7 +24,6 @@
   <a href="#использование">Использование</a> &middot;
   <a href="#дашборд">Дашборд</a> &middot;
   <a href="#api">API</a> &middot;
-  <a href="#премиум">Премиум</a>
 </p>
 
 <br>
@@ -96,7 +95,6 @@ GET /api/monitor/cpu       CPU
 GET /api/monitor/memory    RAM + Swap
 GET /api/monitor/disk      Диски
 GET /api/monitor/network   Сеть
-GET /api/premium           Статус премиум
 GET /api/system            Информация о системе
 ```
 

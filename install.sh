@@ -11,7 +11,7 @@ TEAL='\033[38;5;92m'
 LAVENDER='\033[38;5;147m'
 RESET='\033[0m'
 
-echo -e "\n  ${PURPLE}━━ ameni vs kernel — installer ━━${RESET}\n"
+echo -e "\n  ${PURPLE}━━ ameni — installer ━━${RESET}\n"
 
 if [ -d "$INSTALL_DIR/.git" ]; then
     echo -e "  ${TEAL}◈ Updating existing installation...${RESET}"
@@ -21,6 +21,9 @@ else
     echo -e "  ${TEAL}◈ Cloning to ${INSTALL_DIR}...${RESET}"
     git clone --depth=1 "$REPO_URL" "$INSTALL_DIR"
 fi
+
+echo -e "  ${TEAL}◈ Installing Python dependency (cryptography)...${RESET}"
+pip3 install cryptography 2>/dev/null || pip install cryptography 2>/dev/null || echo -e "  ${LAVENDER}◈ cryptography already installed${RESET}"
 
 mkdir -p "$BIN_DIR"
 ln -sf "$INSTALL_DIR/.ameni/bin/ameni" "$AMENI_LINK"
@@ -38,6 +41,6 @@ if ! echo ":$PATH:" | grep -q ":$BIN_DIR:"; then
 fi
 
 echo -e "  ${PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}\n"
-echo -e "  ${TEAL}Run:${RESET}  ameni monitor"
+echo -e "  ${TEAL}Run:${RESET}  ameni"
 echo -e "  ${TEAL}Help:${RESET} ameni help"
 echo ""

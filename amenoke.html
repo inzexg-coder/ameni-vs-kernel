@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>amenoke — ameni monitor premium</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#08040e;font-family:system-ui,-apple-system,sans-serif;min-height:100vh;color:#c0c0cc;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+    background:radial-gradient(ellipse at 50% 0%,#1a0a2e 0%,transparent 60%);z-index:-1}
+  .card{background:linear-gradient(135deg,#12071e,#1a0a2e);border:1px solid #2a1040;border-radius:12px;padding:40px;max-width:480px;width:100%}
+  h1{font-size:28px;font-weight:300;text-align:center;margin-bottom:4px;
+    background:linear-gradient(90deg,#a855f7,#e9d5ff,#a855f7);background-size:200% auto;
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .sub{color:#6b4a7b;font-size:14px;text-align:center;margin-bottom:28px}
+  .feature{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #1a0820;font-size:14px}
+  .feature:last-child{border:none}
+  .icon{color:#a855f7;font-size:18px;min-width:24px;text-align:center}
+  .label{color:#c084fc}
+  .desc{color:#6b4a7b;font-size:12px;margin-top:2px}
+  .price{text-align:center;margin:24px 0;font-size:13px;color:#6b4a7b}
+  .price span{color:#a855f7;font-size:24px;font-weight:700}
+  .btn{display:block;background:linear-gradient(90deg,#7c3aed,#a855f7);border:none;border-radius:8px;padding:14px;color:#fff;font-family:inherit;font-size:15px;cursor:pointer;text-align:center;text-decoration:none;transition:opacity .2s}
+  .btn:hover{opacity:.9}
+  .contact{text-align:center;margin-top:20px;font-size:12px;color:#4a2a5a}
+  .contact a{color:#7c3aed;text-decoration:none}
+  .note{font-size:11px;color:#4a2a5a;text-align:center;margin-top:16px;line-height:1.5}
+  .logo{text-align:center;margin-bottom:24px;font-size:12px;color:#a855f7;letter-spacing:2px;text-transform:uppercase;opacity:.5}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">amenoke</div>
+  <h1>ameni monitor premium</h1>
+  <div class="sub">unlock advanced monitoring</div>
+
+  <div class="feature">
+    <div class="icon">&#x25C8;</div>
+    <div><div class="label">History graph</div><div class="desc">CPU usage over the last 30 minutes</div></div>
+  </div>
+  <div class="feature">
+    <div class="icon">&#x25C8;</div>
+    <div><div class="label">Detailed metrics</div><div class="desc">Extended RAM, disk, and network stats</div></div>
+  </div>
+  <div class="feature">
+    <div class="icon">&#x25C8;</div>
+    <div><div class="label">Priority support</div><div class="desc">Direct help with setup and configuration</div></div>
+  </div>
+
+  <div class="price">
+    <span>499</span> RUB &mdash; lifetime license per machine
+  </div>
+
+  <a class="btn" href="https://t.me/inzexg" target="_blank">Get a license key</a>
+
+  <div class="contact">
+    Telegram: <a href="https://t.me/inzexg" target="_blank">@inzexg</a>
+  </div>
+
+  <div class="note">
+    After payment you will receive a key tied to your machine.<br>
+    Activate it in the dashboard or via CLI:<br>
+    <code style="color:#6b4a7b;font-size:11px">echo "your-key" &gt; ~/.ameni/license.key</code>
+  </div>
+</div>
+</body>
+</html>

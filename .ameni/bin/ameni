@@ -14,12 +14,10 @@ case "${1:-start}" in
     echo ""
     echo -e "  \033[38;5;141mameni monitor\033[0m"
     echo ""
-    echo -e "  \033[38;5;92mКоманды:\033[0m"
-    echo -e "  \033[38;5;92m  ameni\033[0m                      Запустить панель мониторинга"
-    echo -e "  \033[38;5;92m  ameni --no-browser\033[0m          Запустить без браузера"
-    echo -e "  \033[38;5;92m  ameni help\033[0m                 Это справка"
-    echo ""
-    echo -e "  \033[38;5;147mПремиум: AMENI_PREMIUM=1 или touch ~/.ameni/premium.key\033[0m"
+    echo -e "  \033[38;5;92mCommands:\033[0m"
+    echo -e "  \033[38;5;92m  ameni\033[0m                      Start dashboard"
+    echo -e "  \033[38;5;92m  ameni --no-browser\033[0m          Start without browser"
+    echo -e "  \033[38;5;92m  ameni help\033[0m                 This help"
     echo ""
     ;;
   *)
