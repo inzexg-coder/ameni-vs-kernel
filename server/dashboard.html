@@ -32,48 +32,48 @@
   .g-disk{grid-column:1/7;grid-row:3}
   .g-network{grid-column:8/12;grid-row:4}
   .g-processes{grid-column:1/6;grid-row:4}
-
   .g-premium-label{grid-column:1/13;grid-row:5;text-align:center;margin:8px 0 0}
   .g-history{grid-column:2/12;grid-row:6}
   .g-diskio{grid-column:3/11;grid-row:7}
   .g-auth{grid-column:4/10;grid-row:8}
 
   .card{background:#fff;border:1px solid #e0d0ea;border-radius:16px;padding:24px 28px;
-    box-shadow:0 3px 12px rgba(124,58,237,0.07),0 10px 32px rgba(124,58,237,0.09);position:relative}
+    box-shadow:0 3px 12px rgba(124,58,237,0.07),0 10px 32px rgba(124,58,237,0.09);
+    position:relative;overflow:hidden}
   .card:hover{box-shadow:0 6px 20px rgba(124,58,237,0.12),0 14px 48px rgba(124,58,237,0.13);
     transform:translateY(-2px);border-color:#d0b8e0}
   .card::after{content:'';position:absolute;top:16px;right:20px;width:12px;height:12px;
     border-radius:50%;background:linear-gradient(135deg,#7c3aed,#c084fc);opacity:0.25}
-  .card-title{color:#7c3aed;font-size:14px;text-transform:uppercase;letter-spacing:3px;margin-bottom:14px;font-weight:700}
+  .card-title{color:#5b21b6;font-size:14px;text-transform:uppercase;letter-spacing:3px;margin-bottom:14px;font-weight:700}
 
   .premium-card{border:2px solid;border-image:linear-gradient(135deg,#a855f7,#c084fc,#7c3aed) 1;
-    border-radius:16px}
+    border-radius:16px;animation:premGlow 3s ease-in-out infinite}
   .premium-card .card{box-shadow:0 3px 16px rgba(168,85,247,0.18)}
   .premium-node{display:none}
 
   .metric{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:17px}
-  .label{color:#9a7ab5;font-size:14px}
-  .value{color:#2a1a3e;font-weight:600;font-size:18px}
-  .bar-wrap{width:100%;height:14px;background:#f0e8f8;border-radius:7px;overflow:hidden;margin:6px 0}
+  .label{color:#a78bba;font-size:14px}
+  .value{color:#6d28d9;font-weight:600;font-size:18px}
+  .bar-wrap{width:100%;height:14px;background:#ede4f4;border-radius:7px;overflow:hidden;margin:6px 0}
   .bar-fill{height:100%;border-radius:7px;transition:width .4s ease;background:linear-gradient(90deg,#a855f7,#c084fc)}
 
   .disk-row,.net-row,.proc-row{display:flex;justify-content:space-between;align-items:center;
-    padding:6px 0;font-size:15px;border-bottom:1px solid #f2ecf8}
+    padding:6px 0;font-size:15px;border-bottom:1px solid #f0e6f8}
   .disk-row:last-child,.net-row:last-child,.proc-row:last-child{border-bottom:none}
   .disk-row .mount,.net-row .iface{color:#7c3aed;min-width:70px;font-weight:600;font-size:14px}
-  .disk-row .pct{color:#9a7ab5;min-width:45px;text-align:right}
-  .proc-row .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#4a3060;font-size:14px}
+  .disk-row .pct{color:#a78bba;min-width:45px;text-align:right}
+  .proc-row .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#5b21b6;font-size:14px}
   .proc-row .mem{color:#7c3aed;min-width:40px;text-align:right;font-weight:600;font-size:14px}
 
   .big-text{font-size:42px;font-weight:700;text-align:center;padding:10px 0;
-    background:linear-gradient(135deg,#7c3aed,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    background:linear-gradient(135deg,#6d28d9,#a855f7,#c084fc);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent}
 
   .footer{text-align:center;margin-top:20px;font-size:11px;color:#c8b0d8;letter-spacing:1px}
 
   .premium-badge{display:inline-block;background:linear-gradient(135deg,#7c3aed,#c084fc);
     color:#fff;font-size:10px;padding:3px 10px;border-radius:5px;margin-left:8px;font-weight:700;letter-spacing:0.5px}
 
-  /* Premium section label */
   .prem-label{font-size:12px;text-transform:uppercase;letter-spacing:4px;color:#c084fc;font-weight:700;
     text-align:center;padding:8px 0;position:relative}
   .prem-label::before,.prem-label::after{content:'';display:inline-block;width:60px;height:1px;
@@ -82,20 +82,74 @@
 
   .auth-card{background:#fff;border:1px solid #e0d0ea;border-radius:16px;padding:20px 24px;
     box-shadow:0 2px 8px rgba(124,58,237,0.06)}
-  .auth-card .title{color:#7c3aed;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;margin-bottom:12px;font-weight:700}
+  .auth-card .title{color:#5b21b6;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;margin-bottom:12px;font-weight:700}
   .auth-card input{background:#f8f6fc;border:1px solid #e0d0ea;border-radius:8px;padding:12px 16px;
-    color:#2a1a3e;font-family:inherit;font-size:15px;outline:none;margin-bottom:8px;width:280px}
+    color:#6d28d9;font-family:inherit;font-size:15px;outline:none;margin-bottom:8px;width:280px}
   .auth-card input:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,0.12)}
+  .auth-card input::placeholder{color:#c8b0d8}
   .auth-card button{background:linear-gradient(135deg,#7c3aed,#c084fc);border:none;border-radius:8px;
     padding:12px 24px;color:#fff;font-family:inherit;font-size:14px;cursor:pointer;font-weight:600;margin-left:6px}
   .auth-card button:hover{box-shadow:0 3px 12px rgba(124,58,237,0.3)}
   .auth-card .hint{font-size:11px;color:#c8b0d8;margin-top:6px}
-  .auth-card .hint a{color:#9a7ab5;text-decoration:none}
+  .auth-card .hint a{color:#a78bba;text-decoration:none}
   .auth-card .error{font-size:11px;color:#e53e3e;margin-top:4px}
 
-  /* History canvas extra large */
-  canvas{border-radius:10px;background:#f8f6fc;width:100%;height:200px;border:1px solid #f0e8f8}
+  canvas{border-radius:10px;background:#f8f6fc;width:100%;height:200px;border:1px solid #ede4f4}
   .canvas-label{display:flex;justify-content:space-between;font-size:10px;color:#b8a0c8;margin-top:4px}
+
+  /* 🌟 Animations */
+
+  /* CPU: pulsing glow ring */
+  @keyframes cpuPulse{0%{box-shadow:0 0 0 0 rgba(168,85,247,0)}50%{box-shadow:0 0 0 4px rgba(168,85,247,0.1)}100%{box-shadow:0 0 0 0 rgba(168,85,247,0)}}
+  .g-cpu .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,#7c3aed,#a855f7,#c084fc);opacity:0.6}
+  .g-cpu .card{animation:cpuPulse 2.5s ease-in-out infinite}
+
+  /* Memory: gentle fill pulse on bars */
+  @keyframes memShimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  .g-memory .bar-fill{background-size:200% 100%;animation:memShimmer 4s ease-in-out infinite}
+
+  /* Uptime: blinking colon animation */
+  @keyframes blink{0%{opacity:1}50%{opacity:0.2}100%{opacity:1}}
+  .g-uptime .big-text::after{content:':';animation:blink 1.5s steps(1) infinite;margin-left:0}
+  .g-uptime .card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;
+    background:linear-gradient(180deg,#7c3aed,transparent);opacity:0.15}
+
+  /* Battery: level wave when charging */
+  @keyframes batCharge{0%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-4px) scaleY(1.05)}100%{transform:translateY(0) scaleY(1)}}
+  @keyframes batGlow{0%{opacity:0.4}50%{opacity:0.8}100%{opacity:0.4}}
+  .g-battery .card::before{content:'⚡';position:absolute;top:12px;right:40px;font-size:18px;
+    opacity:0;transition:opacity 0.5s}
+  .g-battery.charging .card::before{opacity:0.6;animation:batGlow 1.5s ease-in-out infinite}
+
+  /* Disk: scanning line sweep */
+  @keyframes diskScan{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+  .g-disk .card::before{content:'';position:absolute;top:0;left:0;width:60px;height:100%;
+    background:linear-gradient(90deg,transparent,rgba(168,85,247,0.06),transparent);
+    animation:diskScan 3s ease-in-out infinite;pointer-events:none}
+
+  /* Network: signal wave dots */
+  @keyframes netWave{0%{transform:scaleY(0.3);opacity:0.5}50%{transform:scaleY(1);opacity:1}100%{transform:scaleY(0.3);opacity:0.5}}
+  .g-network .card::before{content:'';position:absolute;bottom:14px;right:20px;display:flex;gap:3px}
+  .g-network .card{position:relative}
+  .g-network .card::before{content:'▁ ▂ ▃ ▄ ▅';position:absolute;bottom:16px;right:20px;
+    font-size:8px;letter-spacing:2px;color:#c084fc;opacity:0.3;animation:netWave 3s ease-in-out infinite}
+
+  /* Processes: cursor blink */
+  @keyframes typeCur{0%{opacity:1}50%{opacity:0}100%{opacity:1}}
+  .g-processes .card::after{content:'_';position:absolute;bottom:20px;right:24px;
+    font-size:18px;color:#a855f7;opacity:0.4;animation:typeCur 1s steps(1) infinite}
+
+  /* History: subtle glow at bottom */
+  @keyframes histGlow{0%{opacity:0.2}50%{opacity:0.5}100%{opacity:0.2}}
+  .g-history .card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,#7c3aed,#c084fc,#7c3aed);
+    animation:histGlow 2.5s ease-in-out infinite;opacity:0.4}
+
+  /* Premium glow border */
+  @keyframes premGlow{0%{border-image:linear-gradient(135deg,#a855f7,#c084fc,#7c3aed) 1}
+    50%{border-image:linear-gradient(135deg,#c084fc,#a855f7,#7c3aed) 1}
+    100%{border-image:linear-gradient(135deg,#a855f7,#c084fc,#7c3aed) 1}}
 
   .pulse{animation:pulse 2s ease-in-out infinite}
   @keyframes pulse{0%{opacity:1}50%{opacity:0.4}100%{opacity:1}}
@@ -167,7 +221,7 @@
     </div>
   </div>
 
-  <div class="g-battery" id="batteryCard" style="display:none">
+  <div class="g-battery" id="batteryCard">
     <div class="card">
       <div class="card-title">battery</div>
       <div id="batteryContent" class="big-text">--</div>
@@ -195,7 +249,6 @@
     </div>
   </div>
 
-  <!-- Premium section label -->
   <div class="g-premium-label">
     <div class="prem-label">premium features</div>
   </div>
@@ -222,7 +275,7 @@
   <div class="g-auth">
     <div class="auth-card">
       <div class="title">premium <span id="premiumBadge" class="premium-badge" style="display:none">ACTIVE</span></div>
-      <div id="premiumStatus" style="font-size:14px;color:#9a7ab5;margin-bottom:10px">Checking...</div>
+      <div id="premiumStatus" style="font-size:14px;color:#a78bba;margin-bottom:10px">Checking...</div>
       <div id="loginForm" style="display:none;margin-bottom:8px">
         <div><input id="loginInput" type="text" placeholder="username or email"></div>
         <div style="display:flex;gap:8px;align-items:center">
@@ -234,16 +287,16 @@
       </div>
       <div id="loggedInInfo" style="display:none;font-size:14px;margin-bottom:8px">
         <span id="loggedInUsername" style="color:#7c3aed;font-weight:600"></span>
-        <span id="loggedInPremium" style="color:#9a7ab5"></span>
-        <button onclick="amenokeLogout()" style="background:none;border:1px solid #e0d0ea;border-radius:6px;padding:6px 14px;color:#9a7ab5;font-size:13px;cursor:pointer;margin-left:6px">logout</button>
+        <span id="loggedInPremium" style="color:#a78bba"></span>
+        <button onclick="amenokeLogout()" style="background:none;border:1px solid #e0d0ea;border-radius:6px;padding:6px 14px;color:#a78bba;font-size:13px;cursor:pointer;margin-left:6px">logout</button>
       </div>
-      <div id="offlineSection" style="border-top:1px solid #f0e8f8;padding-top:10px;margin-top:6px">
+      <div id="offlineSection" style="border-top:1px solid #f0e6f8;padding-top:10px;margin-top:6px">
         <div style="font-size:11px;color:#c8b0d8;margin-bottom:6px">offline key</div>
         <div style="display:flex;gap:8px;align-items:center">
           <input id="licenseInput" type="text" placeholder="paste license key" style="width:300px">
           <button id="activateBtn" onclick="activateLicense()">Activate</button>
         </div>
-        <div id="premiumResult" style="font-size:12px;margin-top:6px;color:#9a7ab5"></div>
+        <div id="premiumResult" style="font-size:12px;margin-top:6px;color:#a78bba"></div>
       </div>
     </div>
   </div>
@@ -254,6 +307,7 @@
 </div>
 
 <script>
+
 
 
 (function(){
@@ -415,9 +469,9 @@ function update(){
     var bc=document.getElementById('batteryCard');
     if(bat){
       bc.style.display='block';
-      
+      bc.classList.toggle('charging', bat.status=='Charging');
       document.getElementById('batteryContent').innerHTML='<span style="color:'+barColor(bat.pct)+'">'+bat.pct+'%</span> <span style="color:#9a7ab5;font-size:12px">'+bat.status+'</span>';}
-    else{bc.style.display='none';}
+    else{bc.style.display='none';bc.classList.remove('charging');}
 
     var ps=d.processes||[];var ph='';
     ps.forEach(function(p,i){
@@ -453,6 +507,7 @@ function togglePremium(){
       el.style.display=d.premium?'block':'none';});});}
 togglePremium();
 setInterval(togglePremium,30000);
+
 
 
 </script>
