@@ -7,39 +7,33 @@
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:#f8f6fc;font-family:system-ui,-apple-system,sans-serif;min-height:100vh;
-    color:#2a1a3e;overflow-x:auto;padding:24px}
+    color:#2a1a3e;overflow-x:auto;padding:20px}
   body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
     background:radial-gradient(ellipse at 50% 20%,rgba(168,85,247,0.08) 0%,transparent 60%);z-index:-1}
-  .container{max-width:1100px;margin:0 auto;padding:0 20px;position:relative}
-  .ascii{font-family:monospace;font-size:9px;line-height:1.15;text-align:center;margin:8px 0 20px;
+  .container{max-width:1200px;margin:0 auto;padding:0 16px}
+  .ascii{font-family:monospace;font-size:9px;line-height:1.15;text-align:center;margin:6px 0 18px;
     white-space:pre;opacity:0.85;letter-spacing:0.5px}
   h1{font-size:30px;font-weight:700;text-align:center;margin:0 0 4px;letter-spacing:0;
     background:linear-gradient(135deg,#7c3aed,#a855f7,#c084fc);
     -webkit-background-clip:text;-webkit-text-fill-color:transparent}
-  .sub{font-size:13px;text-align:center;margin:0 0 24px;color:#a888c8}
+  .sub{font-size:13px;text-align:center;margin:0 0 20px;color:#a888c8}
   .sub span{color:#7c3aed;font-weight:600}
-  .canvas-wrap{position:relative;min-height:1050px;width:100%}
 
-  /* Background graph */
-  .bg-graph{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden}
-  .bg-graph circle{fill:none;stroke:#d8c8e8;stroke-width:1;opacity:0.3}
-  .bg-graph circle.filled{fill:#e8dff0;opacity:0.15}
-  .bg-graph line{stroke:#d8c8e8;stroke-width:1;opacity:0.12;stroke-dasharray:4,6}
-  .bg-graph path{stroke:#d0c0e0;stroke-width:1;opacity:0.08;fill:none}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;position:relative;z-index:2}
+  .grid>div{position:relative;z-index:2}
 
-  .node{position:absolute;z-index:2}
-  .node-cpu{top:0;left:50%;margin-left:-200px;width:400px}
-  .node-memory{top:180px;left:2%;width:340px}
-  .node-uptime{top:180px;right:2%;width:300px}
-  .node-battery{top:330px;right:2%;width:300px}
-  .node-disk{top:370px;left:2%;width:450px}
-  .node-network{top:520px;right:2%;width:360px}
-  .node-processes{top:540px;left:2%;width:340px}
-  .node-history{top:710px;right:10%;width:380px}
-  .node-diskio{top:720px;left:10%;width:360px}
-  .node-auth{top:880px;left:50%;margin-left:-260px;width:520px}
+  .g-cpu{grid-column:4/10;grid-row:1}
+  .g-memory{grid-column:1/6;grid-row:2}
+  .g-uptime{grid-column:8/13;grid-row:2}
+  .g-battery{grid-column:8/13;grid-row:3}
+  .g-disk{grid-column:2/8;grid-row:3}
+  .g-network{grid-column:8/12;grid-row:4}
+  .g-processes{grid-column:1/6;grid-row:4}
+  .g-history{grid-column:8/13;grid-row:5}
+  .g-diskio{grid-column:3/9;grid-row:6}
+  .g-auth{grid-column:4/10;grid-row:7}
 
-  .card{background:#fff;border:1px solid #e0d0ea;border-radius:14px;padding:20px 22px;
+  .card{background:#fff;border:1px solid #e0d0ea;border-radius:14px;padding:18px 20px;
     box-shadow:0 2px 8px rgba(124,58,237,0.06),0 8px 28px rgba(124,58,237,0.08);position:relative}
   .card:hover{box-shadow:0 4px 16px rgba(124,58,237,0.1),0 12px 40px rgba(124,58,237,0.12);
     transform:translateY(-2px);border-color:#d0b8e0}
@@ -47,31 +41,29 @@
     border-radius:50%;background:linear-gradient(135deg,#7c3aed,#c084fc);opacity:0.3}
   .card-title{color:#7c3aed;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;margin-bottom:10px;font-weight:700}
 
-  .premium-card{border:2px solid transparent;background-clip:padding-box;
-    box-shadow:0 0 0 2px rgba(168,85,247,0.3),0 2px 8px rgba(124,58,237,0.06),0 8px 28px rgba(124,58,237,0.08)}
-  .premium-card:hover{box-shadow:0 0 0 3px rgba(168,85,247,0.5),0 4px 16px rgba(124,58,237,0.15),0 12px 40px rgba(124,58,237,0.12)}
-  .premium-card::before{content:'';position:absolute;top:-2px;left:-2px;right:-2px;bottom:-2px;
-    border-radius:16px;background:linear-gradient(135deg,#a855f7,#e879f9,#f0abfc,#c084fc,#7c3aed);
-    background-size:300% 300%;z-index:-1;animation:premGlow 3s ease infinite}
-  @keyframes premGlow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  /* Premium card with highlighted border */
+  .premium-card{border:2px solid;border-image:linear-gradient(135deg,#a855f7,#c084fc,#7c3aed) 1;border-radius:14px;position:relative}
+  .premium-card::before{content:'';position:absolute;inset:-3px;border-radius:16px;
+    background:linear-gradient(135deg,#a855f7,#c084fc,#7c3aed);z-index:-1}
+  .premium-card .card{box-shadow:0 2px 12px rgba(168,85,247,0.15)}
+  .premium-node{display:none}
 
-  .metric{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:15px}
+  .metric{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:15px}
   .label{color:#9a7ab5;font-size:13px}
   .value{color:#2a1a3e;font-weight:600;font-size:16px}
-  .bar-wrap{width:100%;height:12px;background:#f0e8f8;border-radius:6px;overflow:hidden;margin:6px 0}
+  .bar-wrap{width:100%;height:12px;background:#f0e8f8;border-radius:6px;overflow:hidden;margin:5px 0}
   .bar-fill{height:100%;border-radius:6px;transition:width .4s ease;background:linear-gradient(90deg,#a855f7,#c084fc)}
-  .disk-row,.net-row,.proc-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:14px;border-bottom:1px solid #f2ecf8}
+  .disk-row,.net-row,.proc-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:14px;border-bottom:1px solid #f2ecf8}
   .disk-row:last-child,.net-row:last-child,.proc-row:last-child{border-bottom:none}
   .disk-row .mount,.net-row .iface{color:#7c3aed;min-width:60px;font-weight:600}
   .disk-row .pct{color:#9a7ab5;min-width:40px;text-align:right}
   .proc-row .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#4a3060;font-size:13px}
   .proc-row .mem{color:#7c3aed;min-width:35px;text-align:right;font-weight:600}
-  .big-text{font-size:36px;font-weight:700;text-align:center;padding:10px 0;
+  .big-text{font-size:34px;font-weight:700;text-align:center;padding:8px 0;
     background:linear-gradient(135deg,#7c3aed,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-  .footer{text-align:center;margin-top:12px;font-size:10px;color:#c8b0d8}
-  .premium-badge{display:inline-block;background:linear-gradient(135deg,#a855f7,#e879f9);
-    color:#fff;font-size:9px;padding:2px 10px;border-radius:4px;margin-left:6px;font-weight:700;letter-spacing:0.3px}
-  .premium-node{display:none}
+  .footer{text-align:center;margin-top:16px;font-size:10px;color:#c8b0d8}
+  .premium-badge{display:inline-block;background:linear-gradient(135deg,#7c3aed,#c084fc);
+    color:#fff;font-size:9px;padding:2px 8px;border-radius:4px;margin-left:6px;font-weight:700}
   .auth-card{background:#fff;border:1px solid #e0d0ea;border-radius:14px;padding:18px 22px;box-shadow:0 2px 8px rgba(124,58,237,0.06)}
   .auth-card .title{color:#7c3aed;font-size:11px;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;font-weight:700}
   .auth-card input{background:#f8f6fc;border:1px solid #e0d0ea;border-radius:8px;padding:10px 14px;color:#2a1a3e;font-family:inherit;font-size:14px;outline:none;margin-bottom:6px;width:260px}
@@ -84,157 +76,152 @@
   canvas{border-radius:8px;background:#f8f6fc;width:100%;height:70px;border:1px solid #f0e8f8}
   .pulse{animation:pulse 2s ease-in-out infinite}
   @keyframes pulse{0%{opacity:1}50%{opacity:0.4}100%{opacity:1}}
+
+  /* SVG connectors as background */
+  .bg-lines{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;opacity:0.25}
+  .bg-lines path{stroke:#a855f7;stroke-width:1.5;fill:none}
+  .bg-lines circle{fill:#c084fc;opacity:0.3}
+
   @media(max-width:900px){
-    .node{position:static;margin-left:0!important;width:100%!important;margin-bottom:16px}
-    .canvas-wrap{min-height:auto}
-    .bg-graph{display:none}
+    .grid{display:flex;flex-direction:column;gap:12px}
+    .grid>div{grid-column:auto!important;grid-row:auto!important}
+    .bg-lines{display:none}
   }
 </style>
 </head>
 <body>
+
+<svg class="bg-lines" viewBox="0 0 1200 1200" preserveAspectRatio="none">
+  <path d="M0,200 Q600,100 1200,200"/>
+  <path d="M0,350 Q600,450 1200,350"/>
+  <path d="M0,500 Q600,400 1200,500"/>
+  <path d="M0,650 Q600,750 1200,650"/>
+  <path d="M0,800 Q600,700 1200,800"/>
+  <path d="M400,0 Q300,600 400,1200"/>
+  <path d="M800,0 Q900,600 800,1200"/>
+  <circle cx="300" cy="300" r="4"/>
+  <circle cx="900" cy="300" r="4"/>
+  <circle cx="200" cy="500" r="3"/>
+  <circle cx="1000" cy="500" r="3"/>
+  <circle cx="500" cy="400" r="5"/>
+  <circle cx="700" cy="400" r="4"/>
+  <circle cx="600" cy="600" r="6"/>
+</svg>
+
 <div class="container">
 <div class="ascii" id="asciiBlock"></div>
 <h1>ameni monitor</h1>
 <div class="sub"><span id="distro">--</span> <span id="kernel">--</span> <span id="arch">--</span></div>
 
-<div class="canvas-wrap">
+<div class="grid">
 
-<!-- Background decorative graph -->
-<svg class="bg-graph" viewBox="0 0 1100 1050" preserveAspectRatio="xMidYMin slice">
-  <circle cx="550" cy="60" r="180" class="filled"/>
-  <circle cx="550" cy="60" r="250" class="filled"/>
-  <circle cx="550" cy="60" r="320"/>
-  <circle cx="150" cy="230" r="100" class="filled"/>
-  <circle cx="150" cy="230" r="160"/>
-  <circle cx="950" cy="230" r="80" class="filled"/>
-  <circle cx="950" cy="230" r="140"/>
-  <circle cx="150" cy="460" r="120" class="filled"/>
-  <circle cx="950" cy="460" r="90" class="filled"/>
-  <circle cx="150" cy="460" r="180"/>
-  <circle cx="950" cy="460" r="150"/>
-  <circle cx="200" cy="630" r="70" class="filled"/>
-  <circle cx="900" cy="630" r="80" class="filled"/>
-  <circle cx="550" cy="800" r="150" class="filled"/>
-  <circle cx="550" cy="800" r="220"/>
-  <line x1="550" y1="60" x2="150" y2="230"/>
-  <line x1="550" y1="60" x2="950" y2="230"/>
-  <line x1="150" y1="230" x2="150" y2="460"/>
-  <line x1="950" y1="230" x2="950" y2="460"/>
-  <line x1="150" y1="460" x2="200" y2="630"/>
-  <line x1="950" y1="460" x2="900" y2="630"/>
-  <line x1="200" y1="630" x2="550" y2="800"/>
-  <line x1="900" y1="630" x2="550" y2="800"/>
-  <line x1="150" y1="230" x2="950" y2="460"/>
-  <line x1="950" y1="230" x2="150" y2="460"/>
-  <line x1="550" y1="60" x2="550" y2="800"/>
-  <path d="M100,100 Q550,0 1000,100" />
-  <path d="M50,300 Q550,200 1050,300" />
-  <path d="M50,600 Q550,500 1050,600" />
-</svg>
-
-<div class="node node-cpu">
-  <div class="card">
-    <div class="card-title">cpu</div>
-    <div class="metric"><span class="label">Usage</span><span class="value" id="cpuUsage">--</span></div>
-    <div class="bar-wrap"><div class="bar-fill" id="cpuBar" style="width:0%"></div></div>
-    <div class="metric"><span class="label">Load</span><span class="value" id="cpuLoad">--</span></div>
-    <div class="metric"><span class="label">Cores</span><span class="value" id="cpuCores">--</span></div>
-    <div class="metric"><span class="label">Freq</span><span class="value" id="cpuFreq">--</span></div>
-    <div class="metric"><span class="label">Temp</span><span class="value" id="cpuTemp">--</span></div>
-  </div>
-</div>
-
-<div class="node node-memory">
-  <div class="card">
-    <div class="card-title">memory</div>
-    <div class="metric"><span class="label">RAM</span><span class="value" id="memUsed">--</span></div>
-    <div class="bar-wrap"><div class="bar-fill" id="memBar" style="width:0%"></div></div>
-    <div class="metric"><span class="label">Avail</span><span class="value" id="memAvail">--</span></div>
-    <div class="metric"><span class="label">Swap</span><span class="value" id="memSwap">--</span></div>
-    <div class="bar-wrap"><div class="bar-fill" id="swapBar" style="width:0%"></div></div>
-  </div>
-</div>
-
-<div class="node node-uptime">
-  <div class="card">
-    <div class="card-title">uptime</div>
-    <div id="uptimeContent" class="big-text">--</div>
-  </div>
-</div>
-
-<div class="node node-battery" id="batteryCard" style="display:none">
-  <div class="card">
-    <div class="card-title">battery</div>
-    <div id="batteryContent" class="big-text">--</div>
-  </div>
-</div>
-
-<div class="node node-disk">
-  <div class="card">
-    <div class="card-title">disk</div>
-    <div id="diskContent"></div>
-  </div>
-</div>
-
-<div class="node node-network">
-  <div class="card">
-    <div class="card-title">network</div>
-    <div id="netContent"></div>
-  </div>
-</div>
-
-<div class="node node-processes">
-  <div class="card">
-    <div class="card-title">processes</div>
-    <div id="procContent"></div>
-  </div>
-</div>
-
-<div class="node node-history premium-node" id="historyNode">
-  <div class="card premium-card">
-    <div class="card-title">history <span class="premium-badge">PREMIUM</span></div>
-    <canvas id="historyCanvas"></canvas>
-    <div style="display:flex;justify-content:space-between;font-size:9px;color:#b8a0c8;margin-top:3px">
-      <span id="timeStart">now</span><span>CPU %</span><span id="timeEnd">now</span>
+  <div class="g-cpu">
+    <div class="card">
+      <div class="card-title">cpu</div>
+      <div class="metric"><span class="label">Usage</span><span class="value" id="cpuUsage">--</span></div>
+      <div class="bar-wrap"><div class="bar-fill" id="cpuBar" style="width:0%"></div></div>
+      <div class="metric"><span class="label">Load</span><span class="value" id="cpuLoad">--</span></div>
+      <div class="metric"><span class="label">Cores</span><span class="value" id="cpuCores">--</span></div>
+      <div class="metric"><span class="label">Freq</span><span class="value" id="cpuFreq">--</span></div>
+      <div class="metric"><span class="label">Temp</span><span class="value" id="cpuTemp">--</span></div>
     </div>
   </div>
-</div>
 
-<div class="node node-diskio premium-node" id="diskIONode">
-  <div class="card premium-card">
-    <div class="card-title">disk i/o <span class="premium-badge">PREMIUM</span></div>
-    <div id="diskIOContent"></div>
+  <div class="g-memory">
+    <div class="card">
+      <div class="card-title">memory</div>
+      <div class="metric"><span class="label">RAM</span><span class="value" id="memUsed">--</span></div>
+      <div class="bar-wrap"><div class="bar-fill" id="memBar" style="width:0%"></div></div>
+      <div class="metric"><span class="label">Avail</span><span class="value" id="memAvail">--</span></div>
+      <div class="metric"><span class="label">Swap</span><span class="value" id="memSwap">--</span></div>
+      <div class="bar-wrap"><div class="bar-fill" id="swapBar" style="width:0%"></div></div>
+    </div>
   </div>
-</div>
 
-<div class="node node-auth">
-  <div class="auth-card">
-    <div class="title">premium <span id="premiumBadge" class="premium-badge" style="display:none">ACTIVE</span></div>
-    <div id="premiumStatus" style="font-size:13px;color:#9a7ab5;margin-bottom:10px">Checking...</div>
-    <div id="loginForm" style="display:none;margin-bottom:8px">
-      <div><input id="loginInput" type="text" placeholder="username or email"></div>
-      <div style="display:flex;gap:6px;align-items:center">
-        <input id="passwordInput" type="password" placeholder="password">
-        <button id="loginBtn" onclick="amenokeLogin()">Sign In</button>
+  <div class="g-uptime">
+    <div class="card">
+      <div class="card-title">uptime</div>
+      <div id="uptimeContent" class="big-text">--</div>
+    </div>
+  </div>
+
+  <div class="g-battery" id="batteryCard" style="display:none">
+    <div class="card">
+      <div class="card-title">battery</div>
+      <div id="batteryContent" class="big-text">--</div>
+    </div>
+  </div>
+
+  <div class="g-disk">
+    <div class="card">
+      <div class="card-title">disk</div>
+      <div id="diskContent"></div>
+    </div>
+  </div>
+
+  <div class="g-network">
+    <div class="card">
+      <div class="card-title">network</div>
+      <div id="netContent"></div>
+    </div>
+  </div>
+
+  <div class="g-processes">
+    <div class="card">
+      <div class="card-title">processes</div>
+      <div id="procContent"></div>
+    </div>
+  </div>
+
+  <div class="g-history premium-node" id="historyNode">
+    <div class="premium-card">
+      <div class="card">
+        <div class="card-title">history <span class="premium-badge">PREMIUM</span></div>
+        <canvas id="historyCanvas"></canvas>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:#b8a0c8;margin-top:3px">
+          <span id="timeStart">now</span><span>CPU %</span><span id="timeEnd">now</span>
+        </div>
       </div>
-      <div class="hint"><a href="https://amenoke.ru" target="_blank">amenoke.ru</a> register</div>
-      <div id="loginError" class="error"></div>
-    </div>
-    <div id="loggedInInfo" style="display:none;font-size:13px;margin-bottom:8px">
-      <span id="loggedInUsername" style="color:#7c3aed;font-weight:600"></span>
-      <span id="loggedInPremium" style="color:#9a7ab5"></span>
-      <button onclick="amenokeLogout()" style="background:none;border:1px solid #e0d0ea;border-radius:6px;padding:6px 12px;color:#9a7ab5;font-size:12px;cursor:pointer;margin-left:6px">logout</button>
-    </div>
-    <div id="offlineSection" style="border-top:1px solid #f0e8f8;padding-top:10px;margin-top:6px">
-      <div style="font-size:10px;color:#c8b0d8;margin-bottom:6px">offline key</div>
-      <div style="display:flex;gap:6px;align-items:center">
-        <input id="licenseInput" type="text" placeholder="paste license key" style="width:280px">
-        <button id="activateBtn" onclick="activateLicense()">Activate</button>
-      </div>
-      <div id="premiumResult" style="font-size:11px;margin-top:6px;color:#9a7ab5"></div>
     </div>
   </div>
-</div>
+
+  <div class="g-diskio premium-node" id="diskIONode">
+    <div class="premium-card">
+      <div class="card">
+        <div class="card-title">disk i/o <span class="premium-badge">PREMIUM</span></div>
+        <div id="diskIOContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="g-auth">
+    <div class="auth-card">
+      <div class="title">premium <span id="premiumBadge" class="premium-badge" style="display:none">ACTIVE</span></div>
+      <div id="premiumStatus" style="font-size:13px;color:#9a7ab5;margin-bottom:10px">Checking...</div>
+      <div id="loginForm" style="display:none;margin-bottom:8px">
+        <div><input id="loginInput" type="text" placeholder="username or email"></div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input id="passwordInput" type="password" placeholder="password">
+          <button id="loginBtn" onclick="amenokeLogin()">Sign In</button>
+        </div>
+        <div class="hint"><a href="https://amenoke.ru" target="_blank">amenoke.ru</a> — register</div>
+        <div id="loginError" class="error"></div>
+      </div>
+      <div id="loggedInInfo" style="display:none;font-size:13px;margin-bottom:8px">
+        <span id="loggedInUsername" style="color:#7c3aed;font-weight:600"></span>
+        <span id="loggedInPremium" style="color:#9a7ab5"></span>
+        <button onclick="amenokeLogout()" style="background:none;border:1px solid #e0d0ea;border-radius:6px;padding:6px 12px;color:#9a7ab5;font-size:12px;cursor:pointer;margin-left:6px">logout</button>
+      </div>
+      <div id="offlineSection" style="border-top:1px solid #f0e8f8;padding-top:10px;margin-top:6px">
+        <div style="font-size:10px;color:#c8b0d8;margin-bottom:6px">offline key</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input id="licenseInput" type="text" placeholder="paste license key" style="width:280px">
+          <button id="activateBtn" onclick="activateLicense()">Activate</button>
+        </div>
+        <div id="premiumResult" style="font-size:11px;margin-top:6px;color:#9a7ab5"></div>
+      </div>
+    </div>
+  </div>
 
 </div>
 
@@ -242,6 +229,7 @@
 </div>
 
 <script>
+
 (function(){
   var art=[
     '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢲⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀',
@@ -430,6 +418,7 @@ function togglePremium(){
       el.style.display=d.premium?'block':'none';});});}
 togglePremium();
 setInterval(togglePremium,30000);
+
 </script>
 </body>
 </html>
