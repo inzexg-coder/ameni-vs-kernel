@@ -25,8 +25,8 @@ def _get_machine_id():
         try:
             import subprocess
             if os.name == "nt":
-                r = subprocess.run(["wmic", "csproduct", "get", "uuid"], capture_output=True, text=True, timeout=5)
-                return r.stdout.strip().split("\n")[-1].strip()
+                out, _ = _win_run(["wmic", "csproduct", "get", "uuid"])
+                return out.strip().split("\n")[-1].strip()
         except:
             pass
     return "unknown"
@@ -119,6 +119,13 @@ def _is_premium():
         return True
     return _check_license()
 IS_WIN = os.name == "nt"
+
+def _win_run(cmd, timeout=10):
+    try:
+        r = subprocess.run(cmd, capture_output=True, timeout=timeout)
+        return r.stdout.decode("utf-8", errors="replace"), r.stderr.decode("utf-8", errors="replace")
+    except:
+        return "", ""
 
 
 def cpu_stats():
@@ -451,9 +458,8 @@ def read_processes():
         try:
             import subprocess, json
             ps_cmd = "Get-CimInstance Win32_Process | Sort-Object WorkingSetSize -Descending | Select-Object -First 5 ProcessId,Name,WorkingSetSize | ConvertTo-Json -Compress"
-            r = subprocess.run(["powershell", "-NoProfile", "-Command", ps_cmd],
-                               capture_output=True, text=True, timeout=10)
-            out = r.stdout.strip()
+            out, _ = _win_run(["powershell", "-NoProfile", "-Command", ps_cmd], timeout=10)
+            out = out.strip()
             if out and out != "null":
                 data = json.loads(out)
                 if not isinstance(data, list): data = [data]
@@ -492,14 +498,12 @@ def read_battery():
         try:
             import subprocess, json
             ps_cmd = "Get-CimInstance Win32_Battery | Select-Object EstimatedChargeRemaining, BatteryStatus | ConvertTo-Json -Compress"
-            r = subprocess.run(["powershell", "-NoProfile", "-Command", ps_cmd],
-                               capture_output=True, text=True, timeout=5)
-            out = r.stdout.strip()
+            out, _ = _win_run(["powershell", "-NoProfile", "-Command", ps_cmd])
+            out = out.strip()
             if not out or out == "null":
-                # fallback to wmic
-                r2 = subprocess.run(["wmic", "path", "Win32_Battery", "get", "EstimatedChargeRemaining,BatteryStatus",
-                                    "/format:csv"], capture_output=True, text=True, timeout=5)
-                for line in r2.stdout.strip().split("\n")[1:]:
+                out2, _ = _win_run(["wmic", "path", "Win32_Battery", "get", "EstimatedChargeRemaining,BatteryStatus",
+                                    "/format:csv"])
+                for line in out2.strip().split("\n")[1:]:
                     if not line.strip(): continue
                     parts = [p.strip() for p in line.split(",") if p.strip()]
                     if len(parts) >= 3:
@@ -541,9 +545,8 @@ def read_diskio():
         try:
             import subprocess, json
             ps_cmd = "Get-CimInstance Win32_PerfFormattedData_PerfDisk_LogicalDisk | Select-Object Name,DiskReadBytesPersec,DiskWriteBytesPersec | ConvertTo-Json -Compress"
-            r = subprocess.run(["powershell", "-NoProfile", "-Command", ps_cmd],
-                               capture_output=True, text=True, timeout=10)
-            out = r.stdout.strip()
+            out, _ = _win_run(["powershell", "-NoProfile", "-Command", ps_cmd], timeout=10)
+            out = out.strip()
             if out and out != "null":
                 data = json.loads(out)
                 if not isinstance(data, list): data = [data]
