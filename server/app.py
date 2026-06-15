@@ -122,24 +122,24 @@ IS_WIN = os.name == "nt"
 
 def _win_run(cmd, timeout=10):
     try:
-        import locale
         r = subprocess.run(cmd, capture_output=True, timeout=timeout)
         raw = r.stdout
         if raw[:2] == b"\xff\xfe":
-            return raw.decode("utf-16-le", errors="replace"), r.stderr.decode("utf-16-le", errors="replace")
+            return raw.decode("utf-16-le"), r.stderr.decode("utf-16-le")
         try:
             return raw.decode("utf-8"), r.stderr.decode("utf-8")
         except UnicodeDecodeError:
             pass
-        try:
-            oem = "cp866"
-            return raw.decode(oem, errors="replace"), r.stderr.decode(oem, errors="replace")
-        except:
-            pass
-        try:
-            return raw.decode("cp1251", errors="replace"), r.stderr.decode("cp1251", errors="replace")
-        except:
-            pass
+        if len(raw) > 0 and b"\x00" in raw[:200]:
+            try:
+                return raw.decode("utf-16-le"), r.stderr.decode("utf-16-le")
+            except:
+                pass
+        for enc in ["cp866", "cp1251", "latin-1"]:
+            try:
+                return raw.decode(enc), r.stderr.decode(enc)
+            except:
+                pass
         return raw.decode("utf-8", errors="replace"), r.stderr.decode("utf-8", errors="replace")
     except:
         return "", ""
