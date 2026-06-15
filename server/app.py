@@ -519,6 +519,7 @@ def main():
         except OSError:
             print(f"  Port {PORT} in use. Kill it: fuser -k {PORT}/tcp")
             return
+    if auto_open:
         threading.Timer(1.5, lambda: webbrowser.open(f"http://127.0.0.1:{PORT}")).start()
     try:
         server.serve_forever()
