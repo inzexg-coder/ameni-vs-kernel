@@ -10,7 +10,7 @@
     color:#2a1a3e;overflow-x:auto;padding:24px}
   body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
     background:radial-gradient(ellipse at 50% 20%,rgba(168,85,247,0.08) 0%,transparent 60%);z-index:-1}
-  .container{max-width:1100px;margin:0 auto;padding:0 20px}
+  .container{max-width:1100px;margin:0 auto;padding:0 20px;position:relative}
   .ascii{font-family:monospace;font-size:9px;line-height:1.15;text-align:center;margin:8px 0 20px;
     white-space:pre;opacity:0.85;letter-spacing:0.5px}
   h1{font-size:30px;font-weight:700;text-align:center;margin:0 0 4px;letter-spacing:0;
@@ -18,19 +18,27 @@
     -webkit-background-clip:text;-webkit-text-fill-color:transparent}
   .sub{font-size:13px;text-align:center;margin:0 0 24px;color:#a888c8}
   .sub span{color:#7c3aed;font-weight:600}
-  .canvas-wrap{position:relative;min-height:900px;width:100%}
-  .node{position:absolute;z-index:2;transition:all 0.15s ease}
-  .node:hover{z-index:10}
-  .node-cpu{top:0;left:50%;transform:translateX(-50%);width:400px}
-  .node-memory{top:10px;left:3%;width:350px}
-  .node-uptime{top:0;right:3%;width:280px}
-  .node-battery{top:110px;right:3%;width:280px}
-  .node-disk{top:210px;left:6%;width:430px}
-  .node-network{top:220px;right:6%;width:330px}
-  .node-processes{top:380px;left:3%;width:350px}
-  .node-history{top:390px;right:8%;width:380px}
-  .node-diskio{top:540px;left:15%;width:360px}
-  .node-auth{top:680px;left:50%;transform:translateX(-50%);width:520px}
+  .canvas-wrap{position:relative;min-height:1050px;width:100%}
+
+  /* Background graph */
+  .bg-graph{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden}
+  .bg-graph circle{fill:none;stroke:#d8c8e8;stroke-width:1;opacity:0.3}
+  .bg-graph circle.filled{fill:#e8dff0;opacity:0.15}
+  .bg-graph line{stroke:#d8c8e8;stroke-width:1;opacity:0.12;stroke-dasharray:4,6}
+  .bg-graph path{stroke:#d0c0e0;stroke-width:1;opacity:0.08;fill:none}
+
+  .node{position:absolute;z-index:2}
+  .node-cpu{top:0;left:50%;margin-left:-200px;width:400px}
+  .node-memory{top:180px;left:2%;width:340px}
+  .node-uptime{top:180px;right:2%;width:300px}
+  .node-battery{top:330px;right:2%;width:300px}
+  .node-disk{top:370px;left:2%;width:450px}
+  .node-network{top:520px;right:2%;width:360px}
+  .node-processes{top:540px;left:2%;width:340px}
+  .node-history{top:710px;right:10%;width:380px}
+  .node-diskio{top:720px;left:10%;width:360px}
+  .node-auth{top:880px;left:50%;margin-left:-260px;width:520px}
+
   .card{background:#fff;border:1px solid #e0d0ea;border-radius:14px;padding:20px 22px;
     box-shadow:0 2px 8px rgba(124,58,237,0.06),0 8px 28px rgba(124,58,237,0.08);position:relative}
   .card:hover{box-shadow:0 4px 16px rgba(124,58,237,0.1),0 12px 40px rgba(124,58,237,0.12);
@@ -38,6 +46,15 @@
   .card::after{content:'';position:absolute;top:14px;right:18px;width:10px;height:10px;
     border-radius:50%;background:linear-gradient(135deg,#7c3aed,#c084fc);opacity:0.3}
   .card-title{color:#7c3aed;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;margin-bottom:10px;font-weight:700}
+
+  .premium-card{border:2px solid transparent;background-clip:padding-box;
+    box-shadow:0 0 0 2px rgba(168,85,247,0.3),0 2px 8px rgba(124,58,237,0.06),0 8px 28px rgba(124,58,237,0.08)}
+  .premium-card:hover{box-shadow:0 0 0 3px rgba(168,85,247,0.5),0 4px 16px rgba(124,58,237,0.15),0 12px 40px rgba(124,58,237,0.12)}
+  .premium-card::before{content:'';position:absolute;top:-2px;left:-2px;right:-2px;bottom:-2px;
+    border-radius:16px;background:linear-gradient(135deg,#a855f7,#e879f9,#f0abfc,#c084fc,#7c3aed);
+    background-size:300% 300%;z-index:-1;animation:premGlow 3s ease infinite}
+  @keyframes premGlow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
   .metric{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:15px}
   .label{color:#9a7ab5;font-size:13px}
   .value{color:#2a1a3e;font-weight:600;font-size:16px}
@@ -52,8 +69,8 @@
   .big-text{font-size:36px;font-weight:700;text-align:center;padding:10px 0;
     background:linear-gradient(135deg,#7c3aed,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
   .footer{text-align:center;margin-top:12px;font-size:10px;color:#c8b0d8}
-  .premium-badge{display:inline-block;background:linear-gradient(135deg,#7c3aed,#c084fc);
-    color:#fff;font-size:9px;padding:2px 8px;border-radius:4px;margin-left:6px;font-weight:700}
+  .premium-badge{display:inline-block;background:linear-gradient(135deg,#a855f7,#e879f9);
+    color:#fff;font-size:9px;padding:2px 10px;border-radius:4px;margin-left:6px;font-weight:700;letter-spacing:0.3px}
   .premium-node{display:none}
   .auth-card{background:#fff;border:1px solid #e0d0ea;border-radius:14px;padding:18px 22px;box-shadow:0 2px 8px rgba(124,58,237,0.06)}
   .auth-card .title{color:#7c3aed;font-size:11px;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;font-weight:700}
@@ -67,12 +84,10 @@
   canvas{border-radius:8px;background:#f8f6fc;width:100%;height:70px;border:1px solid #f0e8f8}
   .pulse{animation:pulse 2s ease-in-out infinite}
   @keyframes pulse{0%{opacity:1}50%{opacity:0.4}100%{opacity:1}}
-  .connectors{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none}
-  .connectors path{stroke:#d0c0e0;stroke-width:1.5;fill:none;stroke-dasharray:3,3;opacity:0.5}
   @media(max-width:900px){
-    .node{position:static;transform:none!important;width:100%!important;margin-bottom:16px}
+    .node{position:static;margin-left:0!important;width:100%!important;margin-bottom:16px}
     .canvas-wrap{min-height:auto}
-    .connectors{display:none}
+    .bg-graph{display:none}
   }
 </style>
 </head>
@@ -83,16 +98,38 @@
 <div class="sub"><span id="distro">--</span> <span id="kernel">--</span> <span id="arch">--</span></div>
 
 <div class="canvas-wrap">
-<svg class="connectors" id="connectors">
-  <path d="M200,100 Q550,50 700,80"/>
-  <path d="M200,100 L180,280"/>
-  <path d="M700,80 L760,290"/>
-  <path d="M180,280 Q300,350 500,380"/>
-  <path d="M760,290 Q620,350 420,380"/>
-  <path d="M500,380 L220,530"/>
-  <path d="M420,380 L680,530"/>
-  <path d="M220,530 L420,700"/>
-  <path d="M680,530 L560,700"/>
+
+<!-- Background decorative graph -->
+<svg class="bg-graph" viewBox="0 0 1100 1050" preserveAspectRatio="xMidYMin slice">
+  <circle cx="550" cy="60" r="180" class="filled"/>
+  <circle cx="550" cy="60" r="250" class="filled"/>
+  <circle cx="550" cy="60" r="320"/>
+  <circle cx="150" cy="230" r="100" class="filled"/>
+  <circle cx="150" cy="230" r="160"/>
+  <circle cx="950" cy="230" r="80" class="filled"/>
+  <circle cx="950" cy="230" r="140"/>
+  <circle cx="150" cy="460" r="120" class="filled"/>
+  <circle cx="950" cy="460" r="90" class="filled"/>
+  <circle cx="150" cy="460" r="180"/>
+  <circle cx="950" cy="460" r="150"/>
+  <circle cx="200" cy="630" r="70" class="filled"/>
+  <circle cx="900" cy="630" r="80" class="filled"/>
+  <circle cx="550" cy="800" r="150" class="filled"/>
+  <circle cx="550" cy="800" r="220"/>
+  <line x1="550" y1="60" x2="150" y2="230"/>
+  <line x1="550" y1="60" x2="950" y2="230"/>
+  <line x1="150" y1="230" x2="150" y2="460"/>
+  <line x1="950" y1="230" x2="950" y2="460"/>
+  <line x1="150" y1="460" x2="200" y2="630"/>
+  <line x1="950" y1="460" x2="900" y2="630"/>
+  <line x1="200" y1="630" x2="550" y2="800"/>
+  <line x1="900" y1="630" x2="550" y2="800"/>
+  <line x1="150" y1="230" x2="950" y2="460"/>
+  <line x1="950" y1="230" x2="150" y2="460"/>
+  <line x1="550" y1="60" x2="550" y2="800"/>
+  <path d="M100,100 Q550,0 1000,100" />
+  <path d="M50,300 Q550,200 1050,300" />
+  <path d="M50,600 Q550,500 1050,600" />
 </svg>
 
 <div class="node node-cpu">
@@ -154,7 +191,7 @@
 </div>
 
 <div class="node node-history premium-node" id="historyNode">
-  <div class="card">
+  <div class="card premium-card">
     <div class="card-title">history <span class="premium-badge">PREMIUM</span></div>
     <canvas id="historyCanvas"></canvas>
     <div style="display:flex;justify-content:space-between;font-size:9px;color:#b8a0c8;margin-top:3px">
@@ -164,7 +201,7 @@
 </div>
 
 <div class="node node-diskio premium-node" id="diskIONode">
-  <div class="card">
+  <div class="card premium-card">
     <div class="card-title">disk i/o <span class="premium-badge">PREMIUM</span></div>
     <div id="diskIOContent"></div>
   </div>
@@ -180,7 +217,7 @@
         <input id="passwordInput" type="password" placeholder="password">
         <button id="loginBtn" onclick="amenokeLogin()">Sign In</button>
       </div>
-      <div class="hint"><a href="https://amenoke.ru" target="_blank">amenoke.ru</a> — register</div>
+      <div class="hint"><a href="https://amenoke.ru" target="_blank">amenoke.ru</a> register</div>
       <div id="loginError" class="error"></div>
     </div>
     <div id="loggedInInfo" style="display:none;font-size:13px;margin-bottom:8px">
