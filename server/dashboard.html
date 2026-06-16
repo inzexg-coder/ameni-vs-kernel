@@ -188,6 +188,35 @@
   body.dark .proc-row .mem{color:#c084fc}
   body.dark .net-row .iface{color:#a78bfa}
   body.dark .footer{color:#5a3a6a}
+
+  body.dark .premium-card{border-color:rgba(167,139,250,0.3)}
+  body.dark .premium-card .card{box-shadow:0 3px 16px rgba(168,85,247,0.08)}
+  body.dark .premium-badge{background:linear-gradient(135deg,#7c3aed,#a78bfa)}
+  body.dark .prem-label{color:#a78bfa}
+  body.dark .prem-label::before{background:linear-gradient(90deg,transparent,#a78bfa)}
+  body.dark .prem-label::after{background:linear-gradient(90deg,#a78bfa,transparent)}
+  body.dark #historyCanvas{background:#0d0d18}
+  body.dark .canvas-label{color:#5a3a7a}
+  body.dark .auth-card{background:#12121e;border-color:#1e1a2e}
+  body.dark .auth-card .title{color:#a78bfa}
+  body.dark .auth-card input{background:#1a1a2e;border-color:#2e1a4e;color:#e0d8f0}
+  body.dark .auth-card input:focus{border-color:#a78bfa;box-shadow:0 0 0 3px rgba(167,139,250,0.15)}
+  body.dark .auth-card input::placeholder{color:#5a3a6a}
+  body.dark .auth-card button{background:linear-gradient(135deg,#6d28d9,#a78bfa)}
+  body.dark .auth-card .hint{color:#5a3a6a}
+  body.dark .auth-card .hint a{color:#7a5a9a}
+  body.dark .auth-card .error{color:#f87171}
+  body.dark #offlineSection{border-top-color:#1a1a2e}
+  body.dark #offlineSection input{background:#1a1a2e;border-color:#2e1a4e;color:#e0d8f0}
+  body.dark .auth-card #loggedInInfo button{border-color:#2e1a4e;color:#7a5a9a}
+  body.dark .auth-card #loggedInInfo button:hover{background:#1a1a2e}
+  body.dark .auth-card #premiumResult{color:#7a5a9a}
+  body.dark .auth-card #loggedInUsername{color:#a78bfa!important}
+  body.dark #diskIOContent span[style*="7a4a8a"]{color:#6b5a8a!important}
+  body.dark #diskIOContent span[style*="c084fc"]{color:#c084fc!important}
+  body.dark .disk-row span[style*="7a4a8a"]{color:#6b5a8a!important}
+  body.dark #batteryContent span[style*="9a7ab5"]{color:#7a5a9a!important}
+
   body.dark .theme-toggle{background:rgba(18,18,30,0.9);border-color:#2e1a4e;color:#a78bfa}
 
 </style>
@@ -372,6 +401,13 @@
 })();
 
 function barColor(p){
+  var dk=document.body.classList.contains('dark');
+  if(dk){
+    if(p<50) return '#2dd4bf';
+    if(p<70) return '#38bdf8';
+    if(p<85) return '#818cf8';
+    return '#a78bfa';
+  }
   if(p<50) return '#34d399';
   if(p<70) return '#fbbf24';
   if(p<85) return '#fb923c';
@@ -455,7 +491,7 @@ function update(){
     document.getElementById('cpuUsage').textContent=(c.usage||0)+'%';
     document.getElementById('cpuUsage').style.color=barColor(c.usage||0);
     document.getElementById('cpuBar').style.width=(c.usage||0)+'%';
-    document.getElementById('cpuBar').style.background='linear-gradient(90deg,'+barColor(c.usage||0)+',#34d399)';
+    document.getElementById('cpuBar').style.background='linear-gradient(90deg,'+barColor(c.usage||0)+','+barColor(c.usage||0)+'aa)';
     document.getElementById('cpuLoad').textContent=(c.load_avg||[0,0,0]).join('  ');
     document.getElementById('cpuCores').textContent=(c.cores||0)+' cores';
     var f=(c.freq||[]).slice(0,4).map(function(f){return Math.round(f)+'MHz'}).join(' ');
@@ -467,18 +503,18 @@ function update(){
     document.getElementById('memUsed').textContent=(m.used_pct||0)+'%';
     document.getElementById('memUsed').style.color=barColor(m.used_pct||0);
     document.getElementById('memBar').style.width=(m.used_pct||0)+'%';
-    document.getElementById('memBar').style.background='linear-gradient(90deg,'+barColor(m.used_pct||0)+',#34d399)';
+    document.getElementById('memBar').style.background='linear-gradient(90deg,'+barColor(m.used_pct||0)+','+barColor(m.used_pct||0)+'aa)';
     document.getElementById('memAvail').textContent=(m.avail_gb||0).toFixed(1)+' / '+(m.total_gb||0).toFixed(1)+' GB';
     document.getElementById('memSwap').textContent=(m.swap_used_pct||0)+'%';
     document.getElementById('memSwap').style.color=barColor(m.swap_used_pct||0);
     document.getElementById('swapBar').style.width=(m.swap_used_pct||0)+'%';
-    document.getElementById('swapBar').style.background='linear-gradient(90deg,'+barColor(m.swap_used_pct||0)+',#34d399)';
+    document.getElementById('swapBar').style.background='linear-gradient(90deg,'+barColor(m.swap_used_pct||0)+','+barColor(m.swap_used_pct||0)+'aa)';
 
     var ds=d.disk||[];var dh='';
     ds.forEach(function(dd){
       var bc=barColor(dd.used_pct||0);
       dh+='<div class="disk-row"><span class="mount">'+dd.mount+'</span>'+
-        '<span style="flex:1;margin:0 10px"><div class="bar-wrap" style="height:6px"><div class="bar-fill" style="width:'+dd.used_pct+'%;background:linear-gradient(90deg,'+bc+',#34d399)"></div></div></span>'+
+        '<span style="flex:1;margin:0 10px"><div class="bar-wrap" style="height:6px"><div class="bar-fill" style="width:'+dd.used_pct+'%;background:linear-gradient(90deg,'+bc+','+bc+'aa)"></div></div></span>'+
         '<span class="pct" style="color:'+barColor(dd.used_pct||0)+'">'+dd.used_pct+'%</span>'+
         '<span style="color:#7a4a8a;font-size:11px;min-width:60px;text-align:right">'+(dd.used_gb||0).toFixed(1)+'/'+(dd.total_gb||0).toFixed(1)+'G</span></div>';});
     document.getElementById('diskContent').innerHTML=dh||'<div style="color:#9a7ab5;font-size:12px">No disk data</div>';
