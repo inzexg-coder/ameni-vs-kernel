@@ -26,8 +26,7 @@
   }
 
   .slide-track{
-    display:flex;
-    width:100%;height:100%;
+    display:flex;width:100%;height:100%;
     transition:transform 0.7s cubic-bezier(0.4,0,0.2,1);
   }
 
@@ -37,118 +36,92 @@
     display:flex;align-items:center;justify-content:center;
   }
 
-  /* Banner background - visible ASCII art */
   .slide-bg{
     position:absolute;top:0;left:0;width:100%;height:100%;
     z-index:0;
-    display:flex;align-items:center;justify-content:center;
+    background-size:cover;background-position:center;
+    background-repeat:no-repeat;
   }
 
-  .ascii-bg{
-    font-family:'Courier New',monospace;
-    font-size:14px;line-height:1.15;
-    text-align:center;white-space:pre;
-    color:rgba(109,74,141,0.25);
-    user-select:none;pointer-events:none;
-    transform:scale(1.8);
-    opacity:0.6;
-  }
-
-  .slide-tg .ascii-bg{color:rgba(168,85,247,0.2);}
-  .slide-mon .ascii-bg{color:rgba(109,74,141,0.3);}
-
-  /* Gradient overlays */
   .slide-overlay{
     position:absolute;top:0;left:0;width:100%;height:100%;
     z-index:1;
-    background:
-      radial-gradient(ellipse at 50% 40%,rgba(8,6,14,0.3) 0%,rgba(8,6,14,0.7) 60%,rgba(8,6,14,0.9) 100%);
+    background:linear-gradient(180deg,rgba(8,6,14,0.6) 0%,rgba(8,6,14,0.4) 40%,rgba(8,6,14,0.7) 100%);
     pointer-events:none;
   }
 
-  .slide-tg .slide-overlay{
-    background:
-      radial-gradient(ellipse at 50% 30%,rgba(124,58,237,0.08) 0%,rgba(8,6,14,0.5) 50%,rgba(8,6,14,0.92) 100%);
-  }
+  .slide-tg .slide-bg{background-image:url('/banner-tgparser.jpg');}
+  .slide-mon .slide-bg{background-image:url('/banner-monitor-dark.png');}
 
-  .slide-mon .slide-overlay{
-    background:
-      radial-gradient(ellipse at 50% 30%,rgba(56,189,248,0.05) 0%,rgba(8,6,14,0.5) 50%,rgba(8,6,14,0.92) 100%);
-  }
-
-  /* Content */
   .slide-content{
     position:relative;z-index:2;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
-    width:100%;height:100%;
-    padding:40px 20px;
+    width:100%;height:100%;padding:40px 20px;
     text-align:center;
   }
 
   .brand-main{
-    font-size:64px;font-weight:900;letter-spacing:8px;
+    font-size:72px;font-weight:900;letter-spacing:10px;
     text-transform:uppercase;
     background:linear-gradient(135deg,#a78bfa,#c084fc,#e9d5ff);
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;
     background-clip:text;
-    filter:drop-shadow(0 0 60px rgba(124,58,237,0.4));
-    line-height:1.1;margin-bottom:4px;
+    filter:drop-shadow(0 0 80px rgba(124,58,237,0.5));
+    line-height:1.1;margin-bottom:2px;
   }
 
   .brand-sub{
-    font-size:13px;color:#5a3a7a;letter-spacing:6px;font-weight:300;
-    text-transform:uppercase;margin-bottom:24px;
+    font-size:12px;color:#5a3a7a;letter-spacing:8px;font-weight:300;
+    text-transform:uppercase;margin-bottom:28px;
   }
 
   .tool-card{
     display:inline-flex;flex-direction:column;align-items:center;
-    padding:28px 36px;
-    background:rgba(14,10,26,0.5);
-    border:1px solid rgba(42,30,66,0.4);
+    padding:28px 38px;
+    background:rgba(14,10,26,0.55);
+    border:1px solid rgba(42,30,66,0.35);
     border-radius:16px;
-    backdrop-filter:blur(12px);
-    -webkit-backdrop-filter:blur(12px);
-    min-width:340px;
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    min-width:360px;
+    box-shadow:0 8px 40px rgba(0,0,0,0.3);
   }
 
   .tool-icon{
     width:52px;height:52px;border-radius:14px;
     display:inline-flex;align-items:center;justify-content:center;
-    font-size:22px;color:#fff;margin-bottom:10px;
-    box-shadow:0 4px 24px rgba(124,58,237,0.2);
+    font-size:22px;color:#fff;margin-bottom:8px;
+    box-shadow:0 4px 24px rgba(124,58,237,0.25);
   }
   .slide-tg .tool-icon{background:linear-gradient(135deg,#7c3aed,#f472b6)}
   .slide-mon .tool-icon{background:linear-gradient(135deg,#7c3aed,#38bdf8)}
 
   .tool-name{
-    font-size:22px;font-weight:700;color:#e0d8f0;letter-spacing:1px;
-    margin-bottom:3px;
+    font-size:22px;font-weight:700;color:#e8e0f0;letter-spacing:1px;
+    margin-bottom:2px;
   }
 
   .tool-desc{
-    font-size:12px;color:#6d4a8d;letter-spacing:1px;
-    margin-bottom:14px;
+    font-size:12px;color:#6d4a8d;letter-spacing:1px;margin-bottom:14px;
   }
   .tool-desc span{color:#a78bfa;font-weight:600;}
 
   .metrics-row{
-    display:flex;gap:12px;margin-bottom:18px;
+    display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;justify-content:center;
   }
 
   .metric{
-    padding:6px 14px;
-    background:rgba(8,6,14,0.4);
+    padding:7px 16px;
+    background:rgba(8,6,14,0.45);
     border:1px solid rgba(42,30,66,0.3);
-    border-radius:8px;
-    text-align:center;min-width:72px;
+    border-radius:8px;text-align:center;min-width:78px;
   }
 
   .metric .val{
-    font-size:17px;font-weight:700;
+    font-size:18px;font-weight:700;
     background:linear-gradient(135deg,#6d28d9,#a855f7);
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-    background-clip:text;
-    line-height:1.2;
+    background-clip:text;line-height:1.2;
   }
 
   .metric .lbl{
@@ -172,7 +145,7 @@
   .cta-p,.cta-s{
     padding:10px 24px;border-radius:10px;
     font-size:13px;font-weight:600;text-decoration:none;
-    transition:opacity 0.2s,transform 0.15s;
+    transition:all 0.2s;
     display:inline-flex;align-items:center;gap:6px;
   }
 
@@ -183,13 +156,12 @@
   .cta-p:hover{opacity:0.9;transform:translateY(-1px);}
 
   .cta-s{
-    background:rgba(8,6,14,0.4);
+    background:rgba(8,6,14,0.45);
     border:1px solid rgba(42,30,66,0.3);
     color:#a78bfa;
   }
   .cta-s:hover{background:rgba(124,58,237,0.1);border-color:#7c3aed;}
 
-  /* Navigation */
   .nav-arrow{
     position:fixed;top:50%;transform:translateY(-50%);
     width:48px;height:48px;border-radius:50%;
@@ -221,13 +193,13 @@
   .dot:hover{background:rgba(168,85,247,0.5);}
 
   @media(max-width:768px){
-    .brand-main{font-size:40px;letter-spacing:4px}
-    .tool-card{padding:20px 24px;min-width:auto;width:90%}
-    .metrics-row{flex-wrap:wrap;justify-content:center}
+    .brand-main{font-size:42px;letter-spacing:4px}
+    .tool-card{padding:20px 22px;min-width:auto;width:92%}
+    .metric{min-width:65px;padding:5px 10px}
+    .metric .val{font-size:15px}
     .nav-arrow{width:38px;height:38px;font-size:14px}
     .nav-prev{left:8px}
     .nav-next{right:8px}
-    .ascii-bg{font-size:8px;transform:scale(1.2)}
   }
 </style>
 </head>
@@ -238,19 +210,7 @@
 
     <!-- TG Parser -->
     <div class="slide slide-tg">
-      <div class="slide-bg">
-        <div class="ascii-bg">
-╔══════════════════════════════════════╗
-║  ╔═══╗  ╔═══╗  ╔═════╗  ╔════╗  ╔══╗ ║
-║  ║ 1 ║  ║ 2 ║  ║  3  ║  ║  4 ║  ║P ║ ║
-║  ╚═╤═╝  ╚═╤═╝  ╚═╤═══╝  ╚═╤══╝  ╚═╝ ║
-║    │      │      │        │         ║
-║  ╔═╧══╗ ╔═╧══╗ ╔═╧════╗ ╔═╧═══╗    ║
-║  ║ MSG║ ║ ACT║ ║ GROW║ ║ PDF ║    ║
-║  ╚════╝ ╚════╝ ╚══════╝ ╚═════╝    ║
-╚══════════════════════════════════════╝
-        </div>
-      </div>
+      <div class="slide-bg"></div>
       <div class="slide-overlay"></div>
       <div class="slide-content">
         <div class="brand-main">amenoke</div>
@@ -275,31 +235,7 @@
 
     <!-- Ameni Monitor -->
     <div class="slide slide-mon">
-      <div class="slide-bg">
-        <div class="ascii-bg">
-  ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢲⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-  ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-  ⠀⠀⢀⠄⠂⢉⠤⠐⠋⠈⠡⡈⠉⠐⠠⡀⠀⠀⠀⠀⠀
-  ⠀⢀⡀⢠⣤⠔⠁⢀⠀⠀⠀⠈⢢⠀⠈⠱⡤⣤⠄⣀⠀
-  ⠀⠰⠁⣰⣿⠃⢠⠃⢸⠀⠀⠀⠀⠁⠀⠀⠈⢞⣦⡀⠈⡇
-  ⠀⢇⣠⡿⠁⢀⡃⣈⠀⠀⢰⡀⠀⠀⢢⠰⠀⢺⣧⢰⠀
-  ⠀⠈⣿⠁⡘⡌⡇⡿⠸⠀⠈⡕⡄⠐⡀⠈⠀⢃⠀⠾⠇
-  ⠀⠀⠇⡇⠃⢠⠶⡀⡇⢃⠡⡀⠀⠡⠈⢂⡀⢁⡁⠸⡆⠘⡀
-  ⠀⠸⢸⠘⡜⣑⢴⣀⠑⠯⡂⠄⣀⣣⢀⣈⢺⡜⢣⡆⡇⢣
-  ⠀⠇⢸⡗⣰⡿⡻⠿⡳⡅⠀⠀⠈⡵⠿⠿⡻⣷⡡⡇⡇⢸⣇
-  ⠀⢰⡆⡄⣧⡏⠸⢠⢲⢸⠁⠀⠐⢙⢰⠂⢡⠘⣇⡇⠃⢹⡄
-  ⠀⠟⢰⢁⡇⠇⠰⣀⢁⡜⠀⠀⠀⠘⣀⣁⠌⠃⠰⠁⠈⠰
-  ⡘⠀⠀⢊⣤⠤⠄⠀⠀⠀⠀⠀⠀⠤⠄⢸⠃⠀⠀⠃
-  ⢠⠁⢀⠈⢿⡀⠀⠀⢀⡀⠀⠀⢀⠏⠀⠀⠀⠸
-  ⠘⠸⠘⡀⠀⢣⠀⠀⠁⠃⠀⢀⠎⠀⠀⢠⡇
-  ⠀⠇⢆⢃⠀⠀⡏⢲⢤⢀⡀⢀⣠⠄⡚⠀⣾
-  ⢰⠈⢌⢎⢆⠀⠁⣌⠆⡰⡁⠉⡱⡘⡼⠇⢀⢬⠃⢠⡆
-  ⠀⢢⠑⢵⣧⡀⡿⠳⠂⠀⠀⠁⢺⡀⢀⢠⣮⠃⢀⠆⡰
-  ⠀⠑⠄⣀⠙⡭⠢⢀⡀⠁⠄⣀⣀⣀⡠⠂⢃⡀⠔⠱⡞⢁⠄⣁⠔⠁
-  ⠀⠀⠀⢠⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠉⠁
-  ⠀⠀⠀⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇
-        </div>
-      </div>
+      <div class="slide-bg"></div>
       <div class="slide-overlay"></div>
       <div class="slide-content">
         <div class="brand-main">amenoke</div>
