@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" id="fa-main">
 <script>document.getElementById('fa-main').onerror=function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css';document.head.appendChild(l);}</script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
   *{margin:0;padding:0;box-sizing:border-box}
   ::-webkit-scrollbar{width:3px}
   ::-webkit-scrollbar-track{background:transparent}
@@ -35,143 +35,121 @@
     position:relative;overflow:hidden;
   }
 
+  .slide-bg{
+    position:absolute;top:0;left:0;width:100%;height:100%;
+    z-index:0;
+    background-size:cover;background-position:center;
+    background-repeat:no-repeat;
+  }
+
+  .slide-tg .slide-bg{background-image:url('/banner-tgparser.jpg?v=2');}
+  .slide-mon .slide-bg{background-image:url('/banner-monitor.jpg?v=2');}
+
+  .slide-overlay{
+    position:absolute;top:0;left:0;width:100%;height:100%;
+    z-index:1;
+    pointer-events:none;
+  }
+
+  .slide-tg .slide-overlay{
+    background:linear-gradient(180deg,rgba(8,6,14,0.6) 0%,rgba(8,6,14,0.35) 40%,rgba(8,6,14,0.7) 100%);
+  }
+
+  .slide-mon .slide-overlay{
+    background:linear-gradient(180deg,rgba(8,6,14,0.3) 0%,rgba(8,6,14,0.1) 40%,rgba(8,6,14,0.4) 100%);
+  }
+
   .slide-content{
     position:relative;z-index:2;
-    width:100%;height:100%;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
-    padding:40px 60px;
+    width:100%;height:100%;padding:40px 20px;
     text-align:center;
   }
 
   .brand-main{
-    font-size:72px;font-weight:900;letter-spacing:10px;
+    font-size:76px;font-weight:900;letter-spacing:10px;
     text-transform:uppercase;
     background:linear-gradient(135deg,#a78bfa,#c084fc,#e9d5ff);
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;
     background-clip:text;
-    filter:drop-shadow(0 0 80px rgba(124,58,237,0.4));
+    filter:drop-shadow(0 0 80px rgba(124,58,237,0.5));
     line-height:1.1;margin-bottom:2px;
   }
+
   .brand-sub{
-    font-size:12px;color:#5a3a7a;letter-spacing:6px;font-weight:300;
-    text-transform:uppercase;margin-bottom:24px;
+    font-size:13px;color:#5a3a7a;letter-spacing:8px;font-weight:300;
+    text-transform:uppercase;margin-bottom:32px;
   }
 
-  .tg-card{
-    display:inline-flex;flex-direction:column;align-items:center;
-    padding:26px 34px;
-    background:rgba(14,10,26,0.5);
-    border:1px solid rgba(42,30,66,0.35);
-    border-radius:16px;
-    backdrop-filter:blur(12px);
-    min-width:320px;
-  }
-  .tg-icon{font-size:32px;color:#a78bfa;margin-bottom:8px;}
-  .tg-name{font-size:22px;font-weight:700;color:#e8e0f0;margin-bottom:2px;}
-  .tg-desc{font-size:12px;color:#7a5a9a;margin-bottom:12px;}
-  .tg-desc span{color:#a78bfa;font-weight:600;}
-  .tg-metrics{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;justify-content:center;}
-  .tg-metric{padding:8px 18px;background:rgba(8,6,14,0.4);border:1px solid rgba(42,30,66,0.3);border-radius:8px;text-align:center;min-width:80px;}
-  .tg-metric .v{font-size:17px;font-weight:700;background:linear-gradient(135deg,#6d28d9,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-  .tg-metric .l{font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:#5a3a7a;margin-top:1px;}
-  .tg-premium{border:1.5px solid;border-image:linear-gradient(135deg,#7c3aed,#c084fc) 1;}
-  .tg-premium .v{background:linear-gradient(135deg,#a78bfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-  .tg-cta{display:flex;gap:10px;}
-  .tg-btn{padding:10px 24px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#7c3aed,#c084fc);color:#fff;}
-  .tg-btn:hover{opacity:0.9;transform:translateY(-1px);}
-  .tg-gh{padding:10px 24px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;background:rgba(8,6,14,0.4);border:1px solid rgba(42,30,66,0.3);color:#a78bfa;}
-  .tg-gh:hover{background:rgba(124,58,237,0.1);border-color:#7c3aed;}
-
-  .slide-mon{
-    background:#0d0d18;
+  .tool-name{
+    font-size:28px;font-weight:700;color:#e8e0f0;letter-spacing:1px;
+    margin-bottom:4px;text-shadow:0 2px 20px rgba(0,0,0,0.5);
   }
 
-  .mon-dash{
-    width:100%;max-width:1100px;
-    display:flex;flex-direction:column;
-    gap:14px;
-    padding:20px 0;
+  .tool-desc{
+    font-size:14px;color:#9a7ab5;letter-spacing:1px;margin-bottom:18px;
+    text-shadow:0 2px 12px rgba(0,0,0,0.4);
+  }
+  .tool-desc span{color:#c084fc;font-weight:600;}
+
+  .metrics-row{
+    display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;justify-content:center;
   }
 
-  .mon-top{
-    display:flex;justify-content:space-between;align-items:center;
-    margin-bottom:4px;
-  }
-  .mon-brand{
-    font-size:20px;font-weight:700;color:#a78bfa;letter-spacing:2px;
-    text-transform:uppercase;
-  }
-  .mon-brand span{color:#c084fc;}
-  .mon-premium-pill{
-    display:flex;align-items:center;gap:6px;
-    background:rgba(26,22,40,0.8);border:1px solid #2a1e42;
-    border-radius:16px;padding:5px 12px;
-    font-size:11px;color:#a78bfa;font-weight:600;
-  }
-  .mon-premium-pill i{color:#c084fc;font-size:9px;}
-
-  .mon-grid{
-    display:grid;grid-template-columns:1fr 1fr 1fr 1fr;
-    gap:10px;
+  .metric{
+    padding:10px 22px;
+    background:rgba(8,6,14,0.5);
+    border:1px solid rgba(42,30,66,0.3);
+    border-radius:10px;text-align:center;min-width:90px;
+    backdrop-filter:blur(6px);
   }
 
-  .mon-card{
-    background:rgba(18,14,26,0.7);
-    border:1px solid rgba(30,24,48,0.6);
-    border-radius:10px;
-    padding:14px 16px;
-    text-align:left;
-  }
-
-  .mon-card-title{
-    font-size:10px;text-transform:uppercase;
-    letter-spacing:2px;color:#6d4a8d;font-weight:700;
-    margin-bottom:6px;
-  }
-  .mon-card-title i{color:#7c3aed;margin-right:5px;font-size:9px;}
-
-  .mon-val{
+  .metric .val{
     font-size:20px;font-weight:700;
     background:linear-gradient(135deg,#6d28d9,#a855f7);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-clip:text;line-height:1.2;
+  }
+
+  .metric .lbl{
+    font-size:9px;text-transform:uppercase;letter-spacing:1.5px;
+    color:#6d4a8d;margin-top:2px;
+  }
+
+  .metric-premium{
+    border:1.5px solid;border-image:linear-gradient(135deg,#7c3aed,#c084fc) 1;
+  }
+  .metric-premium .val{
+    background:linear-gradient(135deg,#a78bfa,#c084fc);
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;
     background-clip:text;
   }
 
-  .mon-bar{
-    height:5px;background:#1a1630;border-radius:3px;
-    margin:4px 0;overflow:hidden;
-  }
-  .mon-bar-fill{
-    height:100%;border-radius:3px;
-    background:linear-gradient(90deg,#7c3aed,#a855f7);
+  .cta-row{
+    display:flex;gap:12px;
   }
 
-  .mon-sub{
-    font-size:10px;color:#5a3a7a;
-    display:flex;justify-content:space-between;
+  .cta-p,.cta-s{
+    padding:12px 30px;border-radius:10px;
+    font-size:14px;font-weight:600;text-decoration:none;
+    transition:all 0.2s;
+    display:inline-flex;align-items:center;gap:8px;
   }
 
-  .mon-card-lg{
-    grid-column:span 2;
+  .cta-p{
+    background:linear-gradient(135deg,#7c3aed,#c084fc);
+    color:#fff;
+    box-shadow:0 4px 20px rgba(124,58,237,0.3);
   }
+  .cta-p:hover{opacity:0.9;transform:translateY(-2px);}
 
-  .mon-row{
-    display:flex;justify-content:space-between;
-    padding:3px 0;font-size:11px;
+  .cta-s{
+    background:rgba(8,6,14,0.5);
+    border:1px solid rgba(42,30,66,0.3);
+    color:#a78bfa;
+    backdrop-filter:blur(6px);
   }
-  .mon-row .key{color:#6d4a8d;min-width:60px;}
-  .mon-row .val{color:#a78bfa;font-weight:500;}
-
-  .mon-premium-border{
-    border:1.5px solid;border-image:linear-gradient(135deg,#7c3aed,#c084fc) 1;
-  }
-
-  .mon-premium-text{
-    display:inline-block;background:linear-gradient(135deg,#6d28d9,#a78bfa);
-    color:#e0d8f0;font-size:8px;padding:1px 6px;
-    border-radius:3px;margin-left:4px;font-weight:700;letter-spacing:0.5px;
-    vertical-align:middle;
-  }
+  .cta-s:hover{background:rgba(124,58,237,0.15);border-color:#7c3aed;}
 
   .nav-arrow{
     position:fixed;top:50%;transform:translateY(-50%);
@@ -204,13 +182,14 @@
   .dot:hover{background:rgba(168,85,247,0.5);}
 
   @media(max-width:768px){
-    .slide-content{padding:20px 16px}
-    .brand-main{font-size:36px;letter-spacing:4px}
-    .mon-grid{grid-template-columns:1fr 1fr}
-    .mon-card-lg{grid-column:span 2}
+    .brand-main{font-size:40px;letter-spacing:4px}
+    .tool-name{font-size:22px}
+    .metric{padding:8px 14px;min-width:70px}
+    .metric .val{font-size:16px}
     .nav-arrow{width:38px;height:38px;font-size:14px}
     .nav-prev{left:8px}
     .nav-next{right:8px}
+    .cta-p,.cta-s{padding:10px 20px;font-size:13px}
   }
 </style>
 </head>
@@ -219,116 +198,44 @@
 <div class="carousel">
   <div class="slide-track" id="slideTrack">
 
-    <!-- TG Parser -->
-    <div class="slide" style="background:#08060e">
+    <div class="slide slide-tg">
+      <div class="slide-bg"></div>
+      <div class="slide-overlay"></div>
       <div class="slide-content">
         <div class="brand-main">amenoke</div>
         <div class="brand-sub">instruments</div>
-        <div class="tg-card">
-          <div class="tg-icon"><i class="fab fa-telegram-plane"></i></div>
-          <div class="tg-name">TG Parser</div>
-          <div class="tg-desc"><span>telegram</span> chat analyzer &middot; <span>pdf</span> export &middot; <span>premium</span></div>
-          <div class="tg-metrics">
-            <div class="tg-metric"><div class="v">search</div><div class="l">realtime</div></div>
-            <div class="tg-metric"><div class="v">heatmap</div><div class="l">activity</div></div>
-            <div class="tg-metric"><div class="v">growth</div><div class="l">daily</div></div>
-            <div class="tg-metric tg-premium"><div class="v">PDF</div><div class="l">premium</div></div>
-          </div>
-          <div class="tg-cta">
-            <a class="tg-btn" href="https://amenoke.ru/tg-parser" target="_blank"><i class="fab fa-telegram-plane"></i> Try TG Parser</a>
-            <a class="tg-gh" href="https://github.com/inzexg-coder" target="_blank"><i class="fab fa-github"></i> GitHub</a>
-          </div>
+        <div class="tool-name">TG Parser</div>
+        <div class="tool-desc"><span>telegram</span> chat analyzer &middot; <span>pdf</span> export &middot; <span>premium</span></div>
+        <div class="metrics-row">
+          <div class="metric"><div class="val">search</div><div class="lbl">realtime</div></div>
+          <div class="metric"><div class="val">heatmap</div><div class="lbl">activity</div></div>
+          <div class="metric"><div class="val">growth</div><div class="lbl">daily</div></div>
+          <div class="metric metric-premium"><div class="val">PDF</div><div class="lbl">premium</div></div>
+        </div>
+        <div class="cta-row">
+          <a class="cta-p" href="https://amenoke.ru/tg-parser" target="_blank"><i class="fab fa-telegram-plane"></i> Try TG Parser</a>
+          <a class="cta-s" href="https://github.com/inzexg-coder" target="_blank"><i class="fab fa-github"></i> GitHub</a>
         </div>
       </div>
     </div>
 
-    <!-- Ameni Monitor - full dashboard UI -->
     <div class="slide slide-mon">
-      <div class="slide-content" style="padding:30px 40px;justify-content:flex-start;overflow-y:auto">
-        <div class="mon-dash">
-          <div class="mon-top">
-            <div class="mon-brand">ameno<span>ke</span> monitor</div>
-            <div class="mon-premium-pill"><i class="fas fa-crown"></i> live demo</div>
-          </div>
-
-          <div class="mon-grid">
-            <div class="mon-card">
-              <div class="mon-card-title"><i class="fas fa-microchip"></i> cpu</div>
-              <div class="mon-val">34%</div>
-              <div class="mon-bar"><div class="mon-bar-fill" style="width:34%"></div></div>
-              <div class="mon-sub"><span>load 1.2 0.8 0.5</span><span>48 C</span></div>
-            </div>
-
-            <div class="mon-card">
-              <div class="mon-card-title"><i class="fas fa-memory"></i> memory</div>
-              <div class="mon-val">7.8 GB</div>
-              <div class="mon-bar"><div class="mon-bar-fill" style="width:62%"></div></div>
-              <div class="mon-sub"><span>used 62%</span><span>12.6 GB total</span></div>
-            </div>
-
-            <div class="mon-card">
-              <div class="mon-card-title"><i class="fas fa-hard-drive"></i> disk</div>
-              <div class="mon-val">84.2 GB</div>
-              <div class="mon-bar"><div class="mon-bar-fill" style="width:38%"></div></div>
-              <div class="mon-sub"><span>used 38%</span><span>222.9 GB</span></div>
-            </div>
-
-            <div class="mon-card">
-              <div class="mon-card-title"><i class="fas fa-clock"></i> uptime</div>
-              <div class="mon-val">1d 5h 32m</div>
-              <div class="mon-bar"><div class="mon-bar-fill" style="width:45%"></div></div>
-              <div class="mon-sub"><span>since 15 Jun</span><span>online</span></div>
-            </div>
-
-            <div class="mon-card">
-              <div class="mon-card-title"><i class="fas fa-network-wired"></i> network</div>
-              <div class="mon-row"><span class="key">eth0</span><span class="val">1.2 MB/s</span></div>
-              <div class="mon-row"><span class="key">wlan0</span><span class="val">342 KB/s</span></div>
-              <div class="mon-row"><span class="key">lo</span><span class="val">12 KB/s</span></div>
-            </div>
-
-            <div class="mon-card">
-              <div class="mon-card-title"><i class="fas fa-bolt"></i> battery</div>
-              <div class="mon-val">67%</div>
-              <div class="mon-bar"><div class="mon-bar-fill" style="width:67%"></div></div>
-              <div class="mon-sub"><span>charging</span><span>2h until full</span></div>
-            </div>
-
-            <div class="mon-card mon-card-lg">
-              <div class="mon-card-title"><i class="fas fa-chart-line"></i> history <span class="mon-premium-text">PREMIUM</span></div>
-              <div style="display:flex;gap:4px;height:50px;align-items:flex-end;padding:4px 0">
-                <div style="flex:1;background:linear-gradient(to top,#7c3aed,#c084fc);height:65%;border-radius:2px"></div>
-                <div style="flex:1;background:linear-gradient(to top,#7c3aed,#c084fc);height:45%;border-radius:2px"></div>
-                <div style="flex:1;background:linear-gradient(to top,#7c3aed,#c084fc);height:80%;border-radius:2px"></div>
-                <div style="flex:1;background:linear-gradient(to top,#7c3aed,#c084fc);height:55%;border-radius:2px"></div>
-                <div style="flex:1;background:linear-gradient(to top,#7c3aed,#c084fc);height:90%;border-radius:2px"></div>
-                <div style="flex:1;background:linear-gradient(to top,#7c3aed,#c084fc);height:70%;border-radius:2px"></div>
-                <div style="flex:1;background:linear-gradient(to top,#7c3aed,#c084fc);height:35%;border-radius:2px"></div>
-                <div style="flex:1;background:linear-gradient(to top,#7c3aed,#c084fc);height:60%;border-radius:2px"></div>
-                <div style="flex:1;background:linear-gradient(to top,#7c3aed,#c084fc);height:75%;border-radius:2px"></div>
-                <div style="flex:1;background:linear-gradient(to top,#7c3aed,#c084fc);height:50%;border-radius:2px"></div>
-                <div style="flex:1;background:linear-gradient(to top,#7c3aed,#c084fc);height:85%;border-radius:2px"></div>
-                <div style="flex:1;background:linear-gradient(to top,#7c3aed,#c084fc);height:40%;border-radius:2px"></div>
-              </div>
-              <div class="mon-sub"><span>last 2 min</span><span>update 2s</span></div>
-            </div>
-
-            <div class="mon-card">
-              <div class="mon-card-title"><i class="fas fa-tasks"></i> processes</div>
-              <div class="mon-row"><span class="key">1  python</span><span class="val">142M</span></div>
-              <div class="mon-row"><span class="key">2  node</span><span class="val">98M</span></div>
-              <div class="mon-row"><span class="key">3  nginx</span><span class="val">24M</span></div>
-              <div class="mon-row"><span class="key">4  mysqld</span><span class="val">186M</span></div>
-              <div class="mon-row"><span class="key">5  sshd</span><span class="val">8M</span></div>
-            </div>
-
-            <div class="mon-card mon-premium-border">
-              <div class="mon-card-title"><i class="fas fa-database"></i> disk i/o <span class="mon-premium-text">PREMIUM</span></div>
-              <div class="mon-row"><span class="key">sda</span><span class="val">2.1 MB/s</span></div>
-              <div class="mon-row"><span class="key">nvme0</span><span class="val">856 KB/s</span></div>
-              <div class="mon-row"><span class="key">mmcblk0</span><span class="val">124 KB/s</span></div>
-            </div>
-          </div>
+      <div class="slide-bg"></div>
+      <div class="slide-overlay"></div>
+      <div class="slide-content">
+        <div class="brand-main">amenoke</div>
+        <div class="brand-sub">instruments</div>
+        <div class="tool-name">Ameni Monitor</div>
+        <div class="tool-desc"><span>real-time</span> system dashboard &middot; zero <span>config</span> &middot; one <span>click</span></div>
+        <div class="metrics-row">
+          <div class="metric"><div class="val">34%</div><div class="lbl">cpu</div></div>
+          <div class="metric"><div class="val">38%</div><div class="lbl">disk</div></div>
+          <div class="metric"><div class="val">1d 5h</div><div class="lbl">uptime</div></div>
+          <div class="metric metric-premium"><div class="val">graph</div><div class="lbl">premium</div></div>
+        </div>
+        <div class="cta-row">
+          <a class="cta-p" href="https://amenoke.ru/vs-kernel" target="_blank"><i class="fas fa-download"></i> Get Monitor</a>
+          <a class="cta-s" href="https://github.com/inzexg-coder/ameni-vs-kernel" target="_blank"><i class="fab fa-github"></i> GitHub</a>
         </div>
       </div>
     </div>
