@@ -191,6 +191,36 @@
     .nav-next{right:8px}
     .cta-p,.cta-s{padding:10px 20px;font-size:13px}
   }
+
+  .slide-mon{background:#0d0d18;}
+  .dash{width:100%;max-width:1020px;display:flex;flex-direction:column;gap:12px;padding:12px 0;}
+  .dash-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;}
+  .dash-brand{font-size:18px;font-weight:700;color:#a78bfa;letter-spacing:2px;text-transform:uppercase;}
+  .dash-brand span{color:#c084fc;}
+  .dash-badge{display:flex;align-items:center;gap:5px;background:rgba(26,22,40,0.8);border:1px solid #2a1e42;border-radius:14px;padding:4px 10px;font-size:10px;color:#a78bfa;font-weight:600;}
+  .dash-badge i{color:#c084fc;font-size:8px;}
+  .dash-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;}
+  .dash-card{background:rgba(18,14,26,0.7);border:1px solid rgba(30,24,48,0.5);border-radius:9px;padding:12px 14px;text-align:left;}
+  .dash-ttl{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:#6d4a8d;font-weight:700;margin-bottom:5px;}
+  .dash-ttl i{color:#7c3aed;margin-right:4px;font-size:8px;}
+  .dash-val{font-size:18px;font-weight:700;background:linear-gradient(135deg,#6d28d9,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  .dash-bar{height:4px;background:#1a1630;border-radius:2px;margin:3px 0;overflow:hidden;}
+  .dash-bar-f{height:100%;border-radius:2px;background:linear-gradient(90deg,#7c3aed,#a855f7);}
+  .dash-sub{font-size:9px;color:#5a3a7a;display:flex;justify-content:space-between;}
+  .dash-row{display:flex;justify-content:space-between;padding:2px 0;font-size:10px;}
+  .dash-row .k{color:#6d4a8d;min-width:55px;}
+  .dash-row .v{color:#a78bfa;font-weight:500;}
+  .dash-w{grid-column:span 2;}
+  .dash-prem{border:1.5px solid;border-image:linear-gradient(135deg,#7c3aed,#c084fc) 1;}
+  .prem-tag{display:inline-block;background:linear-gradient(135deg,#6d28d9,#a78bfa);color:#e0d8f0;font-size:7px;padding:1px 5px;border-radius:2px;margin-left:4px;font-weight:700;letter-spacing:0.5px;vertical-align:middle;}
+  .dash-hist{display:flex;gap:3px;height:40px;align-items:flex-end;padding:4px 0;}
+  .dash-hist .b{flex:1;border-radius:1.5px;min-height:4px;}
+  @media(max-width:768px){
+    .dash-grid{grid-template-columns:1fr 1fr;}
+    .dash-w{grid-column:span 2;}
+    .slide-content{padding:12px 16px;}
+  }
+
 </style>
 </head>
 <body>
@@ -258,6 +288,89 @@ function ns(){c=(c+1)%t;up();}
 function ps(){c=(c-1+t)%t;up();}
 function gs(n){c=n;up();}
 document.addEventListener('keydown',function(e){if(e.key==='ArrowRight')ns();if(e.key==='ArrowLeft')ps();});
+</script>
+
+
+<script>
+function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+function randf(min,max){return (Math.random()*(max-min)+min).toFixed(1);}
+function rpick(arr){return arr[Math.floor(Math.random()*arr.length)];}
+var statuses=['charging','discharging','full'];
+var ifaces=['eth0','wlan0','lo','enp3s0'];
+var procs=[
+  {n:'python',m:'142M'},{n:'node',m:'98M'},{n:'nginx',m:'24M'},
+  {n:'mysqld',m:'186M'},{n:'sshd',m:'8M'},{n:'chrome',m:'312M'},
+  {n:'systemd',m:'64M'},{n:'dockerd',m:'128M'},{n:'java',m:'256M'}];
+var disks=['sda','nvme0','mmcblk0','vda'];
+
+function randData(){
+  var cpu=rand(10,95);
+  document.getElementById('dc1').textContent=cpu+'%';
+  document.querySelector('.dash-card:nth-child(1) .dash-bar-f').style.width=cpu+'%';
+  var mem=rand(20,90);
+  var memG=(mem*16/100).toFixed(1);
+  document.getElementById('dc2').textContent=memG+' GB';
+  document.querySelector('.dash-card:nth-child(2) .dash-bar-f').style.width=mem+'%';
+  document.querySelector('.dash-card:nth-child(2) .dash-sub span:first-child').textContent='used '+mem+'%';
+  var disk=rand(15,85);
+  var dg=(disk*250/100).toFixed(1);
+  document.getElementById('dc3').textContent=dg+' GB';
+  document.querySelector('.dash-card:nth-child(3) .dash-bar-f').style.width=disk+'%';
+  document.querySelector('.dash-card:nth-child(3) .dash-sub span:first-child').textContent='used '+disk+'%';
+  var h=rand(0,23),m=rand(0,59);
+  document.getElementById('dc4').textContent=h+'h '+m+'m';
+  document.getElementById('dc5').textContent=randf(0.1,5.0)+' MB/s';
+  document.getElementById('dc6').textContent=rand(50,900)+' KB/s';
+  document.getElementById('dc7').textContent=rand(5,50)+' KB/s';
+  var bat=rand(5,100);
+  document.getElementById('dc8').textContent=bat+'%';
+  document.querySelector('.dash-card:nth-child(6) .dash-bar-f').style.width=bat+'%';
+  document.getElementById('dc9').textContent=rpick(statuses);
+  document.getElementById('dc10').textContent=rand(10,180)+' min left';
+  var pp=[];
+  var pool=procs.slice();
+  for(var i=0;i<5;i++){
+    var p=pool.splice(rand(0,pool.length-1),1)[0];
+    pp.push(p);}
+  var procCard=document.querySelector('.dash-card:nth-child(8)');
+  var rows=procCard.querySelectorAll('.dash-row');
+  for(var i=0;i<5&&i<rows.length;i++){
+    rows[i].querySelector('.k').textContent=(i+1)+'  '+pp[i].n;
+    rows[i].querySelector('.v').textContent=pp[i].m;}
+  var dioCard=document.querySelector('.dash-card:nth-child(9)');
+  var dioRows=dioCard.querySelectorAll('.dash-row');
+  for(var i=0;i<dioRows.length;i++){
+    dioRows[i].querySelector('.v').textContent=randf(0.1,4.0)+' MB/s';}
+
+  var hist=document.getElementById('histChart');
+  var bars=hist.querySelectorAll('.b');
+  var h=[];
+  for(var i=0;i<bars.length;i++){
+    var hi=rand(10,95);
+    h.push(hi);
+    bars[i].style.height=hi+'%';
+    var hue=250+rand(0,60);
+    var sat=rand(60,100);
+    var lit=rand(40,65);
+    bars[i].style.background='linear-gradient(to top,hsl('+hue+','+sat+'%,'+lit+'%),hsl('+(hue-20)+','+(sat+10)+'%,'+(lit+15)+'%))';
+  }
+}
+
+// Initialize history bars
+(function(){
+  var hist=document.getElementById('histChart');
+  if(hist){
+    for(var i=0;i<30;i++){
+      var b=document.createElement('div');
+      b.className='b';
+      b.style.height=rand(10,95)+'%';
+      var hue=250+rand(0,60);
+      b.style.background='linear-gradient(to top,hsl('+hue+',70%,50%),hsl('+(hue-20)+',80%,65%))';
+      hist.appendChild(b);}
+  }
+  randData();
+  setInterval(randData,3000);
+})();
 </script>
 
 </body>
