@@ -45,13 +45,19 @@
 
   .slide-overlay{
     position:absolute;top:0;left:0;width:100%;height:100%;
-    z-index:1;
-    background:linear-gradient(180deg,rgba(8,6,14,0.6) 0%,rgba(8,6,14,0.4) 40%,rgba(8,6,14,0.7) 100%);
-    pointer-events:none;
+    z-index:1;pointer-events:none;
   }
 
   .slide-tg .slide-bg{background-image:url('/banner-tgparser.jpg');}
   .slide-mon .slide-bg{background-image:url('/banner-monitor-dark.png');}
+
+  .slide-tg .slide-overlay{
+    background:linear-gradient(180deg,rgba(8,6,14,0.55) 0%,rgba(8,6,14,0.3) 40%,rgba(8,6,14,0.65) 100%);
+  }
+
+  .slide-mon .slide-overlay{
+    background:linear-gradient(180deg,rgba(8,6,14,0.25) 0%,rgba(8,6,14,0.1) 40%,rgba(8,6,14,0.35) 100%);
+  }
 
   .slide-content{
     position:relative;z-index:2;
@@ -208,7 +214,6 @@
 <div class="carousel">
   <div class="slide-track" id="slideTrack">
 
-    <!-- TG Parser -->
     <div class="slide slide-tg">
       <div class="slide-bg"></div>
       <div class="slide-overlay"></div>
@@ -233,7 +238,6 @@
       </div>
     </div>
 
-    <!-- Ameni Monitor -->
     <div class="slide slide-mon">
       <div class="slide-bg"></div>
       <div class="slide-overlay"></div>
