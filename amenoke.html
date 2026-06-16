@@ -23,7 +23,6 @@
 
   .carousel{
     position:fixed;top:0;left:0;width:100%;height:100%;
-    display:flex;align-items:center;justify-content:center;
   }
 
   .slide-track{
@@ -38,199 +37,197 @@
     display:flex;align-items:center;justify-content:center;
   }
 
-  /* Banner background - full screen with overlay */
+  /* Banner background - visible ASCII art */
   .slide-bg{
     position:absolute;top:0;left:0;width:100%;height:100%;
     z-index:0;
+    display:flex;align-items:center;justify-content:center;
   }
 
-  .slide-bg::before{
-    content:'';position:absolute;top:0;left:0;width:100%;height:100%;
-    background:
-      radial-gradient(ellipse at 30% 20%,rgba(124,58,237,0.07) 0%,transparent 60%),
-      radial-gradient(ellipse at 70% 80%,rgba(168,85,247,0.05) 0%,transparent 50%);
-    z-index:1;
+  .ascii-bg{
+    font-family:'Courier New',monospace;
+    font-size:14px;line-height:1.15;
+    text-align:center;white-space:pre;
+    color:rgba(109,74,141,0.25);
+    user-select:none;pointer-events:none;
+    transform:scale(1.8);
+    opacity:0.6;
   }
 
-  .slide-bg::after{
-    content:'';position:absolute;top:0;left:0;width:100%;height:100%;
-    background:linear-gradient(180deg,transparent 0%,rgba(8,6,14,0.4) 100%);
-    z-index:1;
-  }
+  .slide-tg .ascii-bg{color:rgba(168,85,247,0.2);}
+  .slide-mon .ascii-bg{color:rgba(109,74,141,0.3);}
 
-  /* Decorative grid lines */
-  .bg-grid{
+  /* Gradient overlays */
+  .slide-overlay{
     position:absolute;top:0;left:0;width:100%;height:100%;
-    background-image:
-      linear-gradient(rgba(124,58,237,0.03) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(124,58,237,0.03) 1px,transparent 1px);
-    background-size:60px 60px;
     z-index:1;
+    background:
+      radial-gradient(ellipse at 50% 40%,rgba(8,6,14,0.3) 0%,rgba(8,6,14,0.7) 60%,rgba(8,6,14,0.9) 100%);
+    pointer-events:none;
   }
 
-  /* Content overlay */
+  .slide-tg .slide-overlay{
+    background:
+      radial-gradient(ellipse at 50% 30%,rgba(124,58,237,0.08) 0%,rgba(8,6,14,0.5) 50%,rgba(8,6,14,0.92) 100%);
+  }
+
+  .slide-mon .slide-overlay{
+    background:
+      radial-gradient(ellipse at 50% 30%,rgba(56,189,248,0.05) 0%,rgba(8,6,14,0.5) 50%,rgba(8,6,14,0.92) 100%);
+  }
+
+  /* Content */
   .slide-content{
     position:relative;z-index:2;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     width:100%;height:100%;
     padding:40px 20px;
-  }
-
-  /* Amenoke brand - centered, large, glowing */
-  .brand{
-    text-align:center;margin-bottom:16px;
+    text-align:center;
   }
 
   .brand-main{
-    font-size:52px;font-weight:900;letter-spacing:6px;
+    font-size:64px;font-weight:900;letter-spacing:8px;
     text-transform:uppercase;
     background:linear-gradient(135deg,#a78bfa,#c084fc,#e9d5ff);
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;
     background-clip:text;
-    filter:drop-shadow(0 0 40px rgba(124,58,237,0.3));
-    line-height:1.1;
+    filter:drop-shadow(0 0 60px rgba(124,58,237,0.4));
+    line-height:1.1;margin-bottom:4px;
   }
 
   .brand-sub{
-    font-size:15px;color:#6d4a8d;letter-spacing:4px;font-weight:300;
-    margin-top:2px;
+    font-size:13px;color:#5a3a7a;letter-spacing:6px;font-weight:300;
+    text-transform:uppercase;margin-bottom:24px;
   }
 
-  /* Tool info below brand */
-  .tool-info{
-    text-align:center;margin-top:8px;
+  .tool-card{
+    display:inline-flex;flex-direction:column;align-items:center;
+    padding:28px 36px;
+    background:rgba(14,10,26,0.5);
+    border:1px solid rgba(42,30,66,0.4);
+    border-radius:16px;
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    min-width:340px;
   }
 
   .tool-icon{
-    width:56px;height:56px;border-radius:16px;
+    width:52px;height:52px;border-radius:14px;
     display:inline-flex;align-items:center;justify-content:center;
-    font-size:24px;color:#fff;margin-bottom:10px;
-    box-shadow:0 4px 24px rgba(124,58,237,0.25);
+    font-size:22px;color:#fff;margin-bottom:10px;
+    box-shadow:0 4px 24px rgba(124,58,237,0.2);
   }
+  .slide-tg .tool-icon{background:linear-gradient(135deg,#7c3aed,#f472b6)}
+  .slide-mon .tool-icon{background:linear-gradient(135deg,#7c3aed,#38bdf8)}
 
   .tool-name{
-    font-size:24px;font-weight:700;color:#e0d8f0;letter-spacing:1px;
-    margin-bottom:4px;
+    font-size:22px;font-weight:700;color:#e0d8f0;letter-spacing:1px;
+    margin-bottom:3px;
   }
 
   .tool-desc{
-    font-size:13px;color:#7a5a9a;font-weight:400;letter-spacing:2px;
-    max-width:400px;line-height:1.5;
+    font-size:12px;color:#6d4a8d;letter-spacing:1px;
+    margin-bottom:14px;
   }
   .tool-desc span{color:#a78bfa;font-weight:600;}
 
-  /* Mini metrics row */
-  .mini-metrics{
-    display:flex;gap:20px;margin-top:18px;
+  .metrics-row{
+    display:flex;gap:12px;margin-bottom:18px;
   }
 
-  .mini-metric{
-    text-align:center;padding:8px 18px;
-    background:rgba(14,10,26,0.6);
-    border:1px solid #1e1830;
-    border-radius:10px;
-    min-width:90px;
-    backdrop-filter:blur(4px);
+  .metric{
+    padding:6px 14px;
+    background:rgba(8,6,14,0.4);
+    border:1px solid rgba(42,30,66,0.3);
+    border-radius:8px;
+    text-align:center;min-width:72px;
   }
 
-  .mini-metric .val{
-    font-size:20px;font-weight:700;
+  .metric .val{
+    font-size:17px;font-weight:700;
     background:linear-gradient(135deg,#6d28d9,#a855f7);
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;
     background-clip:text;
-  }
-  .mini-metric .lbl{
-    font-size:9px;text-transform:uppercase;letter-spacing:1.5px;
-    color:#5a3a7a;margin-top:2px;
+    line-height:1.2;
   }
 
-  .mini-premium{
+  .metric .lbl{
+    font-size:8px;text-transform:uppercase;letter-spacing:1.5px;
+    color:#5a3a7a;margin-top:1px;
+  }
+
+  .metric-premium{
     border:1.5px solid;border-image:linear-gradient(135deg,#7c3aed,#c084fc) 1;
   }
-  .mini-premium .val{background:linear-gradient(135deg,#a78bfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  .metric-premium .val{
+    background:linear-gradient(135deg,#a78bfa,#c084fc);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-clip:text;
+  }
 
-  /* CTA buttons */
   .cta-row{
-    display:flex;gap:12px;margin-top:22px;
+    display:flex;gap:10px;
   }
 
-  .cta-primary{
-    display:inline-flex;align-items:center;gap:8px;
-    padding:12px 28px;border-radius:10px;
-    background:linear-gradient(135deg,#7c3aed,#c084fc);
-    color:#fff;text-decoration:none;
-    font-size:14px;font-weight:600;
+  .cta-p,.cta-s{
+    padding:10px 24px;border-radius:10px;
+    font-size:13px;font-weight:600;text-decoration:none;
     transition:opacity 0.2s,transform 0.15s;
-    border:none;cursor:pointer;
+    display:inline-flex;align-items:center;gap:6px;
   }
-  .cta-primary:hover{opacity:0.9;transform:translateY(-1px);}
 
-  .cta-secondary{
-    display:inline-flex;align-items:center;gap:8px;
-    padding:12px 28px;border-radius:10px;
-    background:rgba(14,10,26,0.6);
-    border:1px solid #2a1e42;
-    color:#a78bfa;text-decoration:none;
-    font-size:14px;font-weight:500;
-    transition:all 0.2s;
-    backdrop-filter:blur(4px);
+  .cta-p{
+    background:linear-gradient(135deg,#7c3aed,#c084fc);
+    color:#fff;
   }
-  .cta-secondary:hover{background:rgba(124,58,237,0.1);border-color:#7c3aed;}
+  .cta-p:hover{opacity:0.9;transform:translateY(-1px);}
 
-  /* Navigation arrows */
+  .cta-s{
+    background:rgba(8,6,14,0.4);
+    border:1px solid rgba(42,30,66,0.3);
+    color:#a78bfa;
+  }
+  .cta-s:hover{background:rgba(124,58,237,0.1);border-color:#7c3aed;}
+
+  /* Navigation */
   .nav-arrow{
     position:fixed;top:50%;transform:translateY(-50%);
-    width:52px;height:52px;border-radius:50%;
-    background:rgba(14,10,26,0.5);
-    border:1px solid rgba(42,30,66,0.5);
-    color:#a78bfa;font-size:20px;
+    width:48px;height:48px;border-radius:50%;
+    background:rgba(14,10,26,0.4);
+    border:1px solid rgba(42,30,66,0.4);
+    color:#a78bfa;font-size:18px;
     cursor:pointer;display:flex;align-items:center;justify-content:center;
     transition:all 0.3s;z-index:20;
     backdrop-filter:blur(8px);
   }
   .nav-arrow:hover{
     background:rgba(124,58,237,0.2);
-    border-color:#7c3aed;
-    color:#c084fc;
+    border-color:#7c3aed;color:#c084fc;
     transform:translateY(-50%) scale(1.08);
   }
-  .nav-prev{left:24px}
-  .nav-next{right:24px}
+  .nav-prev{left:20px}
+  .nav-next{right:20px}
 
-  /* Dots */
   .dots{
-    position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
     display:flex;gap:10px;z-index:20;
   }
   .dot{
     width:10px;height:10px;border-radius:50%;
-    background:rgba(42,30,66,0.6);border:none;cursor:pointer;
+    background:rgba(42,30,66,0.5);border:none;cursor:pointer;
     transition:all 0.3s;
   }
-  .dot.active{
-    background:#7c3aed;width:32px;border-radius:5px;
-    box-shadow:0 0 16px rgba(124,58,237,0.3);
-  }
+  .dot.active{background:#7c3aed;width:30px;border-radius:5px;box-shadow:0 0 20px rgba(124,58,237,0.3);}
   .dot:hover{background:rgba(168,85,247,0.5);}
 
-  /* Slide-specific accent colors */
-  .slide-tg .tool-icon{background:linear-gradient(135deg,#7c3aed,#f472b6)}
-  .slide-tg .brand-main{background:linear-gradient(135deg,#a78bfa,#f472b6,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-  .slide-mon .tool-icon{background:linear-gradient(135deg,#7c3aed,#38bdf8)}
-  .slide-mon .brand-main{background:linear-gradient(135deg,#a78bfa,#38bdf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-
-  /* Responsive */
   @media(max-width:768px){
-    .brand-main{font-size:36px;letter-spacing:3px}
-    .nav-arrow{width:40px;height:40px;font-size:16px}
-    .nav-prev{left:10px}
-    .nav-next{right:10px}
-    .mini-metrics{flex-wrap:wrap;justify-content:center;gap:10px}
-    .mini-metric{min-width:70px;padding:6px 12px}
-    .mini-metric .val{font-size:16px}
-    .cta-row{flex-direction:column;align-items:center}
-    .tool-icon{width:44px;height:44px;font-size:18px}
-    .tool-name{font-size:20px}
+    .brand-main{font-size:40px;letter-spacing:4px}
+    .tool-card{padding:20px 24px;min-width:auto;width:90%}
+    .metrics-row{flex-wrap:wrap;justify-content:center}
+    .nav-arrow{width:38px;height:38px;font-size:14px}
+    .nav-prev{left:8px}
+    .nav-next{right:8px}
+    .ascii-bg{font-size:8px;transform:scale(1.2)}
   }
 </style>
 </head>
@@ -239,86 +236,88 @@
 <div class="carousel">
   <div class="slide-track" id="slideTrack">
 
-    <!-- TG Parser Slide -->
+    <!-- TG Parser -->
     <div class="slide slide-tg">
       <div class="slide-bg">
-        <div class="bg-grid"></div>
-      </div>
-      <div class="slide-content">
-        <div class="brand">
-          <div class="brand-main">amenoke</div>
-          <div class="brand-sub">instruments</div>
+        <div class="ascii-bg">
+╔══════════════════════════════════════╗
+║  ╔═══╗  ╔═══╗  ╔═════╗  ╔════╗  ╔══╗ ║
+║  ║ 1 ║  ║ 2 ║  ║  3  ║  ║  4 ║  ║P ║ ║
+║  ╚═╤═╝  ╚═╤═╝  ╚═╤═══╝  ╚═╤══╝  ╚═╝ ║
+║    │      │      │        │         ║
+║  ╔═╧══╗ ╔═╧══╗ ╔═╧════╗ ╔═╧═══╗    ║
+║  ║ MSG║ ║ ACT║ ║ GROW║ ║ PDF ║    ║
+║  ╚════╝ ╚════╝ ╚══════╝ ╚═════╝    ║
+╚══════════════════════════════════════╝
         </div>
-        <div class="tool-info">
+      </div>
+      <div class="slide-overlay"></div>
+      <div class="slide-content">
+        <div class="brand-main">amenoke</div>
+        <div class="brand-sub">instruments</div>
+        <div class="tool-card">
           <div class="tool-icon"><i class="fab fa-telegram-plane"></i></div>
           <div class="tool-name">TG Parser</div>
-          <div class="tool-desc">
-            <span>telegram</span> chat analyzer &middot; export to <span>pdf</span> &middot; <span>premium</span>
+          <div class="tool-desc"><span>telegram</span> chat analyzer &middot; <span>pdf</span> export &middot; <span>premium</span></div>
+          <div class="metrics-row">
+            <div class="metric"><div class="val">search</div><div class="lbl">realtime</div></div>
+            <div class="metric"><div class="val">heatmap</div><div class="lbl">activity</div></div>
+            <div class="metric"><div class="val">growth</div><div class="lbl">daily</div></div>
+            <div class="metric metric-premium"><div class="val">PDF</div><div class="lbl">premium</div></div>
           </div>
-          <div class="mini-metrics">
-            <div class="mini-metric">
-              <div class="val">realtime</div>
-              <div class="lbl">search</div>
-            </div>
-            <div class="mini-metric">
-              <div class="val">activity</div>
-              <div class="lbl">heatmap</div>
-            </div>
-            <div class="mini-metric">
-              <div class="val">cumulative</div>
-              <div class="lbl">growth</div>
-            </div>
-            <div class="mini-metric mini-premium">
-              <div class="val">PDF</div>
-              <div class="lbl">premium</div>
-            </div>
+          <div class="cta-row">
+            <a class="cta-p" href="https://amenoke.ru/tg-parser" target="_blank"><i class="fab fa-telegram-plane"></i> Try TG Parser</a>
+            <a class="cta-s" href="https://github.com/inzexg-coder" target="_blank"><i class="fab fa-github"></i> GitHub</a>
           </div>
-        </div>
-        <div class="cta-row">
-          <a class="cta-primary" href="https://amenoke.ru/tg-parser" target="_blank"><i class="fab fa-telegram-plane"></i> Try TG Parser</a>
-          <a class="cta-secondary" href="https://github.com/inzexg-coder" target="_blank"><i class="fab fa-github"></i> GitHub</a>
         </div>
       </div>
     </div>
 
-    <!-- Ameni Monitor Slide -->
+    <!-- Ameni Monitor -->
     <div class="slide slide-mon">
       <div class="slide-bg">
-        <div class="bg-grid"></div>
-      </div>
-      <div class="slide-content">
-        <div class="brand">
-          <div class="brand-main">amenoke</div>
-          <div class="brand-sub">instruments</div>
+        <div class="ascii-bg">
+  ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢲⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+  ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+  ⠀⠀⢀⠄⠂⢉⠤⠐⠋⠈⠡⡈⠉⠐⠠⡀⠀⠀⠀⠀⠀
+  ⠀⢀⡀⢠⣤⠔⠁⢀⠀⠀⠀⠈⢢⠀⠈⠱⡤⣤⠄⣀⠀
+  ⠀⠰⠁⣰⣿⠃⢠⠃⢸⠀⠀⠀⠀⠁⠀⠀⠈⢞⣦⡀⠈⡇
+  ⠀⢇⣠⡿⠁⢀⡃⣈⠀⠀⢰⡀⠀⠀⢢⠰⠀⢺⣧⢰⠀
+  ⠀⠈⣿⠁⡘⡌⡇⡿⠸⠀⠈⡕⡄⠐⡀⠈⠀⢃⠀⠾⠇
+  ⠀⠀⠇⡇⠃⢠⠶⡀⡇⢃⠡⡀⠀⠡⠈⢂⡀⢁⡁⠸⡆⠘⡀
+  ⠀⠸⢸⠘⡜⣑⢴⣀⠑⠯⡂⠄⣀⣣⢀⣈⢺⡜⢣⡆⡇⢣
+  ⠀⠇⢸⡗⣰⡿⡻⠿⡳⡅⠀⠀⠈⡵⠿⠿⡻⣷⡡⡇⡇⢸⣇
+  ⠀⢰⡆⡄⣧⡏⠸⢠⢲⢸⠁⠀⠐⢙⢰⠂⢡⠘⣇⡇⠃⢹⡄
+  ⠀⠟⢰⢁⡇⠇⠰⣀⢁⡜⠀⠀⠀⠘⣀⣁⠌⠃⠰⠁⠈⠰
+  ⡘⠀⠀⢊⣤⠤⠄⠀⠀⠀⠀⠀⠀⠤⠄⢸⠃⠀⠀⠃
+  ⢠⠁⢀⠈⢿⡀⠀⠀⢀⡀⠀⠀⢀⠏⠀⠀⠀⠸
+  ⠘⠸⠘⡀⠀⢣⠀⠀⠁⠃⠀⢀⠎⠀⠀⢠⡇
+  ⠀⠇⢆⢃⠀⠀⡏⢲⢤⢀⡀⢀⣠⠄⡚⠀⣾
+  ⢰⠈⢌⢎⢆⠀⠁⣌⠆⡰⡁⠉⡱⡘⡼⠇⢀⢬⠃⢠⡆
+  ⠀⢢⠑⢵⣧⡀⡿⠳⠂⠀⠀⠁⢺⡀⢀⢠⣮⠃⢀⠆⡰
+  ⠀⠑⠄⣀⠙⡭⠢⢀⡀⠁⠄⣀⣀⣀⡠⠂⢃⡀⠔⠱⡞⢁⠄⣁⠔⠁
+  ⠀⠀⠀⢠⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠉⠁
+  ⠀⠀⠀⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇
         </div>
-        <div class="tool-info">
+      </div>
+      <div class="slide-overlay"></div>
+      <div class="slide-content">
+        <div class="brand-main">amenoke</div>
+        <div class="brand-sub">instruments</div>
+        <div class="tool-card">
           <div class="tool-icon"><i class="fas fa-tachometer-alt"></i></div>
           <div class="tool-name">Ameni Monitor</div>
-          <div class="tool-desc">
-            <span>real-time</span> system dashboard &middot; zero <span>config</span> &middot; one <span>click</span>
+          <div class="tool-desc"><span>real-time</span> system dashboard &middot; zero <span>config</span> &middot; one <span>click</span></div>
+          <div class="metrics-row">
+            <div class="metric"><div class="val">34%</div><div class="lbl">cpu</div></div>
+            <div class="metric"><div class="val">38%</div><div class="lbl">disk</div></div>
+            <div class="metric"><div class="val">1d 5h</div><div class="lbl">uptime</div></div>
+            <div class="metric metric-premium"><div class="val">graph</div><div class="lbl">premium</div></div>
           </div>
-          <div class="mini-metrics">
-            <div class="mini-metric">
-              <div class="val">34%</div>
-              <div class="lbl">cpu</div>
-            </div>
-            <div class="mini-metric">
-              <div class="val">38%</div>
-              <div class="lbl">disk</div>
-            </div>
-            <div class="mini-metric">
-              <div class="val">1d 5h</div>
-              <div class="lbl">uptime</div>
-            </div>
-            <div class="mini-metric mini-premium">
-              <div class="val">graph</div>
-              <div class="lbl">premium</div>
-            </div>
+          <div class="cta-row">
+            <a class="cta-p" href="https://amenoke.ru/vs-kernel" target="_blank"><i class="fas fa-download"></i> Get Monitor</a>
+            <a class="cta-s" href="https://github.com/inzexg-coder/ameni-vs-kernel" target="_blank"><i class="fab fa-github"></i> GitHub</a>
           </div>
-        </div>
-        <div class="cta-row">
-          <a class="cta-primary" href="https://amenoke.ru/vs-kernel" target="_blank"><i class="fas fa-download"></i> Get Monitor</a>
-          <a class="cta-secondary" href="https://github.com/inzexg-coder/ameni-vs-kernel" target="_blank"><i class="fab fa-github"></i> GitHub</a>
         </div>
       </div>
     </div>
@@ -326,7 +325,6 @@
   </div>
 </div>
 
-<!-- Navigation -->
 <button class="nav-arrow nav-prev" onclick="prevSlide()"><i class="fas fa-chevron-left"></i></button>
 <button class="nav-arrow nav-next" onclick="nextSlide()"><i class="fas fa-chevron-right"></i></button>
 
@@ -336,24 +334,12 @@
 </div>
 
 <script>
-var current=0;
-var total=2;
-var track=document.getElementById('slideTrack');
-var dots=document.querySelectorAll('.dot');
-
-function updateSlide(){
-  track.style.transform='translateX(-'+(current*100)+'%)';
-  dots.forEach(function(d,i){d.classList.toggle('active',i===current);});
-}
-
-function nextSlide(){current=(current+1)%total;updateSlide();}
-function prevSlide(){current=(current-1+total)%total;updateSlide();}
-function goSlide(n){current=n;updateSlide();}
-
-document.addEventListener('keydown',function(e){
-  if(e.key==='ArrowRight')nextSlide();
-  if(e.key==='ArrowLeft')prevSlide();
-});
+var c=0,t=2,tr=document.getElementById('slideTrack'),ds=document.querySelectorAll('.dot');
+function up(){tr.style.transform='translateX(-'+(c*100)+'%)';ds.forEach(function(d,i){d.classList.toggle('active',i===c);});}
+function ns(){c=(c+1)%t;up();}
+function ps(){c=(c-1+t)%t;up();}
+function gs(n){c=n;up();}
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight')ns();if(e.key==='ArrowLeft')ps();});
 </script>
 
 </body>
