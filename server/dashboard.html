@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>ameni monitor</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" id="fa-css">
+<script>document.getElementById('fa-css').onerror=function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css';document.head.appendChild(l);}</script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   ::-webkit-scrollbar{width:6px;height:6px}
@@ -223,6 +224,13 @@
   body.dark #batteryContent span[style*="9a7ab5"]{color:#7a5a9a!important}
 
   body.dark .theme-toggle{background:rgba(18,18,30,0.9);border-color:#2e1a4e;color:#a78bfa}
+  body.dark .premium-active-text{color:#2dd4bf;font-weight:600}
+  body.dark .premium-ok-text{color:#2dd4bf}
+  body.dark .premium-fail-text{color:#f87171}
+  .premium-active-text{color:#34d399;font-weight:600}
+  .premium-ok-text{color:#34d399}
+  .premium-fail-text{color:#ef4444}
+
 
 </style>
 </head>
@@ -450,7 +458,7 @@ function checkPremium(){
     var li=document.getElementById('loggedInInfo');
     var os=document.getElementById('offlineSection');
     if(d.premium){
-      s.innerHTML='<span style="color:#34d399;font-weight:600">PREMIUM ACTIVE</span>';
+      s.innerHTML='<span class="premium-active-text">PREMIUM ACTIVE</span>';
       lf.style.display='none';li.style.display='none';os.style.display='none';}
     else if(d.username){
       li.style.display='block';document.getElementById('loggedInUsername').textContent=d.username;
@@ -483,9 +491,9 @@ function activateLicense(){
   fetch('/api/activate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:k})})
     .then(function(r){return r.json()}).then(function(d){
       var pr=document.getElementById('premiumResult');
-      if(d.ok&&d.premium){pr.innerHTML='<span style="color:#34d399">License activated</span>';checkPremium();}
-      else if(d.ok){pr.innerHTML='<span style="color:#ef4444">Invalid license key</span>';}
-      else{pr.innerHTML='<span style="color:#ef4444">'+(d.error||'Activation failed')+'</span>';}
+      if(d.ok&&d.premium){pr.innerHTML='<span class="premium-ok-text">License activated</span>';checkPremium();}
+      else if(d.ok){pr.innerHTML='<span class="premium-fail-text">Invalid license key</span>';}
+      else{pr.innerHTML='<span class="premium-fail-text">'+(d.error||'Activation failed')+'</span>';}
       b.textContent='Activate';b.disabled=false;});}
 
 checkPremium();

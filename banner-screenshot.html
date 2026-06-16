@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>ameni monitor — screenshot</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:#040408;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-height:100vh;font-family:system-ui,sans-serif;padding:40px;
+  }
+  .screenshot-area{
+    width:1240px;height:877px;overflow:hidden;
+    border-radius:12px;box-shadow:0 8px 48px rgba(0,0,0,0.5);
+    position:relative;
+  }
+  .screenshot-area iframe{
+    width:1240px;height:877px;border:none;
+    transform-origin:top left;
+  }
+  .controls{
+    display:flex;gap:12px;margin-top:24px;flex-wrap:wrap;justify-content:center;
+  }
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:12px 28px;border-radius:10px;
+    font-family:inherit;font-size:14px;font-weight:600;
+    border:none;cursor:pointer;text-decoration:none;
+    transition:opacity 0.2s,transform 0.15s;
+  }
+  .btn-primary{
+    background:linear-gradient(135deg,#7c3aed,#c084fc);
+    color:#fff;
+  }
+  .btn-primary:hover{opacity:0.9;transform:translateY(-1px);}
+  .btn-secondary{
+    background:#1a1a2e;color:#a78bfa;border:1px solid #2e1a4e;
+  }
+  .btn-secondary:hover{background:#2a1a3e;}
+  .hint{
+    color:#5a3a7a;font-size:13px;text-align:center;margin-top:12px;max-width:500px;line-height:1.5;
+  }
+  .hint kbd{
+    background:#1a1a2e;padding:2px 8px;border-radius:4px;
+    font-family:monospace;font-size:12px;color:#c084fc;border:1px solid #2e1a4e;
+  }
+
+  .csp-note{
+    display:none;background:#1a1020;border:1px solid #2e1a4e;
+    border-radius:8px;padding:16px 20px;margin-top:16px;
+    font-size:13px;color:#a78bfa;max-width:600px;line-height:1.5;
+  }
+  .csp-note i{color:#c084fc;margin-right:6px;}
+
+  @media(max-width:1280px){
+    .screenshot-area{width:100%;height:auto;aspect-ratio:1240/877;}
+    .screenshot-area iframe{width:100%;height:auto;aspect-ratio:1240/877;}
+  }
+</style>
+</head>
+<body>
+
+<div class="screenshot-area">
+  <iframe src="banner-dark.html" id="bannerFrame"></iframe>
+</div>
+
+<div class="controls">
+  <button class="btn btn-primary" onclick="captureScreenshot()">
+    <i class="fas fa-camera"></i> Capture Screenshot
+  </button>
+  <a class="btn btn-secondary" href="banner-dark.html" target="_blank">
+    <i class="fas fa-external-link-alt"></i> Open Banner
+  </a>
+  <button class="btn btn-secondary" onclick="toggleNote()">
+    <i class="fas fa-question-circle"></i> Why blank?
+  </button>
+</div>
+
+<div class="hint">
+  <i class="fas fa-info-circle" style="color:#7c3aed"></i>
+  Open the banner directly (<kbd>Open Banner</kbd>), then take a screenshot with <kbd>Win+Shift+S</kbd> (Windows) or <kbd>Shift+Cmd+4</kbd> (macOS).
+</div>
+
+<div class="csp-note" id="cspNote">
+  <i class="fas fa-shield-alt"></i>
+  If the banner doesn't load due to Content Security Policy (CSP), open <code>banner-dark.html</code> directly in a new tab. The iframe may be blocked by your browser's security settings.
+</div>
+
+<script>
+function captureScreenshot(){
+  var note = document.getElementById('cspNote');
+  note.style.display = 'block';
+  note.innerHTML = '<i class="fas fa-info-circle"></i> Browser security prevents programmatic screenshots. Use your OS screenshot tool: <kbd>Win+Shift+S</kbd> or <kbd>PrtSc</kbd>.';
+}
+
+function toggleNote(){
+  var n = document.getElementById('cspNote');
+  n.style.display = n.style.display === 'block' ? 'none' : 'block';
+}
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" id="fa-css-shot">
+<script>
+document.getElementById('fa-css-shot').onerror=function(){
+  var l=document.createElement('link');l.rel='stylesheet';
+  l.href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css';
+  document.head.appendChild(l);
+};
+</script>
+
+</body>
+</html>
