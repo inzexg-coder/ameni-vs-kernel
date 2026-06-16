@@ -1,378 +1,361 @@
 <!DOCTYPE html>
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>amenoke</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" id="fa-main">
 <script>document.getElementById('fa-main').onerror=function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css';document.head.appendChild(l);}</script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
   *{margin:0;padding:0;box-sizing:border-box}
-  ::-webkit-scrollbar{width:3px}
-  ::-webkit-scrollbar-track{background:transparent}
-  ::-webkit-scrollbar-thumb{background:rgba(168,85,247,0.2);border-radius:2px}
-  *{scrollbar-width:thin;scrollbar-color:rgba(168,85,247,0.2) transparent}
 
   body{
-    background:#08060e;
+    background:#0a0812;
     font-family:'Inter',system-ui,sans-serif;
-    min-height:100vh;overflow:hidden;
+    min-height:100vh;overflow-x:hidden;
     color:#c8c0d8;
   }
 
-  .carousel{
-    position:fixed;top:0;left:0;width:100%;height:100%;
-  }
+  .page{width:100%;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px 20px}
 
-  .slide-track{
-    display:flex;width:100%;height:100%;
-    transition:transform 0.7s cubic-bezier(0.4,0,0.2,1);
-  }
-
-  .slide{
-    min-width:100%;height:100vh;
-    position:relative;overflow:hidden;
-  }
-
-  .slide-bg{
-    position:absolute;top:0;left:0;width:100%;height:100%;
-    z-index:0;
-    background-size:cover;background-position:center;
-    background-repeat:no-repeat;
-  }
-
-  .slide-tg .slide-bg{background-image:url('/banner-tgparser.jpg?v=2');}
-  .slide-mon .slide-bg{background-image:url('/banner-monitor.jpg?v=2');}
-
-  .slide-overlay{
-    position:absolute;top:0;left:0;width:100%;height:100%;
-    z-index:1;
-    pointer-events:none;
-  }
-
-  .slide-tg .slide-overlay{
-    background:linear-gradient(180deg,rgba(8,6,14,0.6) 0%,rgba(8,6,14,0.35) 40%,rgba(8,6,14,0.7) 100%);
-  }
-
-  .slide-mon .slide-overlay{
-    background:linear-gradient(180deg,rgba(8,6,14,0.3) 0%,rgba(8,6,14,0.1) 40%,rgba(8,6,14,0.4) 100%);
-  }
-
-  .slide-content{
-    position:relative;z-index:2;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    width:100%;height:100%;padding:40px 20px;
-    text-align:center;
-  }
-
-  .brand-main{
-    font-size:76px;font-weight:900;letter-spacing:10px;
-    text-transform:uppercase;
+  .brand{
+    font-size:52px;font-weight:900;letter-spacing:8px;text-transform:uppercase;
     background:linear-gradient(135deg,#a78bfa,#c084fc,#e9d5ff);
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-    background-clip:text;
-    filter:drop-shadow(0 0 80px rgba(124,58,237,0.5));
-    line-height:1.1;margin-bottom:2px;
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    filter:drop-shadow(0 0 60px rgba(124,58,237,0.35));
+    text-align:center;line-height:1;margin-bottom:4px;
+  }
+  .brand-sub{font-size:11px;color:#4a2a6a;letter-spacing:6px;font-weight:300;text-transform:uppercase;margin-bottom:28px;text-align:center}
+
+  .banner{
+    width:100%;max-width:960px;
+    background:linear-gradient(135deg,#0e0a1a,#120e20);
+    border:1px solid #1e1830;
+    border-radius:20px;
+    padding:28px 32px;
+    position:relative;
+    overflow:hidden;
+  }
+  .banner::before{
+    content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+    background:radial-gradient(ellipse at 30% 20%,rgba(124,58,237,0.06) 0%,transparent 60%),
+               radial-gradient(ellipse at 70% 80%,rgba(168,85,247,0.04) 0%,transparent 50%);
+    z-index:0;pointer-events:none;
   }
 
-  .brand-sub{
-    font-size:13px;color:#5a3a7a;letter-spacing:8px;font-weight:300;
-    text-transform:uppercase;margin-bottom:32px;
+  .banner-inner{position:relative;z-index:1}
+
+  .banner-top{
+    display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;
+  }
+  .banner-logo{
+    display:flex;align-items:center;gap:8px;
+  }
+  .banner-logo i{
+    width:32px;height:32px;border-radius:8px;
+    background:linear-gradient(135deg,#7c3aed,#38bdf8);
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;color:#fff;
+  }
+  .banner-logo span{
+    font-size:16px;font-weight:700;color:#a78bfa;letter-spacing:1px;
+  }
+  .banner-badge{
+    display:flex;align-items:center;gap:5px;
+    background:rgba(26,22,40,0.8);border:1px solid #2a1e42;
+    border-radius:14px;padding:4px 10px;font-size:10px;color:#6d4a8d;font-weight:600;
+  }
+  .banner-badge i{color:#c084fc;font-size:8px;}
+
+  .banner-grid{
+    display:grid;grid-template-columns:1fr 1fr 1fr 1fr;
+    gap:10px;
   }
 
-  .tool-name{
-    font-size:28px;font-weight:700;color:#e8e0f0;letter-spacing:1px;
-    margin-bottom:4px;text-shadow:0 2px 20px rgba(0,0,0,0.5);
+  .b-card{
+    background:rgba(16,12,24,0.6);
+    border:1px solid rgba(30,24,48,0.4);
+    border-radius:10px;
+    padding:14px 16px;
+    text-align:left;
   }
 
-  .tool-desc{
-    font-size:14px;color:#9a7ab5;letter-spacing:1px;margin-bottom:18px;
-    text-shadow:0 2px 12px rgba(0,0,0,0.4);
+  .b-card-ttl{
+    font-size:9px;text-transform:uppercase;letter-spacing:2px;
+    color:#5a3a7a;font-weight:700;margin-bottom:4px;
   }
-  .tool-desc span{color:#c084fc;font-weight:600;}
+  .b-card-ttl i{color:#6d28d9;margin-right:4px;font-size:8px;}
 
-  .metrics-row{
-    display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;justify-content:center;
-  }
-
-  .metric{
-    padding:10px 22px;
-    background:rgba(8,6,14,0.5);
-    border:1px solid rgba(42,30,66,0.3);
-    border-radius:10px;text-align:center;min-width:90px;
-    backdrop-filter:blur(6px);
-  }
-
-  .metric .val{
-    font-size:20px;font-weight:700;
+  .b-card-val{
+    font-size:22px;font-weight:700;line-height:1.2;margin-bottom:2px;
     background:linear-gradient(135deg,#6d28d9,#a855f7);
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-    background-clip:text;line-height:1.2;
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   }
 
-  .metric .lbl{
-    font-size:9px;text-transform:uppercase;letter-spacing:1.5px;
-    color:#6d4a8d;margin-top:2px;
+  .b-card-bar{
+    height:4px;background:#1a1430;border-radius:2px;margin:4px 0;overflow:hidden;
+  }
+  .b-card-bar-f{
+    height:100%;border-radius:2px;
+    background:linear-gradient(90deg,#7c3aed,#a855f7);
   }
 
-  .metric-premium{
+  .b-card-sub{
+    font-size:9px;color:#4a2a6a;display:flex;justify-content:space-between;
+  }
+
+  .b-card-row{
+    display:flex;justify-content:space-between;padding:3px 0;font-size:11px;
+  }
+  .b-card-row .k{color:#5a3a7a}
+  .b-card-row .v{color:#a78bfa;font-weight:500}
+
+  .b-span2{grid-column:span 2}
+
+  .b-premium{
     border:1.5px solid;border-image:linear-gradient(135deg,#7c3aed,#c084fc) 1;
   }
-  .metric-premium .val{
-    background:linear-gradient(135deg,#a78bfa,#c084fc);
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-    background-clip:text;
+
+  .prem-tag{
+    display:inline-block;
+    background:linear-gradient(135deg,#6d28d9,#a78bfa);
+    color:#e0d8f0;font-size:7px;padding:1px 6px;border-radius:2px;
+    margin-left:4px;font-weight:700;letter-spacing:0.5px;vertical-align:middle;
   }
 
-  .cta-row{
-    display:flex;gap:12px;
+  .hist-bars{
+    display:flex;gap:3px;height:50px;align-items:flex-end;padding:4px 0;
+  }
+  .hist-bars .hb{
+    flex:1;border-radius:2px;min-height:3px;
+    background:linear-gradient(to top,#7c3aed,#c084fc);
   }
 
-  .cta-p,.cta-s{
-    padding:12px 30px;border-radius:10px;
-    font-size:14px;font-weight:600;text-decoration:none;
-    transition:all 0.2s;
-    display:inline-flex;align-items:center;gap:8px;
+  .b-footer{
+    margin-top:14px;display:flex;justify-content:space-between;align-items:center;
   }
-
-  .cta-p{
-    background:linear-gradient(135deg,#7c3aed,#c084fc);
-    color:#fff;
-    box-shadow:0 4px 20px rgba(124,58,237,0.3);
+  .b-link{
+    font-size:11px;color:#4a2a6a;text-decoration:none;transition:color 0.2s;
   }
-  .cta-p:hover{opacity:0.9;transform:translateY(-2px);}
+  .b-link:hover{color:#a78bfa;}
+  .b-link i{margin-right:4px;}
 
-  .cta-s{
-    background:rgba(8,6,14,0.5);
-    border:1px solid rgba(42,30,66,0.3);
-    color:#a78bfa;
-    backdrop-filter:blur(6px);
+  .nav-row{
+    display:flex;justify-content:center;gap:10px;margin-top:20px;
   }
-  .cta-s:hover{background:rgba(124,58,237,0.15);border-color:#7c3aed;}
-
-  .nav-arrow{
-    position:fixed;top:50%;transform:translateY(-50%);
-    width:48px;height:48px;border-radius:50%;
-    background:rgba(14,10,26,0.4);
+  .nav-btn{
+    width:40px;height:40px;border-radius:50%;
+    background:rgba(14,10,26,0.5);
     border:1px solid rgba(42,30,66,0.4);
-    color:#a78bfa;font-size:18px;
+    color:#a78bfa;font-size:16px;
     cursor:pointer;display:flex;align-items:center;justify-content:center;
-    transition:all 0.3s;z-index:20;
-    backdrop-filter:blur(8px);
+    transition:all 0.25s;
   }
-  .nav-arrow:hover{
-    background:rgba(124,58,237,0.2);
-    border-color:#7c3aed;color:#c084fc;
-    transform:translateY(-50%) scale(1.08);
-  }
-  .nav-prev{left:20px}
-  .nav-next{right:20px}
+  .nav-btn:hover{background:rgba(124,58,237,0.2);border-color:#7c3aed;color:#c084fc;}
 
-  .dots{
-    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-    display:flex;gap:10px;z-index:20;
-  }
-  .dot{
-    width:10px;height:10px;border-radius:50%;
-    background:rgba(42,30,66,0.5);border:none;cursor:pointer;
-    transition:all 0.3s;
-  }
-  .dot.active{background:#7c3aed;width:30px;border-radius:5px;box-shadow:0 0 20px rgba(124,58,237,0.3);}
-  .dot:hover{background:rgba(168,85,247,0.5);}
+  .nav-dots{display:flex;gap:8px;align-items:center;margin:0 12px;}
+  .nd{width:8px;height:8px;border-radius:50%;background:#2a1e42;border:none;cursor:pointer;transition:all 0.25s;}
+  .nd.act{background:#7c3aed;width:26px;border-radius:4px;box-shadow:0 0 16px rgba(124,58,237,0.3);}
+  .nd:hover{background:rgba(168,85,247,0.5);}
 
-  @media(max-width:768px){
-    .brand-main{font-size:40px;letter-spacing:4px}
-    .tool-name{font-size:22px}
-    .metric{padding:8px 14px;min-width:70px}
-    .metric .val{font-size:16px}
-    .nav-arrow{width:38px;height:38px;font-size:14px}
-    .nav-prev{left:8px}
-    .nav-next{right:8px}
-    .cta-p,.cta-s{padding:10px 20px;font-size:13px}
-  }
+  .slide{display:none}
+  .slide.act{display:block}
 
-  .slide-mon{background:#0d0d18;}
-  .dash{width:100%;max-width:1020px;display:flex;flex-direction:column;gap:12px;padding:12px 0;}
-  .dash-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;}
-  .dash-brand{font-size:18px;font-weight:700;color:#a78bfa;letter-spacing:2px;text-transform:uppercase;}
-  .dash-brand span{color:#c084fc;}
-  .dash-badge{display:flex;align-items:center;gap:5px;background:rgba(26,22,40,0.8);border:1px solid #2a1e42;border-radius:14px;padding:4px 10px;font-size:10px;color:#a78bfa;font-weight:600;}
-  .dash-badge i{color:#c084fc;font-size:8px;}
-  .dash-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;}
-  .dash-card{background:rgba(18,14,26,0.7);border:1px solid rgba(30,24,48,0.5);border-radius:9px;padding:12px 14px;text-align:left;}
-  .dash-ttl{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:#6d4a8d;font-weight:700;margin-bottom:5px;}
-  .dash-ttl i{color:#7c3aed;margin-right:4px;font-size:8px;}
-  .dash-val{font-size:18px;font-weight:700;background:linear-gradient(135deg,#6d28d9,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-  .dash-bar{height:4px;background:#1a1630;border-radius:2px;margin:3px 0;overflow:hidden;}
-  .dash-bar-f{height:100%;border-radius:2px;background:linear-gradient(90deg,#7c3aed,#a855f7);}
-  .dash-sub{font-size:9px;color:#5a3a7a;display:flex;justify-content:space-between;}
-  .dash-row{display:flex;justify-content:space-between;padding:2px 0;font-size:10px;}
-  .dash-row .k{color:#6d4a8d;min-width:55px;}
-  .dash-row .v{color:#a78bfa;font-weight:500;}
-  .dash-w{grid-column:span 2;}
-  .dash-prem{border:1.5px solid;border-image:linear-gradient(135deg,#7c3aed,#c084fc) 1;}
-  .prem-tag{display:inline-block;background:linear-gradient(135deg,#6d28d9,#a78bfa);color:#e0d8f0;font-size:7px;padding:1px 5px;border-radius:2px;margin-left:4px;font-weight:700;letter-spacing:0.5px;vertical-align:middle;}
-  .dash-hist{display:flex;gap:3px;height:40px;align-items:flex-end;padding:4px 0;}
-  .dash-hist .b{flex:1;border-radius:1.5px;min-height:4px;}
-  @media(max-width:768px){
-    .dash-grid{grid-template-columns:1fr 1fr;}
-    .dash-w{grid-column:span 2;}
-    .slide-content{padding:12px 16px;}
+  @media(max-width:700px){
+    .banner-grid{grid-template-columns:1fr 1fr}
+    .b-span2{grid-column:span 2}
+    .brand{font-size:34px;letter-spacing:4px}
+    .banner{padding:18px 16px}
   }
-
 </style>
 </head>
 <body>
 
-<div class="carousel">
-  <div class="slide-track" id="slideTrack">
+<div class="page">
+  <div class="brand">amenoke</div>
+  <div class="brand-sub">instruments</div>
 
-    <div class="slide slide-tg">
-      <div class="slide-bg"></div>
-      <div class="slide-overlay"></div>
-      <div class="slide-content">
-        <div class="brand-main">amenoke</div>
-        <div class="brand-sub">instruments</div>
-        <div class="tool-name">TG Parser</div>
-        <div class="tool-desc"><span>telegram</span> chat analyzer &middot; <span>pdf</span> export &middot; <span>premium</span></div>
-        <div class="metrics-row">
-          <div class="metric"><div class="val">search</div><div class="lbl">realtime</div></div>
-          <div class="metric"><div class="val">heatmap</div><div class="lbl">activity</div></div>
-          <div class="metric"><div class="val">growth</div><div class="lbl">daily</div></div>
-          <div class="metric metric-premium"><div class="val">PDF</div><div class="lbl">premium</div></div>
+  <!-- TG Parser slide -->
+  <div class="slide act" id="s0">
+    <div class="banner" style="max-width:520px;text-align:center">
+      <div class="banner-inner">
+        <div style="font-size:36px;color:#a78bfa;margin-bottom:8px"><i class="fab fa-telegram-plane"></i></div>
+        <div style="font-size:20px;font-weight:700;color:#e8e0f0;margin-bottom:2px">TG Parser</div>
+        <div style="font-size:12px;color:#6d4a8d;margin-bottom:16px"><span style="color:#a78bfa">telegram</span> chat analyzer &middot; <span style="color:#a78bfa">pdf</span> export &middot; <span style="color:#a78bfa">premium</span></div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:18px">
+          <div style="padding:8px 18px;background:rgba(8,6,14,0.4);border:1px solid rgba(42,30,66,0.3);border-radius:8px;text-align:center">
+            <div style="font-size:16px;font-weight:700;background:linear-gradient(135deg,#6d28d9,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">search</div>
+            <div style="font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:#5a3a7a;margin-top:1px">realtime</div>
+          </div>
+          <div style="padding:8px 18px;background:rgba(8,6,14,0.4);border:1px solid rgba(42,30,66,0.3);border-radius:8px;text-align:center">
+            <div style="font-size:16px;font-weight:700;background:linear-gradient(135deg,#6d28d9,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">heatmap</div>
+            <div style="font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:#5a3a7a;margin-top:1px">activity</div>
+          </div>
+          <div style="padding:8px 18px;background:rgba(8,6,14,0.4);border:1px solid rgba(42,30,66,0.3);border-radius:8px;text-align:center">
+            <div style="font-size:16px;font-weight:700;background:linear-gradient(135deg,#6d28d9,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">growth</div>
+            <div style="font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:#5a3a7a;margin-top:1px">daily</div>
+          </div>
+          <div style="padding:8px 18px;background:rgba(8,6,14,0.4);border:1.5px solid;border-image:linear-gradient(135deg,#7c3aed,#c084fc) 1;border-radius:8px;text-align:center">
+            <div style="font-size:16px;font-weight:700;background:linear-gradient(135deg,#a78bfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">PDF</div>
+            <div style="font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:#5a3a7a;margin-top:1px">premium</div>
+          </div>
         </div>
-        <div class="cta-row">
-          <a class="cta-p" href="https://amenoke.ru/tg-parser" target="_blank"><i class="fab fa-telegram-plane"></i> Try TG Parser</a>
-          <a class="cta-s" href="https://github.com/inzexg-coder" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+        <a class="b-link" href="https://amenoke.ru/tg-parser" style="display:inline-flex;align-items:center;gap:6px;padding:8px 20px;background:linear-gradient(135deg,#7c3aed,#c084fc);color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none" target="_blank"><i class="fab fa-telegram-plane"></i> Try TG Parser</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monitor slide -->
+  <div class="slide" id="s1">
+    <div class="banner">
+      <div class="banner-inner">
+        <div class="banner-top">
+          <div class="banner-logo">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>monitor</span>
+          </div>
+          <div class="banner-badge"><i class="fas fa-crown"></i> live demo</div>
+        </div>
+
+        <div class="banner-grid" id="monGrid">
+          <div class="b-card">
+            <div class="b-card-ttl"><i class="fas fa-microchip"></i> cpu</div>
+            <div class="b-card-val" id="m1">34%</div>
+            <div class="b-card-bar"><div class="b-card-bar-f" style="width:34%" id="m1b"></div></div>
+            <div class="b-card-sub"><span id="m1s">load 1.2 0.8 0.5</span><span id="m1t">48 C</span></div>
+          </div>
+          <div class="b-card">
+            <div class="b-card-ttl"><i class="fas fa-memory"></i> memory</div>
+            <div class="b-card-val" id="m2">7.8 GB</div>
+            <div class="b-card-bar"><div class="b-card-bar-f" style="width:62%" id="m2b"></div></div>
+            <div class="b-card-sub"><span id="m2s">used 62%</span><span id="m2t">12.6 GB total</span></div>
+          </div>
+          <div class="b-card">
+            <div class="b-card-ttl"><i class="fas fa-hard-drive"></i> disk</div>
+            <div class="b-card-val" id="m3">84 GB</div>
+            <div class="b-card-bar"><div class="b-card-bar-f" style="width:38%" id="m3b"></div></div>
+            <div class="b-card-sub"><span id="m3s">used 38%</span><span id="m3t">222.9 GB</span></div>
+          </div>
+          <div class="b-card">
+            <div class="b-card-ttl"><i class="fas fa-clock"></i> uptime</div>
+            <div class="b-card-val" id="m4">1d 5h</div>
+            <div class="b-card-bar"><div class="b-card-bar-f" style="width:45%" id="m4b"></div></div>
+            <div class="b-card-sub"><span id="m4s">since 15 Jun</span><span id="m4t">online</span></div>
+          </div>
+          <div class="b-card">
+            <div class="b-card-ttl"><i class="fas fa-network-wired"></i> network</div>
+            <div class="b-card-row"><span class="k">eth0</span><span class="v" id="m5a">1.2 MB/s</span></div>
+            <div class="b-card-row"><span class="k">wlan0</span><span class="v" id="m5b">342 KB/s</span></div>
+            <div class="b-card-row"><span class="k">lo</span><span class="v" id="m5c">12 KB/s</span></div>
+          </div>
+          <div class="b-card">
+            <div class="b-card-ttl"><i class="fas fa-bolt"></i> battery</div>
+            <div class="b-card-val" id="m6">67%</div>
+            <div class="b-card-bar"><div class="b-card-bar-f" style="width:67%" id="m6b"></div></div>
+            <div class="b-card-sub"><span id="m6s">charging</span><span id="m6t">2h left</span></div>
+          </div>
+          <div class="b-card b-span2">
+            <div class="b-card-ttl"><i class="fas fa-chart-line"></i> history <span class="prem-tag">PREMIUM</span></div>
+            <div class="hist-bars" id="histBars"></div>
+            <div class="b-card-sub"><span>last 30 points</span><span>update 2s</span></div>
+          </div>
+          <div class="b-card">
+            <div class="b-card-ttl"><i class="fas fa-tasks"></i> processes</div>
+            <div class="b-card-row"><span class="k">1 python</span><span class="v" id="m7a">142M</span></div>
+            <div class="b-card-row"><span class="k">2 node</span><span class="v" id="m7b">98M</span></div>
+            <div class="b-card-row"><span class="k">3 nginx</span><span class="v" id="m7c">24M</span></div>
+            <div class="b-card-row"><span class="k">4 mysqld</span><span class="v" id="m7d">186M</span></div>
+            <div class="b-card-row"><span class="k">5 sshd</span><span class="v" id="m7e">8M</span></div>
+          </div>
+          <div class="b-card b-premium">
+            <div class="b-card-ttl"><i class="fas fa-database"></i> disk i/o <span class="prem-tag">PREMIUM</span></div>
+            <div class="b-card-row"><span class="k">sda</span><span class="v" id="m8a">2.1 MB/s</span></div>
+            <div class="b-card-row"><span class="k">nvme0</span><span class="v" id="m8b">856 KB/s</span></div>
+            <div class="b-card-row"><span class="k">mmcblk0</span><span class="v" id="m8c">124 KB/s</span></div>
+          </div>
+        </div>
+
+        <div class="b-footer">
+          <span class="b-link"><i class="fas fa-circle" style="font-size:6px;color:#34d399"></i> all systems online</span>
+          <a class="b-link" href="https://github.com/inzexg-coder/ameni-vs-kernel" target="_blank"><i class="fab fa-github"></i> source</a>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="slide slide-mon">
-      <div class="slide-bg"></div>
-      <div class="slide-overlay"></div>
-      <div class="slide-content">
-        <div class="brand-main">amenoke</div>
-        <div class="brand-sub">instruments</div>
-        <div class="tool-name">Ameni Monitor</div>
-        <div class="tool-desc"><span>real-time</span> system dashboard &middot; zero <span>config</span> &middot; one <span>click</span></div>
-        <div class="metrics-row">
-          <div class="metric"><div class="val">34%</div><div class="lbl">cpu</div></div>
-          <div class="metric"><div class="val">38%</div><div class="lbl">disk</div></div>
-          <div class="metric"><div class="val">1d 5h</div><div class="lbl">uptime</div></div>
-          <div class="metric metric-premium"><div class="val">graph</div><div class="lbl">premium</div></div>
-        </div>
-        <div class="cta-row">
-          <a class="cta-p" href="https://amenoke.ru/vs-kernel" target="_blank"><i class="fas fa-download"></i> Get Monitor</a>
-          <a class="cta-s" href="https://github.com/inzexg-coder/ameni-vs-kernel" target="_blank"><i class="fab fa-github"></i> GitHub</a>
-        </div>
-      </div>
+  <div class="nav-row">
+    <button class="nav-btn" onclick="gs(0)"><i class="fas fa-chevron-left"></i></button>
+    <div class="nav-dots">
+      <button class="nd act" onclick="gs(0)"></button>
+      <button class="nd" onclick="gs(1)"></button>
     </div>
-
+    <button class="nav-btn" onclick="gs(1)"><i class="fas fa-chevron-right"></i></button>
   </div>
 </div>
 
-<button class="nav-arrow nav-prev" onclick="ps()"><i class="fas fa-chevron-left"></i></button>
-<button class="nav-arrow nav-next" onclick="ns()"><i class="fas fa-chevron-right"></i></button>
-
-<div class="dots" id="dots">
-  <button class="dot active" onclick="gs(0)"></button>
-  <button class="dot" onclick="gs(1)"></button>
-</div>
-
 <script>
-var c=0,t=2,tr=document.getElementById('slideTrack'),ds=document.querySelectorAll('.dot');
-function up(){tr.style.transform='translateX(-'+(c*100)+'%)';ds.forEach(function(d,i){d.classList.toggle('active',i===c);});}
-function ns(){c=(c+1)%t;up();}
-function ps(){c=(c-1+t)%t;up();}
-function gs(n){c=n;up();}
-document.addEventListener('keydown',function(e){if(e.key==='ArrowRight')ns();if(e.key==='ArrowLeft')ps();});
-</script>
-
-
-<script>
-function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
-function randf(min,max){return (Math.random()*(max-min)+min).toFixed(1);}
-function rpick(arr){return arr[Math.floor(Math.random()*arr.length)];}
-var statuses=['charging','discharging','full'];
-var ifaces=['eth0','wlan0','lo','enp3s0'];
-var procs=[
-  {n:'python',m:'142M'},{n:'node',m:'98M'},{n:'nginx',m:'24M'},
-  {n:'mysqld',m:'186M'},{n:'sshd',m:'8M'},{n:'chrome',m:'312M'},
-  {n:'systemd',m:'64M'},{n:'dockerd',m:'128M'},{n:'java',m:'256M'}];
-var disks=['sda','nvme0','mmcblk0','vda'];
-
-function randData(){
-  var cpu=rand(10,95);
-  document.getElementById('dc1').textContent=cpu+'%';
-  document.querySelector('.dash-card:nth-child(1) .dash-bar-f').style.width=cpu+'%';
-  var mem=rand(20,90);
-  var memG=(mem*16/100).toFixed(1);
-  document.getElementById('dc2').textContent=memG+' GB';
-  document.querySelector('.dash-card:nth-child(2) .dash-bar-f').style.width=mem+'%';
-  document.querySelector('.dash-card:nth-child(2) .dash-sub span:first-child').textContent='used '+mem+'%';
-  var disk=rand(15,85);
-  var dg=(disk*250/100).toFixed(1);
-  document.getElementById('dc3').textContent=dg+' GB';
-  document.querySelector('.dash-card:nth-child(3) .dash-bar-f').style.width=disk+'%';
-  document.querySelector('.dash-card:nth-child(3) .dash-sub span:first-child').textContent='used '+disk+'%';
-  var h=rand(0,23),m=rand(0,59);
-  document.getElementById('dc4').textContent=h+'h '+m+'m';
-  document.getElementById('dc5').textContent=randf(0.1,5.0)+' MB/s';
-  document.getElementById('dc6').textContent=rand(50,900)+' KB/s';
-  document.getElementById('dc7').textContent=rand(5,50)+' KB/s';
-  var bat=rand(5,100);
-  document.getElementById('dc8').textContent=bat+'%';
-  document.querySelector('.dash-card:nth-child(6) .dash-bar-f').style.width=bat+'%';
-  document.getElementById('dc9').textContent=rpick(statuses);
-  document.getElementById('dc10').textContent=rand(10,180)+' min left';
-  var pp=[];
-  var pool=procs.slice();
-  for(var i=0;i<5;i++){
-    var p=pool.splice(rand(0,pool.length-1),1)[0];
-    pp.push(p);}
-  var procCard=document.querySelector('.dash-card:nth-child(8)');
-  var rows=procCard.querySelectorAll('.dash-row');
-  for(var i=0;i<5&&i<rows.length;i++){
-    rows[i].querySelector('.k').textContent=(i+1)+'  '+pp[i].n;
-    rows[i].querySelector('.v').textContent=pp[i].m;}
-  var dioCard=document.querySelector('.dash-card:nth-child(9)');
-  var dioRows=dioCard.querySelectorAll('.dash-row');
-  for(var i=0;i<dioRows.length;i++){
-    dioRows[i].querySelector('.v').textContent=randf(0.1,4.0)+' MB/s';}
-
-  var hist=document.getElementById('histChart');
-  var bars=hist.querySelectorAll('.b');
-  var h=[];
-  for(var i=0;i<bars.length;i++){
-    var hi=rand(10,95);
-    h.push(hi);
-    bars[i].style.height=hi+'%';
-    var hue=250+rand(0,60);
-    var sat=rand(60,100);
-    var lit=rand(40,65);
-    bars[i].style.background='linear-gradient(to top,hsl('+hue+','+sat+'%,'+lit+'%),hsl('+(hue-20)+','+(sat+10)+'%,'+(lit+15)+'%))';
-  }
+function gs(n){
+  document.querySelectorAll('.slide').forEach(function(s,i){s.classList.toggle('act',i===n);});
+  document.querySelectorAll('.nd').forEach(function(d,i){d.classList.toggle('act',i===n);});
 }
 
-// Initialize history bars
+var procs=[{n:'python',m:'142M'},{n:'node',m:'98M'},{n:'nginx',m:'24M'},{n:'mysqld',m:'186M'},{n:'sshd',m:'8M'},{n:'chrome',m:'312M'},{n:'dockerd',m:'128M'},{n:'java',m:'256M'},{n:'systemd',m:'64M'}];
+var sts=['charging','discharging','full'];
+
+function ri(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function rf(a,b){return (Math.random()*(b-a)+a).toFixed(1);}
+function rp(a){return a[Math.floor(Math.random()*a.length)];}
+
+function upd(){
+  var cpu=ri(10,95);
+  document.getElementById('m1').textContent=cpu+'%';
+  document.getElementById('m1b').style.width=cpu+'%';
+  var mem=ri(20,90);
+  document.getElementById('m2').textContent=(mem*16/100).toFixed(1)+' GB';
+  document.getElementById('m2b').style.width=mem+'%';
+  document.getElementById('m2s').textContent='used '+mem+'%';
+  var dsk=ri(15,85);
+  document.getElementById('m3').textContent=(dsk*250/100).toFixed(0)+' GB';
+  document.getElementById('m3b').style.width=dsk+'%';
+  document.getElementById('m3s').textContent='used '+dsk+'%';
+  var hu=ri(0,23),mu=ri(0,59);
+  document.getElementById('m4').textContent=hu+'h '+mu+'m';
+  document.getElementById('m5a').textContent=rf(0.1,5.0)+' MB/s';
+  document.getElementById('m5b').textContent=ri(50,900)+' KB/s';
+  document.getElementById('m5c').textContent=ri(5,50)+' KB/s';
+  var bat=ri(5,100);
+  document.getElementById('m6').textContent=bat+'%';
+  document.getElementById('m6b').style.width=bat+'%';
+  document.getElementById('m6s').textContent=rp(sts);
+  document.getElementById('m6t').textContent=ri(10,180)+' min left';
+  var pool=procs.slice();
+  for(var i=0;i<5;i++){
+    var p=pool.splice(ri(0,pool.length-1),1)[0];
+    document.getElementById('m7' + String.fromCharCode(97+i)).textContent=p.m;}
+  for(var i=0;i<3;i++){
+    document.getElementById('m8' + String.fromCharCode(97+i)).textContent=rf(0.1,4.0)+' MB/s';}
+  var hb=document.querySelectorAll('.hb');
+  hb.forEach(function(b){
+    var hi=ri(10,95);
+    b.style.height=hi+'%';
+    var hue=250+ri(0,60);
+    b.style.background='linear-gradient(to top,hsl('+hue+',70%,50%),hsl('+(hue-20)+',80%,65%))';
+  });
+}
+
 (function(){
-  var hist=document.getElementById('histChart');
-  if(hist){
-    for(var i=0;i<30;i++){
-      var b=document.createElement('div');
-      b.className='b';
-      b.style.height=rand(10,95)+'%';
-      var hue=250+rand(0,60);
-      b.style.background='linear-gradient(to top,hsl('+hue+',70%,50%),hsl('+(hue-20)+',80%,65%))';
-      hist.appendChild(b);}
-  }
-  randData();
-  setInterval(randData,3000);
+  var hist=document.getElementById('histBars');
+  for(var i=0;i<24;i++){
+    var b=document.createElement('div');
+    b.className='hb';
+    b.style.height=ri(10,95)+'%';
+    hist.appendChild(b);}
+  upd();
+  setInterval(upd,3000);
 })();
 </script>
 
