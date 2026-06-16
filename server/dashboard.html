@@ -152,9 +152,48 @@
     .grid>div{grid-column:auto!important;grid-row:auto!important}
     .bg-lines{display:none}
   }
+
+  /* Theme toggle */
+  .theme-toggle{
+    position:fixed;top:20px;right:20px;z-index:100;
+    width:40px;height:40px;border-radius:10px;
+    background:rgba(255,255,255,0.9);border:1px solid #e0d0ea;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    font-size:16px;color:#5b21b6;transition:all .25s;
+    box-shadow:0 2px 8px rgba(124,58,237,0.07);backdrop-filter:blur(8px);
+  }
+  .theme-toggle:hover{transform:scale(1.08);box-shadow:0 4px 16px rgba(124,58,237,0.15)}
+
+  /* Dark theme variables */
+  body.dark{background:#0d0d18;color:#d0c8e0}
+  body.dark::before{background:radial-gradient(ellipse at 50% 20%,rgba(124,58,237,0.15) 0%,transparent 60%)}
+  body.dark .ascii{color:#a78bfa;opacity:0.5;text-shadow:0 0 20px rgba(167,139,250,0.15)}
+  body.dark h1{background:linear-gradient(135deg,#a78bfa,#c084fc,#e9d5ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  body.dark .sub{color:#7a5a9a}
+  body.dark .sub span{color:#a78bfa}
+  body.dark .section-label{color:#6b4a7b}
+  body.dark .card{background:#12121e;border-color:#1e1a2e;box-shadow:0 3px 12px rgba(0,0,0,0.3)}
+  body.dark .card:hover{border-color:#2e1a4e;box-shadow:0 6px 20px rgba(124,58,237,0.15)}
+  body.dark .card::after{opacity:0.1}
+  body.dark .card-title{color:#a78bfa}
+  body.dark .card-title i{color:#7c3aed}
+  body.dark .label{color:#7a5a9a}
+  body.dark .value{color:#c084fc}
+  body.dark .bar-wrap{background:#1e1a2e}
+  body.dark .metric{padding:6px 0}
+  body.dark .disk-row{border-bottom-color:#1a1a2e}
+  body.dark .disk-row .mount{color:#a78bfa}
+  body.dark .disk-row .pct{color:#7a5a9a}
+  body.dark .proc-row .name{color:#a78bfa}
+  body.dark .proc-row .mem{color:#c084fc}
+  body.dark .net-row .iface{color:#a78bfa}
+  body.dark .footer{color:#5a3a6a}
+  body.dark .theme-toggle{background:rgba(18,18,30,0.9);border-color:#2e1a4e;color:#a78bfa}
+
 </style>
 </head>
 <body>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Switch theme"><i class="fas fa-moon"></i></button>
 
 <svg class="bg-lines" viewBox="0 0 1200 1200" preserveAspectRatio="none">
   <path d="M0,200 Q600,80 1200,200"/>
@@ -502,5 +541,25 @@ setInterval(togglePremium,30000);
 
 
 </script>
+
+<script>
+(function(){
+  var t=localStorage.getItem('ameniTheme');
+  if(t==='dark'){document.body.classList.add('dark');
+    document.querySelector('#themeToggle i').className='fas fa-sun';}
+})();
+function toggleTheme(){
+  var b=document.body;
+  b.classList.toggle('dark');
+  var icon=document.querySelector('#themeToggle i');
+  if(b.classList.contains('dark')){
+    icon.className='fas fa-sun';
+    localStorage.setItem('ameniTheme','dark');}
+  else{
+    icon.className='fas fa-moon';
+    localStorage.setItem('ameniTheme','light');}
+}
+</script>
+
 </body>
 </html>
